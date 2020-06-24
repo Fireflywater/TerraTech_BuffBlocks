@@ -1,0 +1,6 @@
+C:\Users\Firefly\Desktop\tt\FFW_TT_BuffBlock\FFW_TT_BuffBlock\bin\Debug\FFW_TT_BuffBlock.dll
+C:\Users\Firefly\Desktop\tt\FFW_TT_BuffBlock\FFW_TT_BuffBlock\bin\Debug\FFW_TT_BuffBlock.pdb
+C:\Users\Firefly\Desktop\tt\FFW_TT_BuffBlock\FFW_TT_BuffBlock\obj\Debug\FFW_TT_BuffBlock.csproj.CoreCompileInputs.cache
+C:\Users\Firefly\Desktop\tt\FFW_TT_BuffBlock\FFW_TT_BuffBlock\obj\Debug\FFW_TT_BuffBlock.dll
+C:\Users\Firefly\Desktop\tt\FFW_TT_BuffBlock\FFW_TT_BuffBlock\obj\Debug\FFW_TT_BuffBlock.pdb
+C:\Users\Firefly\Desktop\tt\FFW_TT_BuffBlock\FFW_TT_BuffBlock\obj\Debug\FFW_TT_BuffBlock.csprojAssemblyReference.cache

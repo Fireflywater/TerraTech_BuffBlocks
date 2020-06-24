@@ -1,0 +1,9 @@
+{
+  "Id": "Adds a lot of stuff for killing things",
+  "DisplayName": "TEST",
+  "Author": "Mindlessmrawesome",
+  "Version": "0.0.1",
+  "Enable": true,
+  "AssemblyName": "FFW_TT_BuffBlock.dll",
+  "EntryMethod": "FFW_TT_BuffBlock.QPatch.Main"
+}
