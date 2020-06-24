@@ -1,11 +1,11 @@
 TerraTech Buff Blocks
 
-Only RATE OF FIRE functions.
+~~Only RATE OF FIRE functions.
 Be aware this is not packaged for implementation, not yet.
 
 Plesae assist in making `FFW_TT_BuffBlock.BuffController.RefreshWheels(ModuleWheels, float)` work.
 
-What I want to do is...
+What I want to do is...~~
 ```
 RefreshWheels(ModuleWheels wheels, float rpm)
 {
@@ -19,4 +19,6 @@ RefreshWheels(ModuleWheels wheels, float rpm)
 }
 ```
 
-Reflection is going over my head. Please use an assembly editor or view like dnSpy for TerraTech's source code.
+~~Reflection is going over my head. Please use an assembly editor or view like dnSpy for TerraTech's source code.~~
+
+Success! No help in this context neccessary... not yet, at least.

@@ -47,10 +47,11 @@ namespace FFW_TT_BuffBlock
         [HarmonyPatch(typeof(ModuleWheels), "OnDetach")]
         class ModuleWheels_Detach_Patch
         {
-            static void Postfix(ref ModuleWheels __instance)
+            static bool Prefix(ref ModuleWheels __instance)
             {
                 BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
                 buff.RemoveWheels(__instance);
+                return true;
             }
         }
     }
