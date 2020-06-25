@@ -30,7 +30,7 @@ namespace FFW_TT_BuffBlock
 
         [SerializeField]
         public string m_BuffType;
-        // Valid options: "WeaponCooldown", "WheelsRPM", "BoosterBurnRate"
+        // Valid options: "WeaponCooldown", "WheelsRPM", "BoosterBurnRate", "ShieldRadius"
 
         [SerializeField]
         public float m_Strength;

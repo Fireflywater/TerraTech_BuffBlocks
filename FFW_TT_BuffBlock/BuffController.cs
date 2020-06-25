@@ -16,6 +16,7 @@ namespace FFW_TT_BuffBlock
         public List<ModuleWeaponGun> weaponList = new List<ModuleWeaponGun>();
         public List<ModuleWheels> wheelsList = new List<ModuleWheels>();
         public List<ModuleBooster> boosterList = new List<ModuleBooster>();
+        public List<ModuleShieldGenerator> shieldList = new List<ModuleShieldGenerator>();
 
         /* WEAPON : FIRE RATE */
         public Dictionary<ModuleBuff, float> weaponCooldownBuffBlocks = new Dictionary<ModuleBuff, float>();
@@ -44,11 +45,20 @@ namespace FFW_TT_BuffBlock
         /* BOOSTER : BURN RATE */
         public Dictionary<ModuleBuff, float> boosterBurnRateBuffBlocks = new Dictionary<ModuleBuff, float>();
         public Dictionary<ModuleBooster, float> boosterBurnRateOld = new Dictionary<ModuleBooster, float>();
-        public float boosterBurnRateMult { get { return this.boosterBurnRateBuffBlocks.Values.Average(); } }
+        public float BoosterBurnRateMult { get { return this.boosterBurnRateBuffBlocks.Values.Average(); } }
         public static FieldInfo field_Jets = typeof(ModuleBooster)
             .GetField("jets", BindingFlags.NonPublic | BindingFlags.Instance);
         public static FieldInfo field_BurnRate = typeof(BoosterJet)
             .GetField("m_BurnRate", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        /* SHIELD : RADIUS */
+        public Dictionary<ModuleBuff, float> shieldRadiusBuffBlocks = new Dictionary<ModuleBuff, float>();
+        public Dictionary<ModuleShieldGenerator, float> shieldRadiusOld = new Dictionary<ModuleShieldGenerator, float>();
+        public float ShieldRadiusMult { get { return this.shieldRadiusBuffBlocks.Values.Average(); } }
+        public static FieldInfo field_Radius = typeof(ModuleShieldGenerator)
+            .GetField("m_Radius", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        public static FieldInfo field_State = typeof(ModuleShieldGenerator)
+            .GetField("m_State", BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -111,7 +121,7 @@ namespace FFW_TT_BuffBlock
             }
             if (buff.m_BuffType == "BoosterBurnRate")
             {
-                Console.WriteLine("FFW - Booster Burn Rate Buff Added");
+                //Console.WriteLine("FFW - Booster Burn Rate Buff Added");
                 this.boosterBurnRateBuffBlocks.Add(buff, buff.m_Strength);
                 if (this.boosterBurnRateBuffBlocks.Count == 1)
                 {
@@ -127,9 +137,23 @@ namespace FFW_TT_BuffBlock
                                 Console.WriteLine("Registered burn rate...");
                                 Console.WriteLine(value_BurnRate);
                             }
-                            field_BurnRate.SetValue(jet, this.boosterBurnRateOld[booster] * boosterBurnRateMult);
+                            field_BurnRate.SetValue(jet, this.boosterBurnRateOld[booster] * BoosterBurnRateMult);
                             Console.WriteLine("Burn rate set");
                         }
+                    }
+                }
+            }
+            if (buff.m_BuffType == "ShieldRadius")
+            {
+                //Console.WriteLine("FFW - Shield Radius Buff Added");
+                this.shieldRadiusBuffBlocks.Add(buff, buff.m_Strength);
+                if (this.shieldRadiusBuffBlocks.Count == 1)
+                {
+                    foreach (ModuleShieldGenerator shield in this.shieldList)
+                    {
+                        Type stateEnum = field_State.GetValue(shield).GetType();
+                        field_Radius.SetValue(shield, this.shieldRadiusOld[shield] * ShieldRadiusMult);
+                        field_State.SetValue(shield, Enum.ToObject(stateEnum, 0));
                     }
                 }
             }
@@ -166,7 +190,7 @@ namespace FFW_TT_BuffBlock
             }
             if (buff.m_BuffType == "BoosterBurnRate")
             {
-                Console.WriteLine("FFW - Booster Burn Rate Buff Removed");
+                //Console.WriteLine("FFW - Booster Burn Rate Buff Removed");
                 foreach (ModuleBooster booster in this.boosterList)
                 {
                     List<BoosterJet> value_Jets = (List<BoosterJet>)field_Jets.GetValue(booster);
@@ -179,6 +203,20 @@ namespace FFW_TT_BuffBlock
                     }
                 }
                 this.boosterBurnRateBuffBlocks.Remove(buff);
+            }
+            if (buff.m_BuffType == "ShieldRadius")
+            {
+                //Console.WriteLine("FFW - Shield Radius Buff Removed");
+                this.shieldRadiusBuffBlocks.Remove(buff);
+                if (this.shieldRadiusBuffBlocks.Count == 0)
+                {
+                    foreach (ModuleShieldGenerator shield in this.shieldList)
+                    {
+                        Type stateEnum = field_State.GetValue(shield).GetType();
+                        field_Radius.SetValue(shield, this.shieldRadiusOld[shield]);
+                        field_State.SetValue(shield, Enum.ToObject(stateEnum, 0));
+                    }
+                }
             }
         }
 
@@ -229,7 +267,7 @@ namespace FFW_TT_BuffBlock
 
         public void AddBooster(ModuleBooster booster)
         {
-            Console.WriteLine("FFW - Booster Added");
+            //Console.WriteLine("FFW - Booster Added");
             this.boosterList.Add(booster);
             List<BoosterJet> value_Jets = (List<BoosterJet>)field_Jets.GetValue(booster);
             
@@ -244,7 +282,7 @@ namespace FFW_TT_BuffBlock
                         Console.WriteLine("Registered burn rate...");
                         Console.WriteLine(value_BurnRate);
                     }
-                    field_BurnRate.SetValue(jet, this.boosterBurnRateOld[booster] * boosterBurnRateMult);
+                    field_BurnRate.SetValue(jet, this.boosterBurnRateOld[booster] * BoosterBurnRateMult);
                     Console.WriteLine("Burn rate set");
                 }
             }
@@ -252,7 +290,7 @@ namespace FFW_TT_BuffBlock
 
         public void RemoveBooster(ModuleBooster booster)
         {
-            Console.WriteLine("FFW - Booster Removed");
+            //Console.WriteLine("FFW - Booster Removed");
             List<BoosterJet> value_Jets = (List<BoosterJet>)field_Jets.GetValue(booster);
             foreach (BoosterJet jet in value_Jets)
             {
@@ -263,6 +301,27 @@ namespace FFW_TT_BuffBlock
             }
             this.boosterList.Remove(booster);
             this.boosterBurnRateOld.Remove(booster);
+        }
+
+        public void AddShield(ModuleShieldGenerator shield)
+        {
+            Console.WriteLine("FFW - Shield Added");
+            this.shieldList.Add(shield);
+            float value_Radius = (float)field_Radius.GetValue(shield);
+            this.shieldRadiusOld.Add(shield, value_Radius);
+            if (this.shieldRadiusBuffBlocks.Count > 0)
+            {
+                field_Radius.SetValue(shield, this.shieldRadiusOld[shield] * ShieldRadiusMult);
+            }
+        }
+
+
+        public void RemoveShield(ModuleShieldGenerator shield)
+        {
+            Console.WriteLine("FFW - Shield Removed");
+            field_Radius.SetValue(shield, this.shieldRadiusOld[shield]);
+            this.shieldList.Remove(shield);
+            this.shieldRadiusOld.Remove(shield);
         }
 
         public void RefreshWheels(ModuleWheels wheels, float rpm) // Todo: push in new torque instead of rpm
