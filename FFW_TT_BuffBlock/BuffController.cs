@@ -31,12 +31,21 @@ namespace FFW_TT_BuffBlock
         public static FieldInfo field_MW_ShotCooldown = typeof(ModuleWeapon)
             .GetField("m_ShotCooldown", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        /* WEAPON: ROTATION SPEED */
+        /* WEAPON : ROTATION SPEED */
         public Dictionary<ModuleBuff, float> weaponRotationBuffBlocks = new Dictionary<ModuleBuff, float>();
         public Dictionary<ModuleWeaponGun, float> weaponRotationOld = new Dictionary<ModuleWeaponGun, float>();
         public float WeaponRotationMult { get { return this.weaponRotationBuffBlocks.Values.Average(); } }
         public static FieldInfo field_Rotation = typeof(ModuleWeapon)
             .GetField("m_RotateSpeed", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        /* WEAPON : SPREAD */
+        public Dictionary<ModuleBuff, float> weaponSpreadBuffBlocks = new Dictionary<ModuleBuff, float>();
+        public Dictionary<ModuleWeaponGun, float> weaponSpreadOld = new Dictionary<ModuleWeaponGun, float>();
+        public float WeaponSpreadMult { get { return this.weaponSpreadBuffBlocks.Values.Average(); } }
+        public static FieldInfo field_FiringData = typeof(ModuleWeaponGun)
+            .GetField("m_FiringData", BindingFlags.NonPublic | BindingFlags.Instance);
+        public static FieldInfo field_Spread = typeof(FireData)
+            .GetField("m_BulletSprayVariance", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* WHEELS : MAX RPM */
         public Dictionary<ModuleBuff, float> wheelsRpmBuffBlocks = new Dictionary<ModuleBuff, float>();
@@ -134,6 +143,19 @@ namespace FFW_TT_BuffBlock
                     {
                         ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
                         field_Rotation.SetValue(value_ModuleWeapon, this.weaponRotationOld[weapon] * WeaponRotationMult);
+                    }
+                }
+            }
+            if (buff.m_BuffType == "WeaponSpread")
+            {
+                //Console.WriteLine("FFW - Weapon Spread Buff Added");
+                this.weaponSpreadBuffBlocks.Add(buff, buff.m_Strength);
+                if (this.weaponSpreadBuffBlocks.Count == 1)
+                {
+                    foreach (ModuleWeaponGun weapon in this.weaponList)
+                    {
+                        FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
+                        field_Spread.SetValue(value_FiringData, this.weaponSpreadOld[weapon] * WeaponSpreadMult);
                     }
                 }
             }
@@ -237,6 +259,19 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
+            if (buff.m_BuffType == "WeaponSpread")
+            {
+                //Console.WriteLine("FFW - Weapon Spread Buff Removed");
+                this.weaponSpreadBuffBlocks.Remove(buff);
+                if (this.weaponSpreadBuffBlocks.Count == 0)
+                {
+                    foreach (ModuleWeaponGun weapon in this.weaponList)
+                    {
+                        FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
+                        field_Spread.SetValue(value_FiringData, this.weaponSpreadOld[weapon]);
+                    }
+                }
+            }
             if (buff.m_BuffType == "WheelsRPM")
             {
                 //Console.WriteLine("FFW - Wheels RPM Buff Removed");
@@ -309,6 +344,9 @@ namespace FFW_TT_BuffBlock
             });
             ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
             this.weaponRotationOld.Add(weapon, (float)field_Rotation.GetValue(value_ModuleWeapon));
+            FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
+            this.weaponSpreadOld.Add(weapon, (float)field_Spread.GetValue(value_FiringData));
+
             if (this.weaponCooldownBuffBlocks.Count > 0)
             {
                 field_ShotCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][0] * WeaponCooldownMult);
@@ -319,6 +357,10 @@ namespace FFW_TT_BuffBlock
             {
                 field_Rotation.SetValue(value_ModuleWeapon, this.weaponRotationOld[weapon] * WeaponRotationMult);
             }
+            if (this.weaponSpreadBuffBlocks.Count > 0)
+            {
+                field_Spread.SetValue(value_FiringData, this.weaponSpreadOld[weapon] * WeaponSpreadMult);
+            }
         }
 
         public void RemoveWeapon(ModuleWeaponGun weapon)
@@ -328,9 +370,13 @@ namespace FFW_TT_BuffBlock
             field_BurstCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][1]);
             ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
             field_MW_ShotCooldown.SetValue(value_ModuleWeapon, this.weaponCooldownOld[weapon][0]);
+            FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
+            field_Spread.SetValue(value_FiringData, this.weaponSpreadOld[weapon]);
+
             this.weaponList.Remove(weapon);
             this.weaponCooldownOld.Remove(weapon);
             this.weaponRotationOld.Remove(weapon);
+            this.weaponSpreadOld.Remove(weapon);
         }
 
         public void AddWheels(ModuleWheels wheels)
