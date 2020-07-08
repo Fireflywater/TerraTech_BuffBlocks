@@ -18,6 +18,7 @@ namespace FFW_TT_BuffBlock
         public List<ModuleBooster> boosterList = new List<ModuleBooster>();
         public List<ModuleShieldGenerator> shieldList = new List<ModuleShieldGenerator>();
         public List<ModuleDrill> drillList = new List<ModuleDrill>();
+        public List<ModuleEnergyStore> energyStoreList = new List<ModuleEnergyStore>();
 
         /* WEAPON : FIRE RATE */
         public Dictionary<ModuleBuff, float> weaponCooldownBuffBlocks = new Dictionary<ModuleBuff, float>();
@@ -98,6 +99,15 @@ namespace FFW_TT_BuffBlock
         public static FieldInfo field_Dps = typeof(ModuleDrill)
             .GetField("damagePerSecond", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
+        /* ENERGY STORE : CAPACITY */
+        public Dictionary<ModuleBuff, float> energyStoreCapBuffBlocks = new Dictionary<ModuleBuff, float>();
+        public Dictionary<ModuleEnergyStore, float> energyStoreCapOld = new Dictionary<ModuleEnergyStore, float>();
+        public float EnergyStoreCapMult { get { return this.energyStoreCapBuffBlocks.Values.Average(); } }
+        public static FieldInfo field_Capacity = typeof(ModuleEnergyStore)
+            .GetField("m_Capacity", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        public static PropertyInfo prop_Current = typeof(ModuleEnergyStore)
+            .GetProperty("CurrentAmount", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        
         public static BuffController MakeNewIfNone(Tank objTank)
         {
             foreach (BuffController element in BuffController.allControllers)
@@ -265,6 +275,19 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
+            if (buff.m_BuffType == "EnergyStoreCap")
+            {
+                //Console.WriteLine("FFW - Energy Store Capacity Buff Added");
+                this.energyStoreCapBuffBlocks.Add(buff, buff.m_Strength);
+                if (this.energyStoreCapBuffBlocks.Count == 1)
+                {
+                    foreach (ModuleEnergyStore store in this.energyStoreList)
+                    {
+                        prop_Current.SetValue(store, 0.0f);
+                        field_Capacity.SetValue(store, this.energyStoreCapOld[store] * EnergyStoreCapMult);
+                    }
+                }
+            }
         }
 
         public void RemoveBuff(ModuleBuff buff)
@@ -393,6 +416,19 @@ namespace FFW_TT_BuffBlock
                     foreach (ModuleDrill drill in this.drillList)
                     {
                         field_Dps.SetValue(drill, this.drillDpsOld[drill]);
+                    }
+                }
+            }
+            if (buff.m_BuffType == "EnergyStoreCap")
+            {
+                //Console.WriteLine("FFW - Energy Store Capacity Buff Removed");
+                this.energyStoreCapBuffBlocks.Remove(buff);
+                if (this.energyStoreCapBuffBlocks.Count == 0)
+                {
+                    foreach (ModuleEnergyStore store in this.energyStoreList)
+                    {
+                        prop_Current.SetValue(store, 0.0f);
+                        field_Capacity.SetValue(store, this.energyStoreCapOld[store]);
                     }
                 }
             }
@@ -559,13 +595,36 @@ namespace FFW_TT_BuffBlock
             }
         }
 
-
         public void RemoveDrill(ModuleDrill drill)
         {
             //Console.WriteLine("FFW - Drill Removed");
             field_Dps.SetValue(drill, this.drillDpsOld[drill]);
             this.drillList.Remove(drill);
             this.drillDpsOld.Remove(drill);
+        }
+
+        public void AddEnergyStore(ModuleEnergyStore store)
+        {
+            //Console.WriteLine("FFW - Energy Store Added");
+            this.energyStoreList.Add(store);
+            this.energyStoreCapOld.Add(store, (float)field_Capacity.GetValue(store));
+            if (this.drillDpsBuffBlocks.Count > 0)
+            {
+                prop_Current.SetValue(store, 0.0f);
+                field_Capacity.SetValue(store, this.energyStoreCapOld[store] * EnergyStoreCapMult);
+            }
+        }
+
+        public void RemoveEnergyStore(ModuleEnergyStore store)
+        {
+            //Console.WriteLine("FFW - Energy Store Removed");
+            if (this.drillDpsBuffBlocks.Count > 0)
+            {
+                prop_Current.SetValue(store, 0.0f);
+                field_Capacity.SetValue(store, this.energyStoreCapOld[store]);
+            }
+            this.energyStoreList.Remove(store);
+            this.energyStoreCapOld.Remove(store);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque)
