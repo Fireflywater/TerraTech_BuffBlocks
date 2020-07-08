@@ -17,6 +17,7 @@ namespace FFW_TT_BuffBlock
         public List<ModuleWheels> wheelsList = new List<ModuleWheels>();
         public List<ModuleBooster> boosterList = new List<ModuleBooster>();
         public List<ModuleShieldGenerator> shieldList = new List<ModuleShieldGenerator>();
+        public List<ModuleDrill> drillList = new List<ModuleDrill>();
 
         /* WEAPON : FIRE RATE */
         public Dictionary<ModuleBuff, float> weaponCooldownBuffBlocks = new Dictionary<ModuleBuff, float>();
@@ -89,6 +90,13 @@ namespace FFW_TT_BuffBlock
             .GetField("m_Radius", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         public static FieldInfo field_State = typeof(ModuleShieldGenerator)
             .GetField("m_State", BindingFlags.NonPublic | BindingFlags.Instance);
+
+        /* DRILL : DPS */
+        public Dictionary<ModuleBuff, float> drillDpsBuffBlocks = new Dictionary<ModuleBuff, float>();
+        public Dictionary<ModuleDrill, float> drillDpsOld = new Dictionary<ModuleDrill, float>();
+        public float DrillDpsMult { get { return this.drillDpsBuffBlocks.Values.Average(); } }
+        public static FieldInfo field_Dps = typeof(ModuleDrill)
+            .GetField("damagePerSecond", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -245,6 +253,18 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
+            if (buff.m_BuffType == "DrillDps")
+            {
+                //Console.WriteLine("FFW - Drill Dps Buff Added");
+                this.drillDpsBuffBlocks.Add(buff, buff.m_Strength);
+                if (this.drillDpsBuffBlocks.Count == 1)
+                {
+                    foreach (ModuleDrill drill in this.drillList)
+                    {
+                        field_Dps.SetValue(drill, this.drillDpsOld[drill] * DrillDpsMult);
+                    }
+                }
+            }
         }
 
         public void RemoveBuff(ModuleBuff buff)
@@ -361,6 +381,18 @@ namespace FFW_TT_BuffBlock
                         Type stateEnum = field_State.GetValue(shield).GetType();
                         field_Radius.SetValue(shield, this.shieldRadiusOld[shield]);
                         field_State.SetValue(shield, Enum.ToObject(stateEnum, 0));
+                    }
+                }
+            }
+            if (buff.m_BuffType == "DrillDps")
+            {
+                //Console.WriteLine("FFW - Drill Dps Buff Removed");
+                this.drillDpsBuffBlocks.Remove(buff);
+                if (this.drillDpsBuffBlocks.Count == 0)
+                {
+                    foreach (ModuleDrill drill in this.drillList)
+                    {
+                        field_Dps.SetValue(drill, this.drillDpsOld[drill]);
                     }
                 }
             }
@@ -497,7 +529,7 @@ namespace FFW_TT_BuffBlock
 
         public void AddShield(ModuleShieldGenerator shield)
         {
-            Console.WriteLine("FFW - Shield Added");
+            //Console.WriteLine("FFW - Shield Added");
             this.shieldList.Add(shield);
             float value_Radius = (float)field_Radius.GetValue(shield);
             this.shieldRadiusOld.Add(shield, value_Radius);
@@ -510,10 +542,30 @@ namespace FFW_TT_BuffBlock
 
         public void RemoveShield(ModuleShieldGenerator shield)
         {
-            Console.WriteLine("FFW - Shield Removed");
+            //Console.WriteLine("FFW - Shield Removed");
             field_Radius.SetValue(shield, this.shieldRadiusOld[shield]);
             this.shieldList.Remove(shield);
             this.shieldRadiusOld.Remove(shield);
+        }
+
+        public void AddDrill(ModuleDrill drill)
+        {
+            //Console.WriteLine("FFW - Drill Added");
+            this.drillList.Add(drill);
+            this.drillDpsOld.Add(drill, (float)field_Dps.GetValue(drill));
+            if (this.drillDpsBuffBlocks.Count > 0)
+            {
+                field_Dps.SetValue(drill, this.drillDpsOld[drill] * DrillDpsMult);
+            }
+        }
+
+
+        public void RemoveDrill(ModuleDrill drill)
+        {
+            //Console.WriteLine("FFW - Drill Removed");
+            field_Dps.SetValue(drill, this.drillDpsOld[drill]);
+            this.drillList.Remove(drill);
+            this.drillDpsOld.Remove(drill);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque)

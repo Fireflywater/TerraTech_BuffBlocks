@@ -98,6 +98,28 @@ namespace FFW_TT_BuffBlock
                 return true;
             }
         }
+
+        [HarmonyPatch(typeof(ModuleDrill), "OnAttach")]
+        class ModuleDrill_Attach_Patch
+        {
+            static bool Prefix(ref ModuleDrill __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddDrill(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleDrill), "OnDetach")]
+        class ModuleDrill_Detach_Patch
+        {
+            static bool Prefix(ref ModuleDrill __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveDrill(__instance);
+                return true;
+            }
+        }
     }
 }
 
