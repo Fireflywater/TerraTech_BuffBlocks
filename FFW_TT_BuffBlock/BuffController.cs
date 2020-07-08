@@ -18,6 +18,7 @@ namespace FFW_TT_BuffBlock
         public List<ModuleBooster> boosterList = new List<ModuleBooster>();
         public List<ModuleShieldGenerator> shieldList = new List<ModuleShieldGenerator>();
         public List<ModuleDrill> drillList = new List<ModuleDrill>();
+        public List<ModuleEnergy> energyList = new List<ModuleEnergy>();
         public List<ModuleEnergyStore> energyStoreList = new List<ModuleEnergyStore>();
 
         /* WEAPON : FIRE RATE */
@@ -92,12 +93,19 @@ namespace FFW_TT_BuffBlock
         public static FieldInfo field_State = typeof(ModuleShieldGenerator)
             .GetField("m_State", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        /* DRILL : DPS */
+        /* DRILL : DAMAGE PER SECOND */
         public Dictionary<ModuleBuff, float> drillDpsBuffBlocks = new Dictionary<ModuleBuff, float>();
         public Dictionary<ModuleDrill, float> drillDpsOld = new Dictionary<ModuleDrill, float>();
         public float DrillDpsMult { get { return this.drillDpsBuffBlocks.Values.Average(); } }
         public static FieldInfo field_Dps = typeof(ModuleDrill)
             .GetField("damagePerSecond", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        /* ENERGY : OUTPUT PER SECOND */
+        public Dictionary<ModuleBuff, float> energyOpsBuffBlocks = new Dictionary<ModuleBuff, float>();
+        public Dictionary<ModuleEnergy, float> energyOpsOld = new Dictionary<ModuleEnergy, float>();
+        public float EnergyOpsMult { get { return this.energyOpsBuffBlocks.Values.Average(); } }
+        public static FieldInfo field_Ops = typeof(ModuleEnergy)
+            .GetField("m_OutputPerSecond", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* ENERGY STORE : CAPACITY */
         public Dictionary<ModuleBuff, float> energyStoreCapBuffBlocks = new Dictionary<ModuleBuff, float>();
@@ -275,6 +283,18 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
+            if (buff.m_BuffType == "EnergyOps")
+            {
+                //Console.WriteLine("FFW - Energy Ops Buff Added");
+                this.energyOpsBuffBlocks.Add(buff, buff.m_Strength);
+                if (this.energyOpsBuffBlocks.Count == 1)
+                {
+                    foreach (ModuleEnergy energy in this.energyList)
+                    {
+                        field_Ops.SetValue(energy, this.energyOpsOld[energy] * EnergyOpsMult);
+                    }
+                }
+            }
             if (buff.m_BuffType == "EnergyStoreCap")
             {
                 //Console.WriteLine("FFW - Energy Store Capacity Buff Added");
@@ -416,6 +436,18 @@ namespace FFW_TT_BuffBlock
                     foreach (ModuleDrill drill in this.drillList)
                     {
                         field_Dps.SetValue(drill, this.drillDpsOld[drill]);
+                    }
+                }
+            }
+            if (buff.m_BuffType == "EnergyOps")
+            {
+                //Console.WriteLine("FFW - Energy Ops Buff Removed");
+                this.energyOpsBuffBlocks.Remove(buff);
+                if (this.energyOpsBuffBlocks.Count == 0)
+                {
+                    foreach (ModuleEnergy energy in this.energyList)
+                    {
+                        field_Ops.SetValue(energy, this.energyOpsOld[energy]);
                     }
                 }
             }
@@ -601,6 +633,25 @@ namespace FFW_TT_BuffBlock
             field_Dps.SetValue(drill, this.drillDpsOld[drill]);
             this.drillList.Remove(drill);
             this.drillDpsOld.Remove(drill);
+        }
+
+        public void AddEnergy(ModuleEnergy energy)
+        {
+            //Console.WriteLine("FFW - Energy Added");
+            this.energyList.Add(energy);
+            this.energyOpsOld.Add(energy, (float)field_Ops.GetValue(energy));
+            if (this.energyOpsBuffBlocks.Count > 0)
+            {
+                field_Ops.SetValue(energy, this.energyOpsOld[energy] * EnergyOpsMult);
+            }
+        }
+
+        public void RemoveEnergy(ModuleEnergy energy)
+        {
+            //Console.WriteLine("FFW - Energy Removed");
+            field_Ops.SetValue(energy, this.energyOpsOld[energy]);
+            this.energyList.Remove(energy);
+            this.energyOpsOld.Remove(energy);
         }
 
         public void AddEnergyStore(ModuleEnergyStore store)

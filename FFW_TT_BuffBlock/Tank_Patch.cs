@@ -121,6 +121,28 @@ namespace FFW_TT_BuffBlock
             }
         }
 
+        [HarmonyPatch(typeof(ModuleEnergy), "OnAttach")]
+        class ModuleEnergy_Attach_Patch
+        {
+            static bool Prefix(ref ModuleEnergy __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddEnergy(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleEnergy), "OnDetach")]
+        class ModuleEnergy_Detach_Patch
+        {
+            static bool Prefix(ref ModuleEnergy __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveEnergy(__instance);
+                return true;
+            }
+        }
+
         [HarmonyPatch(typeof(ModuleEnergyStore), "OnAttach")]
         class ModuleEnergyStore_Attach_Patch
         {
