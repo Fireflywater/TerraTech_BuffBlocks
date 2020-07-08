@@ -67,6 +67,11 @@ namespace FFW_TT_BuffBlock
         public Dictionary<ModuleWheels, List<float>> wheelsBrakeOld = new Dictionary<ModuleWheels, List<float>>(); // [0] = passiveBrakeMaxTorque, [1] = basicFrictionTorque
         public float WheelsBrakeMult { get { return this.wheelsBrakeBuffBlocks.Values.Average(); } }
 
+        /* WHEELS : MAX TORQUE */
+        public Dictionary<ModuleBuff, float> wheelsTorqueBuffBlocks = new Dictionary<ModuleBuff, float>();
+        public Dictionary<ModuleWheels, float> wheelsTorqueOld = new Dictionary<ModuleWheels, float>(); // [0] = passiveBrakeMaxTorque, [1] = basicFrictionTorque
+        public float WheelsTorqueMult { get { return this.wheelsTorqueBuffBlocks.Values.Average(); } }
+
         /* BOOSTER : BURN RATE */
         public Dictionary<ModuleBuff, float> boosterBurnRateBuffBlocks = new Dictionary<ModuleBuff, float>();
         public Dictionary<ModuleBooster, float> boosterBurnRateOld = new Dictionary<ModuleBooster, float>();
@@ -188,6 +193,20 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
+            if (buff.m_BuffType == "WheelsTorque")
+            {
+                //Console.WriteLine("FFW - Wheels Torque Buff Added");
+                this.wheelsTorqueBuffBlocks.Add(buff, buff.m_Strength);
+                if (this.wheelsTorqueBuffBlocks.Count == 1)
+                {
+                    foreach (ModuleWheels wheels in this.wheelsList)
+                    {
+                        ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+                        torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels] * WheelsTorqueMult;
+                        this.RefreshWheels(wheels, torque);
+                    }
+                }
+            }
             if (buff.m_BuffType == "BoosterBurnRate")
             {
                 //Console.WriteLine("FFW - Booster Burn Rate Buff Added");
@@ -301,6 +320,20 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
+            if (buff.m_BuffType == "WheelsTorque")
+            {
+                //Console.WriteLine("FFW - Wheels Torque Buff Removed");
+                this.wheelsTorqueBuffBlocks.Remove(buff);
+                if (this.wheelsTorqueBuffBlocks.Count == 0)
+                {
+                    foreach (ModuleWheels wheels in this.wheelsList)
+                    {
+                        ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+                        torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels];
+                        this.RefreshWheels(wheels, torque);
+                    }
+                }
+            }
             if (buff.m_BuffType == "BoosterBurnRate")
             {
                 //Console.WriteLine("FFW - Booster Burn Rate Buff Removed");
@@ -390,6 +423,7 @@ namespace FFW_TT_BuffBlock
                 torque.passiveBrakeMaxTorque,
                 torque.basicFrictionTorque
             });
+            this.wheelsTorqueOld.Add(wheels, torque.torqueCurveMaxTorque);
             if (this.wheelsRpmBuffBlocks.Count > 0)
             {
                 torque.torqueCurveMaxRpm = this.wheelsRpmOld[wheels] * WheelsRpmMult;
@@ -401,6 +435,11 @@ namespace FFW_TT_BuffBlock
                 torque.basicFrictionTorque = this.wheelsBrakeOld[wheels][1] * WheelsBrakeMult;
                 this.RefreshWheels(wheels, torque); // Identical lines...
             }
+            if (this.wheelsTorqueBuffBlocks.Count > 0)
+            {
+                torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels] * WheelsTorqueMult;
+                this.RefreshWheels(wheels, torque);
+            }
         }
 
         public void RemoveWheels(ModuleWheels wheels)
@@ -410,10 +449,12 @@ namespace FFW_TT_BuffBlock
             torque.torqueCurveMaxRpm = this.wheelsRpmOld[wheels];
             torque.passiveBrakeMaxTorque = this.wheelsBrakeOld[wheels][0];
             torque.basicFrictionTorque = this.wheelsBrakeOld[wheels][1];
+            torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels];
             this.RefreshWheels(wheels, torque);
             this.wheelsList.Remove(wheels);
             this.wheelsRpmOld.Remove(wheels);
             this.wheelsBrakeOld.Remove(wheels);
+            this.wheelsTorqueOld.Remove(wheels);
         }
 
         public void AddBooster(ModuleBooster booster)
@@ -479,6 +520,11 @@ namespace FFW_TT_BuffBlock
         {
             field_TorqueParams.SetValue(wheels, torque); // Apply new Torque to ModuleWheels
 
+            //ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
+            //wheelparams.strafeSteeringSpeed = 20.0f;
+
+            //field_WheelParams.SetValue(wheels, wheelparams);
+
             List<ManWheels.Wheel> value_Wheels = (List<ManWheels.Wheel>)field_Wheels.GetValue(wheels);
             foreach (ManWheels.Wheel wheel in value_Wheels)
             {
@@ -498,8 +544,14 @@ namespace FFW_TT_BuffBlock
                     //float i = wheels.block.CurrentMass * 0.9f / (float)value_Wheels.Count * value_WheelParams.radius * value_WheelParams.radius;
                     ModuleWheels.AttachData moduleData = new ModuleWheels.AttachData(wheels, (float)field_p_Inertia.GetValue(value_AttachedWheelState), value_Wheels.Count);
 
+                    /*FieldInfo field_p_WheelParams = value_AttachedWheelState.GetType()
+                        .GetField("wheelParams", BindingFlags.NonPublic | BindingFlags.Instance);
+                    
+                    field_p_WheelParams.SetValue(value_AttachedWheelState, wheelparams);*/
+
                     wheel.UpdateAttachData(moduleData); // Update it! Live! Do it!
-                    // Also logs "only for use in Editor" error, annoying...
+                                                        // Also logs "only for use in Editor" error, annoying...
+                                                        
                 }
             }
         }
