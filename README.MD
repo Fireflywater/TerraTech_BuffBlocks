@@ -1,24 +1,48 @@
-TerraTech Buff Blocks
+## TerraTech Buff Blocks
 
-~~Only RATE OF FIRE functions.
-Be aware this is not packaged for implementation, not yet.
+### UNRELEASE INSTALLATION:
 
-Plesae assist in making `FFW_TT_BuffBlock.BuffController.RefreshWheels(ModuleWheels, float)` work.
+* Install TerraTech Mod Manager.
 
-What I want to do is...~~
+* Install NuTerra Block Injector.
+
+* Clone repository.
+
+* Move `<Cloned Repository>/QMods/BuffBlockTest/` to `<TerraTech Root>/QMods/`.
+
+* Move `<Cloned Repository>/CustomBlocks/FFW_BuffBlock_Test/` to `<TerraTech Root>/CustomBlocks`.
+
+* Placeholder blocks can be found In-game as GSO Accessories.
+
+### MODULE IMPLEMENTATION TO JSON BLOCKS
+
+* Use placeholder blocks from `<Cloned Repository>/CustomBlocks/FFW_BuffBlock_Test/` for reference.
+
+* Add the following code to target JSON Block's `"JSONBLOCK"` key...
+
 ```
-RefreshWheels(ModuleWheels wheels, float rpm)
-{
-	ManWheels.TorqueParams torque = wheels.m_TorqueParams;
-	torque.torqueCurveMaxTorque = rpm;
-	foreach (ManWheels.Wheel wheel in wheels)
-	{
-		Singleton.Manager<ManWheels>.inst.m_WheelState[wheel.attachedID].torqueParams = torque;
-	}
-
+"FFW_TT_BuffBlock.ModuleBuff": {
+	"m_BuffType": "<BuffType>",
+	"m_Strength": <Strength>
 }
 ```
 
-~~Reflection is going over my head. Please use an assembly editor or view like dnSpy for TerraTech's source code.~~
+* Where <BuffType> can be...
 
-Success! No help in this context neccessary... not yet, at least.
+* "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity", "WheelsRPM", "WheelsBrake", "WheelsTorque"...
+
+* "BoosterBurnRate", "ShieldRadius", "DrillDps", "EnergyOps", "EnergyStoreCap"...
+
+* Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue.
+
+### TODO:
+
+* Credits. (TerraTech Discord, Rimworld Discord)
+
+* License. 
+
+* TTMM direct installation.
+
+* Release Example blocks, courtesy Rafs. 
+
+* Additional values as requested.
