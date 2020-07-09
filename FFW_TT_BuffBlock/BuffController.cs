@@ -20,6 +20,7 @@ namespace FFW_TT_BuffBlock
         public List<ModuleDrill> drillList = new List<ModuleDrill>();
         public List<ModuleEnergy> energyList = new List<ModuleEnergy>();
         public List<ModuleEnergyStore> energyStoreList = new List<ModuleEnergyStore>();
+        public List<ModuleItemConsume> itemConList = new List<ModuleItemConsume>();
 
         /* WEAPON : FIRE RATE */
         public Dictionary<ModuleBuff, float> weaponCooldownBuffBlocks = new Dictionary<ModuleBuff, float>();
@@ -122,7 +123,14 @@ namespace FFW_TT_BuffBlock
             .GetField("m_Capacity", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         public static PropertyInfo prop_Current = typeof(ModuleEnergyStore)
             .GetProperty("CurrentAmount", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        
+
+        /* ITEM CONSUME : NEEDS ANCHORED */
+        public Dictionary<ModuleBuff, bool> itemConAnchorBuffBlocks = new Dictionary<ModuleBuff, bool>();
+        public Dictionary<ModuleItemConsume, bool> itemConAnchorOld = new Dictionary<ModuleItemConsume, bool>();
+        public bool ItemConAnchorFixed { get { return itemConAnchorBuffBlocks.ContainsValue(true); } } // Priority on True
+        public static FieldInfo field_NeedsAnchor = typeof(ModuleItemConsume)
+            .GetField("m_NeedsToBeAnchored", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
         public static BuffController MakeNewIfNone(Tank objTank)
         {
             foreach (BuffController element in BuffController.allControllers)
@@ -328,6 +336,18 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
+            if (buff.m_BuffType == "ItemConAnchored")
+            {
+                //Console.WriteLine("FFW - Item Consumer Anchor Buff Added");
+                this.itemConAnchorBuffBlocks.Add(buff, buff.m_Strength == 1.0f); // true if 1, false if not
+                if (this.itemConAnchorBuffBlocks.Count == 1)
+                {
+                    foreach (ModuleItemConsume item in this.itemConList)
+                    {
+                        field_NeedsAnchor.SetValue(item, ItemConAnchorFixed);
+                    }
+                }
+            }
         }
 
         public void RemoveBuff(ModuleBuff buff)
@@ -494,6 +514,18 @@ namespace FFW_TT_BuffBlock
                     {
                         prop_Current.SetValue(store, 0.0f);
                         field_Capacity.SetValue(store, this.energyStoreCapOld[store]);
+                    }
+                }
+            }
+            if (buff.m_BuffType == "ItemConAnchored")
+            {
+                //Console.WriteLine("FFW - Item Consumer Anchor Buff Removed");
+                this.itemConAnchorBuffBlocks.Remove(buff);
+                if (this.itemConAnchorBuffBlocks.Count == 0)
+                {
+                    foreach (ModuleItemConsume item in this.itemConList)
+                    {
+                        field_NeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
                     }
                 }
             }
@@ -731,6 +763,26 @@ namespace FFW_TT_BuffBlock
             }
             this.energyStoreList.Remove(store);
             this.energyStoreCapOld.Remove(store);
+        }
+
+        public void AddItemCon(ModuleItemConsume item)
+        {
+            //Console.WriteLine("FFW - Item Consumer Added");
+            this.itemConList.Add(item);
+            this.itemConAnchorOld.Add(item, (bool)field_NeedsAnchor.GetValue(item));
+            //field_NeedsAnchor.SetValue(item, false);
+            if (this.itemConAnchorBuffBlocks.Count > 0)
+            {
+                field_NeedsAnchor.SetValue(item, ItemConAnchorFixed);
+            }
+        }
+
+        public void RemoveItemCon(ModuleItemConsume item)
+        {
+            //Console.WriteLine("FFW - Item Consumer Removed");
+            field_NeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
+            this.itemConList.Remove(item);
+            this.itemConAnchorOld.Remove(item);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque)

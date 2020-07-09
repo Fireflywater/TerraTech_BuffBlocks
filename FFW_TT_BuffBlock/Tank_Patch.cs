@@ -164,6 +164,27 @@ namespace FFW_TT_BuffBlock
                 return true;
             }
         }
+        [HarmonyPatch(typeof(ModuleItemConsume), "OnAttach")]
+        class ModuleItemConsume_Attach_Patch
+        {
+            static bool Prefix(ref ModuleItemConsume __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddItemCon(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleItemConsume), "OnDetach")]
+        class ModuleItemConsume_Detach_Patch
+        {
+            static bool Prefix(ref ModuleItemConsume __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveItemCon(__instance);
+                return true;
+            }
+        }
     }
 }
 
