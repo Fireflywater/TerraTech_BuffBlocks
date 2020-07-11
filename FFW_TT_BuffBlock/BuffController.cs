@@ -26,7 +26,7 @@ namespace FFW_TT_BuffBlock
         //public Dictionary<ModuleBuff, bool> buffBlocksNeedsAnchor = new Dictionary<ModuleBuff, bool>();
 
         /* WEAPON : FIRE RATE */
-        public List<ModuleBuff> weaponCooldownBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> weaponCooldownBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWeaponGun, List<float>> weaponCooldownOld = new Dictionary<ModuleWeaponGun, List<float>>(); // [0] = ShotCooldown, [1] = BurstCooldown
         public static FieldInfo field_ShotCooldown = typeof(ModuleWeaponGun)
             .GetField("m_ShotCooldown", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -38,13 +38,13 @@ namespace FFW_TT_BuffBlock
             .GetField("m_ShotCooldown", BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* WEAPON : ROTATION SPEED */
-        public List<ModuleBuff> weaponRotationBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> weaponRotationBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWeaponGun, float> weaponRotationOld = new Dictionary<ModuleWeaponGun, float>();
         public static FieldInfo field_Rotation = typeof(ModuleWeapon)
             .GetField("m_RotateSpeed", BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* WEAPON : SPREAD */
-        public List<ModuleBuff> weaponSpreadBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> weaponSpreadBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWeaponGun, float> weaponSpreadOld = new Dictionary<ModuleWeaponGun, float>();
         public static FieldInfo field_FiringData = typeof(ModuleWeaponGun)
             .GetField("m_FiringData", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -52,13 +52,13 @@ namespace FFW_TT_BuffBlock
             .GetField("m_BulletSprayVariance", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* WEAPON : VELOCITY */
-        public List<ModuleBuff> weaponVelocityBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> weaponVelocityBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWeaponGun, float> weaponVelocityOld = new Dictionary<ModuleWeaponGun, float>();
         public static FieldInfo field_Velocity = typeof(FireData)
             .GetField("m_MuzzleVelocity", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* WHEELS : MAX RPM */
-        public List<ModuleBuff> wheelsRpmBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> wheelsRpmBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWheels, float> wheelsRpmOld = new Dictionary<ModuleWheels, float>();
         public static FieldInfo field_TorqueParams = typeof(ModuleWheels)
             .GetField("m_TorqueParams", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -72,15 +72,15 @@ namespace FFW_TT_BuffBlock
             .GetField("m_WheelState", BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* WHEELS : BRAKE TORQUE */
-        public List<ModuleBuff> wheelsBrakeBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> wheelsBrakeBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWheels, List<float>> wheelsBrakeOld = new Dictionary<ModuleWheels, List<float>>(); // [0] = passiveBrakeMaxTorque, [1] = basicFrictionTorque
 
         /* WHEELS : MAX TORQUE */
-        public List<ModuleBuff> wheelsTorqueBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> wheelsTorqueBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWheels, float> wheelsTorqueOld = new Dictionary<ModuleWheels, float>(); // [0] = passiveBrakeMaxTorque, [1] = basicFrictionTorque
 
         /* BOOSTER : BURN RATE */
-        public List<ModuleBuff> boosterBurnRateBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> boosterBurnRateBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleBooster, float> boosterBurnRateOld = new Dictionary<ModuleBooster, float>();
         public static FieldInfo field_Jets = typeof(ModuleBooster)
             .GetField("jets", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -88,27 +88,27 @@ namespace FFW_TT_BuffBlock
             .GetField("m_BurnRate", BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* SHIELD : RADIUS */
-        public List<ModuleBuff> shieldRadiusBuffBlocks = new List<ModuleBuff>();
+        /*public Dictionary<ModuleBuff, int> shieldRadiusBuffBlocks = new List<ModuleBuff>();
         public Dictionary<ModuleShieldGenerator, float> shieldRadiusOld = new Dictionary<ModuleShieldGenerator, float>();
         public static FieldInfo field_Radius = typeof(ModuleShieldGenerator)
             .GetField("m_Radius", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         public static FieldInfo field_State = typeof(ModuleShieldGenerator)
-            .GetField("m_State", BindingFlags.NonPublic | BindingFlags.Instance);
+            .GetField("m_State", BindingFlags.NonPublic | BindingFlags.Instance);*/
 
         /* DRILL : DAMAGE PER SECOND */
-        public List<ModuleBuff> drillDpsBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> drillDpsBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleDrill, float> drillDpsOld = new Dictionary<ModuleDrill, float>();
         public static FieldInfo field_Dps = typeof(ModuleDrill)
             .GetField("damagePerSecond", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* ENERGY : OUTPUT PER SECOND */
-        public List<ModuleBuff> energyOpsBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> energyOpsBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleEnergy, float> energyOpsOld = new Dictionary<ModuleEnergy, float>();
         public static FieldInfo field_Ops = typeof(ModuleEnergy)
             .GetField("m_OutputPerSecond", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* ENERGY STORE : CAPACITY */
-        public List<ModuleBuff> energyStoreCapBuffBlocks = new List<ModuleBuff>();
+        public Dictionary<ModuleBuff, int> energyStoreCapBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleEnergyStore, float> energyStoreCapOld = new Dictionary<ModuleEnergyStore, float>();
         public static FieldInfo field_Capacity = typeof(ModuleEnergyStore)
             .GetField("m_Capacity", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -152,10 +152,13 @@ namespace FFW_TT_BuffBlock
         public float GetBuffAverage(string prop)
         {
             FieldInfo field_LocalProp = this.GetType().GetField(prop);
-            List<ModuleBuff> value_LocalProp = (List<ModuleBuff>)field_LocalProp.GetValue(this);
+            Dictionary<ModuleBuff, int> value_LocalProp = (Dictionary<ModuleBuff, int>)field_LocalProp.GetValue(this);
 
             float d = 1.0f;
-            List<float> allMults = (List<float>)value_LocalProp.Select(x => x.Strength).ToList();
+            //List<float> allMults = (List<float>)value_LocalProp.Select(x => x.Value.Strength(x)).ToList();
+
+            List<float> allMults = (List<float>)value_LocalProp.Select(x => x.Key.Strength(x.Key, x.Value)).ToList();
+
             if (allMults.Count > 0)
             { 
                 d = allMults.Average();
@@ -241,7 +244,7 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
-            if (type.Contains("ShieldRadius") || type.Contains("All"))
+            /*if (type.Contains("ShieldRadius") || type.Contains("All"))
             {
                 foreach (ModuleShieldGenerator shield in this.shieldList)
                 {
@@ -249,7 +252,7 @@ namespace FFW_TT_BuffBlock
                     field_Radius.SetValue(shield, this.shieldRadiusOld[shield] * this.GetBuffAverage("shieldRadiusBuffBlocks"));
                     field_State.SetValue(shield, Enum.ToObject(stateEnum, 0));
                 }
-            }
+            }*/
             if (type.Contains("DrillDps") || type.Contains("All"))
             {
                 foreach (ModuleDrill drill in this.drillList)
@@ -283,116 +286,136 @@ namespace FFW_TT_BuffBlock
 
         public void AddBuff(ModuleBuff buff)
         {
-            switch (buff.m_BuffType)
+            List<string> effects = buff.AllEffects;
+            if (effects.Contains("WeaponCooldown"))
             {
-                case "WeaponCooldown":
-                    this.weaponCooldownBuffBlocks.Add(buff);
-                    break;
-                case "WeaponRotation":
-                    this.weaponRotationBuffBlocks.Add(buff);
-                    break;
-                case "WeaponSpread":
-                    this.weaponSpreadBuffBlocks.Add(buff);
-                    break;
-                case "WeaponVelocity":
-                    this.weaponVelocityBuffBlocks.Add(buff);
-                    break;
-                case "WheelsRpm":
-                    this.wheelsRpmBuffBlocks.Add(buff);
-                    break;
-                case "WheelsBrake":
-                    this.wheelsBrakeBuffBlocks.Add(buff);
-                    break;
-                case "WheelsTorque":
-                    this.wheelsTorqueBuffBlocks.Add(buff);
-                    break;
-                case "BoosterBurnRate":
-                    this.boosterBurnRateBuffBlocks.Add(buff);
-                    if (this.boosterBurnRateBuffBlocks.Count == 1)
+                this.weaponCooldownBuffBlocks.Add(buff, buff.GetEffect("WeaponCooldown"));
+            }
+            if (effects.Contains("WeaponRotation"))
+            {
+                this.weaponRotationBuffBlocks.Add(buff, buff.GetEffect("WeaponRotation"));
+            }
+            if (effects.Contains("WeaponSpread"))
+            {
+                this.weaponSpreadBuffBlocks.Add(buff, buff.GetEffect("WeaponSpread"));
+            }
+            if (effects.Contains("WeaponVelocity"))
+            {
+                this.weaponVelocityBuffBlocks.Add(buff, buff.GetEffect("WeaponVelocity"));
+            }
+            if (effects.Contains("WheelsRpm"))
+            {
+                this.wheelsRpmBuffBlocks.Add(buff, buff.GetEffect("WheelsRpm"));
+            }
+            if (effects.Contains("WheelsBrake"))
+            {
+                this.wheelsBrakeBuffBlocks.Add(buff, buff.GetEffect("WheelsBrake"));
+            }
+            if (effects.Contains("WheelsTorque"))
+            {
+                this.wheelsTorqueBuffBlocks.Add(buff, buff.GetEffect("WheelsTorque"));
+            }
+            if (effects.Contains("BoosterBurnRate"))
+            {
+                this.boosterBurnRateBuffBlocks.Add(buff, buff.GetEffect("BoosterBurnRate"));
+                if (this.boosterBurnRateBuffBlocks.Count == 1)
+                {
+                    foreach (ModuleBooster booster in this.boosterList)
                     {
-                        foreach (ModuleBooster booster in this.boosterList)
+                        List<BoosterJet> value_Jets = (List<BoosterJet>)field_Jets.GetValue(booster);
+                        foreach (BoosterJet jet in value_Jets)
                         {
-                            List<BoosterJet> value_Jets = (List<BoosterJet>)field_Jets.GetValue(booster);
-                            foreach (BoosterJet jet in value_Jets)
+                            if (!boosterBurnRateOld.ContainsKey(booster))
                             {
-                                if (!boosterBurnRateOld.ContainsKey(booster))
-                                {
-                                    float value_BurnRate = (float)field_BurnRate.GetValue(jet);
-                                    this.boosterBurnRateOld.Add(booster, value_BurnRate);
-                                }
+                                float value_BurnRate = (float)field_BurnRate.GetValue(jet);
+                                this.boosterBurnRateOld.Add(booster, value_BurnRate);
                             }
                         }
                     }
-                    break;
-                case "ShieldRadius":
-                    this.shieldRadiusBuffBlocks.Add(buff);
-                    break;
-                case "DrillDps":
-                    this.drillDpsBuffBlocks.Add(buff);
-                    break;
-                case "EnergyOps":
-                    this.energyOpsBuffBlocks.Add(buff);
-                    break;
-                case "EnergyStoreCap":
-                    this.energyStoreCapBuffBlocks.Add(buff);
-                    break;
-                case "ItemConAnchored":
-                    this.itemConAnchorBuffBlocks.Add(buff, buff.m_Strength == 1.0f); // true if 1, false if not
-                    break;
-                default:
-                    break;
+                }
+            }
+            /*if (effects.Contains("ShieldRadius")) 
+            {
+                this.shieldRadiusBuffBlocks.Add(buff, buff.GetEffect("WeaponCooldown"));
+            }*/
+            if (effects.Contains("DrillDps"))
+            {
+                this.drillDpsBuffBlocks.Add(buff, buff.GetEffect("DrillDps"));
+            }
+            if (effects.Contains("EnergyOps"))
+            {
+                this.energyOpsBuffBlocks.Add(buff, buff.GetEffect("EnergyOps"));
+            }
+            if (effects.Contains("EnergyStoreCap"))
+            {
+                this.energyStoreCapBuffBlocks.Add(buff, buff.GetEffect("EnergyStoreCap"));
+            }
+            if (effects.Contains("ItemConAnchored"))
+            {
+                //this.itemConAnchorBuffBlocks.Add(buff, buff.m_Strength == 1.0f); // true if 1, false if not
+                this.itemConAnchorBuffBlocks.Add(buff, false); // true if 1, false if not
             }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
-            this.Update(new string[] { buff.m_BuffType });
+            this.Update(buff.m_BuffType);
+            //this.Update(new string[] { buff.m_BuffType });
         }
 
         public void RemoveBuff(ModuleBuff buff)
         {
-            switch (buff.m_BuffType)
+            List<string> effects = buff.AllEffects;
+            if (effects.Contains("WeaponCooldown"))
             {
-                case "WeaponCooldown":
-                    this.weaponCooldownBuffBlocks.Remove(buff);
-                    break;
-                case "WeaponRotation":
-                    this.weaponRotationBuffBlocks.Remove(buff);
-                    break;
-                case "WeaponSpread":
-                    this.weaponSpreadBuffBlocks.Remove(buff);
-                    break;
-                case "WeaponVelocity":
-                    this.weaponVelocityBuffBlocks.Remove(buff);
-                    break;
-                case "WheelsRpm":
-                    this.wheelsRpmBuffBlocks.Remove(buff);
-                    break;
-                case "WheelsBrake":
-                    this.wheelsBrakeBuffBlocks.Remove(buff);
-                    break;
-                case "WheelsTorque":
-                    this.wheelsTorqueBuffBlocks.Remove(buff);
-                    break;
-                case "BoosterBurnRate":
-                    this.boosterBurnRateBuffBlocks.Remove(buff);
-                    break;
-                case "ShieldRadius":
-                    this.shieldRadiusBuffBlocks.Remove(buff);
-                    break;
-                case "DrillDps":
-                    this.drillDpsBuffBlocks.Remove(buff);
-                    break;
-                case "EnergyOps":
-                    this.energyOpsBuffBlocks.Remove(buff);
-                    break;
-                case "EnergyStoreCap":
-                    this.energyStoreCapBuffBlocks.Remove(buff);
-                    break;
-                case "ItemConAnchored":
-                    this.itemConAnchorBuffBlocks.Remove(buff);
-                    break;
-                default:
-                    break;
+                this.weaponCooldownBuffBlocks.Remove(buff);
             }
-            this.Update(new string[] { buff.m_BuffType });
+            if (effects.Contains("WeaponRotation"))
+            {
+                this.weaponRotationBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("WeaponSpread"))
+            {
+                this.weaponSpreadBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("WeaponVelocity"))
+            {
+                this.weaponVelocityBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("WheelsRpm"))
+            {
+                this.wheelsRpmBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("WheelsBrake"))
+            {
+                this.wheelsBrakeBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("WheelsTorque"))
+            {
+                this.wheelsTorqueBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("BoosterBurnRate"))
+            {
+                this.boosterBurnRateBuffBlocks.Remove(buff);
+            }
+            /*if (effects.Contains("ShieldRadius")) {
+                this.shieldRadiusBuffBlocks.Remove(buff);
+            }*/
+            if (effects.Contains("DrillDps"))
+            {
+                this.drillDpsBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("EnergyOps"))
+            {
+                this.energyOpsBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("EnergyStoreCap"))
+            {
+                this.energyStoreCapBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("ItemConAnchored"))
+            {
+                this.itemConAnchorBuffBlocks.Remove(buff);
+            }
+            this.Update(buff.m_BuffType);
+            //this.Update(new string[] { buff.m_BuffType });
         }
 
         public void AddWeapon(ModuleWeaponGun weapon)
@@ -489,7 +512,7 @@ namespace FFW_TT_BuffBlock
             this.boosterBurnRateOld.Remove(booster);
         }
 
-        public void AddShield(ModuleShieldGenerator shield)
+        /*public void AddShield(ModuleShieldGenerator shield)
         {
             this.shieldList.Add(shield);
             float value_Radius = (float)field_Radius.GetValue(shield);
@@ -504,7 +527,7 @@ namespace FFW_TT_BuffBlock
             field_Radius.SetValue(shield, this.shieldRadiusOld[shield]);
             this.shieldList.Remove(shield);
             this.shieldRadiusOld.Remove(shield);
-        }
+        }*/
 
         public void AddDrill(ModuleDrill drill)
         {

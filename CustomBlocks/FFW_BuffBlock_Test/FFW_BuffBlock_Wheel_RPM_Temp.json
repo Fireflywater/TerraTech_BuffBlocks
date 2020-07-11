@@ -41,8 +41,9 @@
   "KeepColliders": false,
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
-		"m_BuffType": "WheelsRpm",
-		"m_Strength": 5.0
+		"m_BuffType": ["WheelsRpm"],
+		"m_Strength": [5.0],
+		"m_NeedsToBeAnchored": [false]
 	}
   }
 }

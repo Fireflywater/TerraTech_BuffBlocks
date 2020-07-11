@@ -41,8 +41,9 @@
   "KeepColliders": false,
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
-		"m_BuffType": "WeaponSpread",
-		"m_Strength": 2.0
+		"m_BuffType": ["WeaponSpread"],
+		"m_Strength": [2.0],
+		"m_NeedsToBeAnchored": [false]
 	}
   }
 }

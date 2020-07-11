@@ -41,8 +41,9 @@
   "KeepColliders": false,
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
-		"m_BuffType": "BoosterBurnRate",
-		"m_Strength": 0.1
+		"m_BuffType": ["BoosterBurnRate"],
+		"m_Strength": [0.1],
+		"m_NeedsToBeAnchored": [false]
 	}
   }
 }

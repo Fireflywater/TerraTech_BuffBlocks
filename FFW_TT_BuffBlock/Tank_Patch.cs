@@ -77,7 +77,7 @@ namespace FFW_TT_BuffBlock
             }
         }
 
-        [HarmonyPatch(typeof(ModuleShieldGenerator), "OnAttach")]
+        /*[HarmonyPatch(typeof(ModuleShieldGenerator), "OnAttach")]
         class ModuleShieldGenerator_Attach_Patch
         {
             static bool Prefix(ref ModuleShieldGenerator __instance)
@@ -97,7 +97,7 @@ namespace FFW_TT_BuffBlock
                 buff.RemoveShield(__instance);
                 return true;
             }
-        }
+        }*/
 
         [HarmonyPatch(typeof(ModuleDrill), "OnAttach")]
         class ModuleDrill_Attach_Patch
