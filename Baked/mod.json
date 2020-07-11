@@ -1,8 +1,8 @@
 {
-  "Id": "EEEE",
-  "DisplayName": "TEST",
+  "Id": "Buff Blocks",
+  "DisplayName": "Buff Blocks",
   "Author": "Fireflywater",
-  "Version": "0.0.1",
+  "Version": "1.0.0",
   "Enable": true,
   "AssemblyName": "FFW_TT_BuffBlock.dll",
   "EntryMethod": "FFW_TT_BuffBlock.QPatch.Main"
