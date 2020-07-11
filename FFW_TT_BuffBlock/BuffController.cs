@@ -297,7 +297,7 @@ namespace FFW_TT_BuffBlock
                 case "WeaponVelocity":
                     this.weaponVelocityBuffBlocks.Add(buff);
                     break;
-                case "WheelsRPM":
+                case "WheelsRpm":
                     this.wheelsRpmBuffBlocks.Add(buff);
                     break;
                 case "WheelsBrake":
@@ -362,7 +362,7 @@ namespace FFW_TT_BuffBlock
                 case "WeaponVelocity":
                     this.weaponVelocityBuffBlocks.Remove(buff);
                     break;
-                case "WheelsRPM":
+                case "WheelsRpm":
                     this.wheelsRpmBuffBlocks.Remove(buff);
                     break;
                 case "WheelsBrake":
@@ -409,8 +409,7 @@ namespace FFW_TT_BuffBlock
             this.weaponSpreadOld.Add(weapon, (float)field_Spread.GetValue(value_FiringData));
             this.weaponVelocityOld.Add(weapon, (float)field_Velocity.GetValue(value_FiringData));
 
-            //this.Update(new string[] { "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity" });
-            this.Update(new string[] { "WeaponCooldown" });
+            this.Update(new string[] { "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity" });
         }
 
         public void RemoveWeapon(ModuleWeaponGun weapon)
@@ -442,7 +441,7 @@ namespace FFW_TT_BuffBlock
             });
             this.wheelsTorqueOld.Add(wheels, torque.torqueCurveMaxTorque);
             
-            //this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque"});
+            this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque"});
             //this.RefreshWheels(wheels, torque);
         }
 
@@ -473,7 +472,7 @@ namespace FFW_TT_BuffBlock
                 }
             }
 
-            //this.Update(new string[] { "BoosterBurnRate" });
+            this.Update(new string[] { "BoosterBurnRate" });
         }
 
         public void RemoveBooster(ModuleBooster booster)
@@ -496,7 +495,7 @@ namespace FFW_TT_BuffBlock
             float value_Radius = (float)field_Radius.GetValue(shield);
             this.shieldRadiusOld.Add(shield, value_Radius);
             
-            //this.Update(new string[] { "ShieldRadius" });
+            this.Update(new string[] { "ShieldRadius" });
         }
 
 
@@ -512,7 +511,7 @@ namespace FFW_TT_BuffBlock
             this.drillList.Add(drill);
             this.drillDpsOld.Add(drill, (float)field_Dps.GetValue(drill));
 
-            //this.Update(new string[] { "DrillDps" });
+            this.Update(new string[] { "DrillDps" });
         }
 
         public void RemoveDrill(ModuleDrill drill)
@@ -527,7 +526,7 @@ namespace FFW_TT_BuffBlock
             this.energyList.Add(energy);
             this.energyOpsOld.Add(energy, (float)field_Ops.GetValue(energy));
 
-            //this.Update(new string[] { "EnergyOps" });
+            this.Update(new string[] { "EnergyOps" });
         }
 
         public void RemoveEnergy(ModuleEnergy energy)
@@ -542,7 +541,7 @@ namespace FFW_TT_BuffBlock
             this.energyStoreList.Add(store);
             this.energyStoreCapOld.Add(store, (float)field_Capacity.GetValue(store));
             
-            //this.Update(new string[] { "EnergyStoreCap" });
+            this.Update(new string[] { "EnergyStoreCap" });
         }
 
         public void RemoveEnergyStore(ModuleEnergyStore store)
@@ -561,7 +560,7 @@ namespace FFW_TT_BuffBlock
             this.itemConList.Add(item);
             this.itemConAnchorOld.Add(item, (bool)field_NeedsAnchor.GetValue(item));
 
-            //this.Update(new string[] { "ItemConAnchored" });
+            this.Update(new string[] { "ItemConAnchored" });
         }
 
         public void RemoveItemCon(ModuleItemConsume item)
