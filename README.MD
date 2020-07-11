@@ -1,20 +1,26 @@
-## TerraTech Buff Blocks
+## TerraTech Buff Blocks (v1.0.0)
 
-### UNRELEASE INSTALLATION:
+Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
+
+Want to add your own? Consule `MODULE IMPLEMENTATION TO JSON BLOCKS` below.
+
+Adding your own, and want to suggest additional variables or functionality? Contact me on Discord at `Fireflywater#0457`.
+
+### RELEASE INSTALLATION:
 
 * Install TerraTech Mod Manager.
 
-* Install NuTerra Block Injector.
+* Install NuTerra Block Injector via Mod Manager.
 
-* Clone repository.
+* Install Buff Blocks via Mod Manager.
 
-* Move `<Cloned Repository>/QMods/BuffBlockTest/` to `<TerraTech Root>/QMods/`.
+### TEMP PLACEHOLDER BLOCK INSTALLATION: 
 
-* Move `<Cloned Repository>/CustomBlocks/FFW_BuffBlock_Test/` to `<TerraTech Root>/CustomBlocks`.
+* For placeholder blocks, clone this repository and move `<Cloned Repository>/CustomBlocks/FFW_BuffBlock_Test/` to `<TerraTech Root>/CustomBlocks`.
 
 * Placeholder blocks can be found In-game as GSO Accessories.
 
-### MODULE IMPLEMENTATION TO JSON BLOCKS
+### MODULE IMPLEMENTATION TO JSON BLOCKS: 
 
 * Use placeholder blocks from `<Cloned Repository>/CustomBlocks/FFW_BuffBlock_Test/` for reference.
 
@@ -23,26 +29,29 @@
 ```
 "FFW_TT_BuffBlock.ModuleBuff": {
 	"m_BuffType": "<BuffType>",
-	"m_Strength": <Strength>
+	"m_Strength": <Strength>,
+	"m_NeedsToBeAnchored": <Anchor>
 }
 ```
 
-* Where <BuffType> can be...
+* Where <BuffType> can be... (Required)
 
 * "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity", "WheelsRPM", "WheelsBrake", "WheelsTorque"...
 
 * "BoosterBurnRate", "ShieldRadius", "DrillDps", "EnergyOps", "EnergyStoreCap"...
 
-* Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue.
+* Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. (Required)
 
-### TODO:
+* Where <Anchor> can be a boolean, true or false. Dictating if the tech must be anchored to benefit from the buff. There is no "If Not Anchored" flag, unless requested. (Optional, default False)
 
-* Credits. (TerraTech Discord, Rimworld Discord)
+### CREDITS: 
 
-* License. 
+* TerraTech Discord / Continued Advice and Support, Feature Requests
 
-* TTMM direct installation.
+* RimWorld Discord / Initial Advice and Support
 
-* Release Example blocks, courtesy Rafs. 
+* FLSoz / Initial Advice and Framework
 
-* Additional values as requested.
+* Aceba1 / TerraTech Mod Manager Comptibility
+
+* Rafs / Modeling and JSON Block Implementation (TBD)
