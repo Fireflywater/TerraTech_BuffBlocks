@@ -28,21 +28,23 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 ```
 "FFW_TT_BuffBlock.ModuleBuff": {
-	"m_BuffType": "<BuffType>",
-	"m_Strength": <Strength>,
-	"m_NeedsToBeAnchored": <Anchor>
+	"m_BuffType": [<BuffType>],
+	"m_Strength": [<Strength>],
+	"m_NeedsToBeAnchored": [<Anchor>]
 }
 ```
 
-* Where <BuffType> can be... (Required)
+* Where <BuffType> can be...
 
 * "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity", "WheelsRpm", "WheelsBrake", "WheelsTorque"...
 
 * "BoosterBurnRate", "ShieldRadius", "DrillDps", "EnergyOps", "EnergyStoreCap"...
 
-* Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. (Required)
+* Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue.
 
-* Where <Anchor> can be a boolean, true or false. Dictating if the tech must be anchored to benefit from the buff. There is no "If Not Anchored" flag, unless requested. (Optional, default False)
+* Where <Anchor> can be a boolean, true or false. Dictating if the tech must be anchored to benefit from the buff. There is no "If Not Anchored" flag, unless requested.
+
+* As arrays, you can put multiple variables in each. Matching indexes are read together. For example, the 1st m_BuffType will have the 1st m_Strength, ditto 2nd.
 
 ### CREDITS: 
 
