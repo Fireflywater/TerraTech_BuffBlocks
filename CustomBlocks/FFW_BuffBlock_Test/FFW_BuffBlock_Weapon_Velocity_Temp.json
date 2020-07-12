@@ -43,6 +43,7 @@
     "FFW_TT_BuffBlock.ModuleBuff": {
 		"m_BuffType": ["WeaponVelocity"],
 		"m_Strength": [2.5],
+		"m_AddAfter": [0.0],
 		"m_NeedsToBeAnchored": [false]
 	}
   }

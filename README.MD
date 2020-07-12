@@ -1,4 +1,4 @@
-## TerraTech Buff Blocks (v1.0.1)
+## TerraTech Buff Blocks (v1.0.2)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
@@ -30,6 +30,7 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 "FFW_TT_BuffBlock.ModuleBuff": {
 	"m_BuffType": [<BuffType>],
 	"m_Strength": [<Strength>],
+	"m_AddAfter": [<AddAfter>],
 	"m_NeedsToBeAnchored": [<Anchor>]
 }
 ```
@@ -40,7 +41,9 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 * "BoosterBurnRate", "DISABLEDShieldRadiusDISABLED", "DrillDps", "EnergyOps", "EnergyStoreCap"...
 
-* Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue.
+* Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. 1.0 for no change.
+
+* Where <AddAfter> can be a float. AddAfter is added after Strength, go figure. Use this to force 0s to become positives. Be careful with extreme numbers. 0.0 for no change.
 
 * Where <Anchor> can be a boolean, true or false. Dictating if the tech must be anchored to benefit from the buff. There is no "If Not Anchored" flag, unless requested.
 
@@ -59,6 +62,12 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
+
+7/12/2020, v1.0.2:
+
+* Added `m_AddAfter` parameter, allowing further hacking of variables.
+
+* All previously made Buff Blocks will need to be updated to include this parameter.
 
 7/11/2020, v1.0.1:
 

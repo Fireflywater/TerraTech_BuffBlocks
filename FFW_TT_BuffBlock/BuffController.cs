@@ -160,18 +160,29 @@ namespace FFW_TT_BuffBlock
             FieldInfo field_LocalProp = this.GetType().GetField(prop);
             Dictionary<ModuleBuff, int> value_LocalProp = (Dictionary<ModuleBuff, int>)field_LocalProp.GetValue(this);
 
-            float d = 1.0f;
-            //List<float> allMults = (List<float>)value_LocalProp.Select(x => x.Value.Strength(x)).ToList();
-
+            float m = 1.0f;
             List<float> allMults = (List<float>)value_LocalProp.Select(x => x.Key.Strength(x.Key, x.Value)).ToList();
-
             if (allMults.Count > 0)
             { 
-                d = allMults.Average();
+                m = allMults.Average();
             }
-            return (value_LocalProp.Count > 0) ? d : 1.0f;
 
-            //return (value_LocalProp.Count > 0) ? value_LocalProp.Values.Average() : 1.0f;
+            return (value_LocalProp.Count > 0) ? m : 1.0f;
+            
+        }
+        public float GetBuffAddAverage(string prop)
+        {
+            FieldInfo field_LocalProp = this.GetType().GetField(prop);
+            Dictionary<ModuleBuff, int> value_LocalProp = (Dictionary<ModuleBuff, int>)field_LocalProp.GetValue(this);
+
+            float a = 0.0f;
+            List<float> allAdds = (List<float>)value_LocalProp.Select(x => x.Key.AddAfter(x.Key, x.Value)).ToList();
+            if (allAdds.Count > 0)
+            {
+                a = allAdds.Average();
+            }
+
+            return (value_LocalProp.Count > 0) ? a : 0.0f;
         }
 
         public void Update(string[] type)
@@ -181,10 +192,10 @@ namespace FFW_TT_BuffBlock
             {
                 foreach (ModuleWeaponGun weapon in this.weaponList)
                 {
-                    field_ShotCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][0] * this.GetBuffAverage("weaponCooldownBuffBlocks"));
-                    field_BurstCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][1] * this.GetBuffAverage("weaponCooldownBuffBlocks"));
+                    field_ShotCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][0] * this.GetBuffAverage("weaponCooldownBuffBlocks") + this.GetBuffAddAverage("weaponCooldownBuffBlocks"));
+                    field_BurstCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][1] * this.GetBuffAverage("weaponCooldownBuffBlocks") + this.GetBuffAddAverage("weaponCooldownBuffBlocks"));
                     ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
-                    field_MW_ShotCooldown.SetValue(value_ModuleWeapon, this.weaponCooldownOld[weapon][0] * this.GetBuffAverage("weaponCooldownBuffBlocks"));
+                    field_MW_ShotCooldown.SetValue(value_ModuleWeapon, this.weaponCooldownOld[weapon][0] * this.GetBuffAverage("weaponCooldownBuffBlocks") + this.GetBuffAddAverage("weaponCooldownBuffBlocks"));
                 }
             }
             if (type.Contains("WeaponRotation") || type.Contains("All"))
@@ -192,7 +203,7 @@ namespace FFW_TT_BuffBlock
                 foreach (ModuleWeaponGun weapon in this.weaponList)
                 {
                     ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
-                    field_Rotation.SetValue(value_ModuleWeapon, this.weaponRotationOld[weapon] * this.GetBuffAverage("weaponRotationBuffBlocks"));
+                    field_Rotation.SetValue(value_ModuleWeapon, this.weaponRotationOld[weapon] * this.GetBuffAverage("weaponRotationBuffBlocks") + this.GetBuffAddAverage("weaponRotationBuffBlocks"));
                 }
             }
             if (type.Contains("WeaponSpread") || type.Contains("All"))
@@ -200,7 +211,7 @@ namespace FFW_TT_BuffBlock
                 foreach (ModuleWeaponGun weapon in this.weaponList)
                 {
                     FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
-                    field_Spread.SetValue(value_FiringData, this.weaponSpreadOld[weapon] * this.GetBuffAverage("weaponSpreadBuffBlocks"));
+                    field_Spread.SetValue(value_FiringData, this.weaponSpreadOld[weapon] * this.GetBuffAverage("weaponSpreadBuffBlocks") + this.GetBuffAddAverage("weaponSpreadBuffBlocks"));
                 }
             }
             if (type.Contains("WeaponVelocity") || type.Contains("All"))
@@ -208,7 +219,7 @@ namespace FFW_TT_BuffBlock
                 foreach (ModuleWeaponGun weapon in this.weaponList)
                 {
                     FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
-                    field_Velocity.SetValue(value_FiringData, this.weaponVelocityOld[weapon] * this.GetBuffAverage("weaponVelocityBuffBlocks"));
+                    field_Velocity.SetValue(value_FiringData, this.weaponVelocityOld[weapon] * this.GetBuffAverage("weaponVelocityBuffBlocks") + this.GetBuffAddAverage("weaponVelocityBuffBlocks"));
                 }
             }
             if (type.Contains("WheelsRpm") || type.Contains("All"))
@@ -216,7 +227,7 @@ namespace FFW_TT_BuffBlock
                 foreach (ModuleWheels wheels in this.wheelsList)
                 {
                     ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                    torque.torqueCurveMaxRpm = this.wheelsRpmOld[wheels] * this.GetBuffAverage("wheelsRpmBuffBlocks");
+                    torque.torqueCurveMaxRpm = this.wheelsRpmOld[wheels] * this.GetBuffAverage("wheelsRpmBuffBlocks") + this.GetBuffAddAverage("wheelsRpmBuffBlocks");
                     this.RefreshWheels(wheels, torque);
                 }
             }
@@ -225,8 +236,8 @@ namespace FFW_TT_BuffBlock
                 foreach (ModuleWheels wheels in this.wheelsList)
                 {
                     ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                    torque.passiveBrakeMaxTorque = this.wheelsBrakeOld[wheels][0] * this.GetBuffAverage("wheelsBrakeBuffBlocks");
-                    torque.basicFrictionTorque = this.wheelsBrakeOld[wheels][1] * this.GetBuffAverage("wheelsBrakeBuffBlocks");
+                    torque.passiveBrakeMaxTorque = this.wheelsBrakeOld[wheels][0] * this.GetBuffAverage("wheelsBrakeBuffBlocks") + this.GetBuffAddAverage("wheelsBrakeBuffBlocks");
+                    torque.basicFrictionTorque = this.wheelsBrakeOld[wheels][1] * this.GetBuffAverage("wheelsBrakeBuffBlocks") + this.GetBuffAddAverage("wheelsBrakeBuffBlocks");
                     this.RefreshWheels(wheels, torque);
                 }
             }
@@ -235,7 +246,7 @@ namespace FFW_TT_BuffBlock
                 foreach (ModuleWheels wheels in this.wheelsList)
                 {
                     ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                    torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels] * this.GetBuffAverage("wheelsTorqueBuffBlocks");
+                    torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels] * this.GetBuffAverage("wheelsTorqueBuffBlocks") + this.GetBuffAddAverage("wheelsTorqueBuffBlocks");
                     this.RefreshWheels(wheels, torque);
                 }
             }
@@ -246,7 +257,7 @@ namespace FFW_TT_BuffBlock
                     List<BoosterJet> value_Jets = (List<BoosterJet>)field_Jets.GetValue(booster);
                     foreach (BoosterJet jet in value_Jets)
                     {
-                        field_BurnRate.SetValue(jet, this.boosterBurnRateOld[booster] * this.GetBuffAverage("boosterBurnRateBuffBlocks"));
+                        field_BurnRate.SetValue(jet, this.boosterBurnRateOld[booster] * this.GetBuffAverage("boosterBurnRateBuffBlocks") + this.GetBuffAddAverage("boosterBurnRateBuffBlocks"));
                     }
                 }
             }
@@ -263,14 +274,14 @@ namespace FFW_TT_BuffBlock
             {
                 foreach (ModuleDrill drill in this.drillList)
                 {
-                    field_Dps.SetValue(drill, this.drillDpsOld[drill] * this.GetBuffAverage("drillDpsBuffBlocks"));
+                    field_Dps.SetValue(drill, this.drillDpsOld[drill] * this.GetBuffAverage("drillDpsBuffBlocks") + this.GetBuffAddAverage("drillDpsBuffBlocks"));
                 }
             }
             if (type.Contains("EnergyOps") || type.Contains("All"))
             {
                 foreach (ModuleEnergy energy in this.energyList)
                 {
-                    field_Ops.SetValue(energy, this.energyOpsOld[energy] * this.GetBuffAverage("energyOpsBuffBlocks"));
+                    field_Ops.SetValue(energy, this.energyOpsOld[energy] * this.GetBuffAverage("energyOpsBuffBlocks") + this.GetBuffAddAverage("energyOpsBuffBlocks"));
                 }
             }
             if (type.Contains("EnergyStoreCap") || type.Contains("All"))
@@ -281,7 +292,7 @@ namespace FFW_TT_BuffBlock
                     {
                         prop_Current.SetValue(store, 0.0f);
                     }
-                    field_Capacity.SetValue(store, this.energyStoreCapOld[store] * this.GetBuffAverage("energyStoreCapBuffBlocks"));
+                    field_Capacity.SetValue(store, this.energyStoreCapOld[store] * this.GetBuffAverage("energyStoreCapBuffBlocks") + this.GetBuffAddAverage("energyStoreCapBuffBlocks"));
                 }
             }
             if (type.Contains("ItemConAnchored") || type.Contains("All"))

@@ -1,6 +1,6 @@
 {
   "Name": "WEAPON SPREAD TEST TEST",
-  "Description": "aaaaaa",
+  "Description": "aaaaaab",
   "ID": 6630006, 
 
   "Faction": 0, 
@@ -42,7 +42,8 @@
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
 		"m_BuffType": ["WeaponSpread"],
-		"m_Strength": [2.0],
+		"m_Strength": [0.0],
+		"m_AddAfter": [1.0],
 		"m_NeedsToBeAnchored": [false]
 	}
   }

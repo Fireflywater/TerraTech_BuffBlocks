@@ -42,7 +42,8 @@
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
 		"m_BuffType": ["EnergyStoreCap"],
-		"m_Strength": [5],
+		"m_Strength": [5.0],
+		"m_AddAfter": [0.0],
 		"m_NeedsToBeAnchored": [false]
 	}
   }

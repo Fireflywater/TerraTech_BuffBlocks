@@ -43,6 +43,7 @@
     "FFW_TT_BuffBlock.ModuleBuff": {
 		"m_BuffType": ["WheelsBrake", "WheelsTorque"],
 		"m_Strength": [0.0, 0.01],
+		"m_AddAfter": [0.0],
 		"m_NeedsToBeAnchored": [false, false]
 	}
   }
