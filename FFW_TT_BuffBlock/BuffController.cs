@@ -116,11 +116,17 @@ namespace FFW_TT_BuffBlock
             .GetProperty("CurrentAmount", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* ITEM CONSUME : NEEDS ANCHORED */
-        /*public Dictionary<ModuleBuff, bool> itemConAnchorBuffBlocks = new Dictionary<ModuleBuff, bool>();
+        public Dictionary<ModuleBuff, bool> itemConAnchorBuffBlocks = new Dictionary<ModuleBuff, bool>();
         public Dictionary<ModuleItemConsume, bool> itemConAnchorOld = new Dictionary<ModuleItemConsume, bool>();
-        public bool ItemConAnchorFixed { get { return itemConAnchorBuffBlocks.ContainsValue(true); } } // Priority on True
+        public bool ItemConAnchorFixed
+        {
+            get
+            {
+                return itemConAnchorBuffBlocks.ContainsValue(true);
+            }
+        } // Priority on True
         public static FieldInfo field_NeedsAnchor = typeof(ModuleItemConsume)
-            .GetField("m_NeedsToBeAnchored", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);*/
+            .GetField("m_NeedsToBeAnchored", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -278,13 +284,20 @@ namespace FFW_TT_BuffBlock
                     field_Capacity.SetValue(store, this.energyStoreCapOld[store] * this.GetBuffAverage("energyStoreCapBuffBlocks"));
                 }
             }
-            /*if (type.Contains("ItemConAnchored") || type.Contains("All"))
+            if (type.Contains("ItemConAnchored") || type.Contains("All"))
             {
                 foreach (ModuleItemConsume item in this.itemConList)
                 {
-                    field_NeedsAnchor.SetValue(item, ItemConAnchorFixed);
+                    if (itemConAnchorBuffBlocks.Count > 0)
+                    {
+                        field_NeedsAnchor.SetValue(item, ItemConAnchorFixed);
+                    }
+                    else
+                    {
+                        field_NeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
+                    }
                 }
-            }*/
+            }
         }
 
         public void AddBuff(ModuleBuff buff)
@@ -353,11 +366,11 @@ namespace FFW_TT_BuffBlock
             {
                 this.energyStoreCapBuffBlocks.Add(buff, buff.GetEffect("EnergyStoreCap"));
             }
-            /*if (effects.Contains("ItemConAnchored"))
+            if (effects.Contains("ItemConAnchored"))
             {
                 //this.itemConAnchorBuffBlocks.Add(buff, buff.m_Strength == 1.0f); // true if 1, false if not
                 this.itemConAnchorBuffBlocks.Add(buff, false); // true if 1, false if not
-            }*/
+            }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -413,10 +426,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.energyStoreCapBuffBlocks.Remove(buff);
             }
-            /*if (effects.Contains("ItemConAnchored"))
+            if (effects.Contains("ItemConAnchored"))
             {
                 this.itemConAnchorBuffBlocks.Remove(buff);
-            }*/
+            }
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
         }
@@ -581,7 +594,7 @@ namespace FFW_TT_BuffBlock
             this.energyStoreCapOld.Remove(store);
         }
 
-        /*public void AddItemCon(ModuleItemConsume item)
+        public void AddItemCon(ModuleItemConsume item)
         {
             this.itemConList.Add(item);
             this.itemConAnchorOld.Add(item, (bool)field_NeedsAnchor.GetValue(item));
@@ -594,7 +607,7 @@ namespace FFW_TT_BuffBlock
             field_NeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
             this.itemConList.Remove(item);
             this.itemConAnchorOld.Remove(item);
-        }*/
+        }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque)
         {

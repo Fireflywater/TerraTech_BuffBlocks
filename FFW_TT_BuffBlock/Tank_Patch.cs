@@ -165,7 +165,7 @@ namespace FFW_TT_BuffBlock
             }
         }
 
-        /*[HarmonyPatch(typeof(ModuleItemConsume), "OnAttach")]
+        [HarmonyPatch(typeof(ModuleItemConsume), "OnAttach")]
         class ModuleItemConsume_Attach_Patch
         {
             static bool Prefix(ref ModuleItemConsume __instance)
@@ -185,7 +185,7 @@ namespace FFW_TT_BuffBlock
                 buff.RemoveItemCon(__instance);
                 return true;
             }
-        }*/
+        }
     }
 }
 

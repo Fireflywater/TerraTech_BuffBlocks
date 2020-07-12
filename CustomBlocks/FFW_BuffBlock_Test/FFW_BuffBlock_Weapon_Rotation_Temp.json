@@ -42,7 +42,7 @@
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
 		"m_BuffType": ["WeaponRotation"],
-		"m_Strength": [50.0,]
+		"m_Strength": [50.0],
 		"m_NeedsToBeAnchored": [false]
 	}
   }
