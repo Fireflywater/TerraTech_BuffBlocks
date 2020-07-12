@@ -60,7 +60,7 @@ namespace FFW_TT_BuffBlock
         private void OnAnchor(ModuleAnchor anchor, bool anchored, bool fromAfterTechPopulate)
         {
             BuffController buff = BuffController.MakeNewIfNone(this.block.tank);
-            buff.Update(new string[] { "All" });
+            buff.Update(new string[] { "All", "Anchor" });
         }
 
         private void OnPool()
