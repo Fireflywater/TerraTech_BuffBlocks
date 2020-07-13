@@ -21,6 +21,7 @@ namespace FFW_TT_BuffBlock
         public List<ModuleEnergy> energyList = new List<ModuleEnergy>();
         public List<ModuleEnergyStore> energyStoreList = new List<ModuleEnergyStore>();
         public List<ModuleItemConsume> itemConList = new List<ModuleItemConsume>();
+        public List<ModuleHeart> heartList = new List<ModuleHeart>();
 
 
         //public Dictionary<ModuleBuff, bool> buffBlocksNeedsAnchor = new Dictionary<ModuleBuff, bool>();
@@ -122,15 +123,17 @@ namespace FFW_TT_BuffBlock
         /* ITEM CONSUME : NEEDS ANCHORED */
         public Dictionary<ModuleBuff, bool> itemConAnchorBuffBlocks = new Dictionary<ModuleBuff, bool>();
         public Dictionary<ModuleItemConsume, bool> itemConAnchorOld = new Dictionary<ModuleItemConsume, bool>();
-        public bool ItemConAnchorFixed
-        {
-            get
-            {
-                return itemConAnchorBuffBlocks.ContainsValue(true);
-            }
-        } // Priority on True
-        public static FieldInfo field_NeedsAnchor = typeof(ModuleItemConsume)
+        public bool ItemConAnchorFixed { get { return itemConAnchorBuffBlocks.ContainsValue(true); } } // Priority on True
+        public static FieldInfo field_ItemConNeedsAnchor = typeof(ModuleItemConsume)
             .GetField("m_NeedsToBeAnchored", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        /* HEART SCU : NEEDS ANCHORED */
+
+        public Dictionary<ModuleBuff, bool> heartAnchorBuffBlocks = new Dictionary<ModuleBuff, bool>();
+        public Dictionary<ModuleHeart, bool> heartAnchorOld = new Dictionary<ModuleHeart, bool>();
+        public bool HeartAnchorFixed { get { return itemConAnchorBuffBlocks.ContainsValue(true); } } // Priority on True
+        public static FieldInfo field_HeartNeedsAnchor = typeof(ModuleHeart)
+            .GetField("m_HasAnchor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -319,11 +322,25 @@ namespace FFW_TT_BuffBlock
                 {
                     if (itemConAnchorBuffBlocks.Count > 0)
                     {
-                        field_NeedsAnchor.SetValue(item, ItemConAnchorFixed);
+                        field_ItemConNeedsAnchor.SetValue(item, ItemConAnchorFixed);
                     }
                     else
                     {
-                        field_NeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
+                        field_ItemConNeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
+                    }
+                }
+            }
+            if (type.Contains("HeartAnchored") || type.Contains("All"))
+            {
+                foreach (ModuleHeart heart in this.heartList)
+                {
+                    if (heartAnchorBuffBlocks.Count > 0)
+                    {
+                        field_HeartNeedsAnchor.SetValue(heart, HeartAnchorFixed);
+                    }
+                    else
+                    {
+                        field_HeartNeedsAnchor.SetValue(heart, this.heartAnchorOld[heart]);
                     }
                 }
             }
@@ -404,6 +421,10 @@ namespace FFW_TT_BuffBlock
                 //this.itemConAnchorBuffBlocks.Add(buff, buff.m_Strength == 1.0f); // true if 1, false if not
                 this.itemConAnchorBuffBlocks.Add(buff, false); // true if 1, false if not
             }
+            if (effects.Contains("HeartAnchored"))
+            {
+                this.heartAnchorBuffBlocks.Add(buff, false);
+            }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -467,6 +488,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.itemConAnchorBuffBlocks.Remove(buff);
             }
+            if (effects.Contains("HeartAnchored"))
+            {
+                this.heartAnchorBuffBlocks.Remove(buff);
+            }
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
         }
@@ -523,7 +548,7 @@ namespace FFW_TT_BuffBlock
                 wheelparams.tireProperties.props.gripFactorLat
             });
 
-            this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque"});
+            this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip"});
             //this.RefreshWheels(wheels, torque);
         }
 
@@ -642,16 +667,31 @@ namespace FFW_TT_BuffBlock
         public void AddItemCon(ModuleItemConsume item)
         {
             this.itemConList.Add(item);
-            this.itemConAnchorOld.Add(item, (bool)field_NeedsAnchor.GetValue(item));
+            this.itemConAnchorOld.Add(item, (bool)field_ItemConNeedsAnchor.GetValue(item));
 
             this.Update(new string[] { "ItemConAnchored" });
         }
 
         public void RemoveItemCon(ModuleItemConsume item)
         {
-            field_NeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
+            field_ItemConNeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
             this.itemConList.Remove(item);
             this.itemConAnchorOld.Remove(item);
+        }
+
+        public void AddHeart(ModuleHeart heart)
+        {
+            this.heartList.Add(heart);
+            this.heartAnchorOld.Add(heart, (bool)field_HeartNeedsAnchor.GetValue(heart));
+
+            this.Update(new string[] { "HeartAnchored" });
+        }
+
+        public void RemoveHeart(ModuleHeart heart)
+        {
+            field_HeartNeedsAnchor.SetValue(heart, this.heartAnchorOld[heart]);
+            this.heartList.Remove(heart);
+            this.heartAnchorOld.Remove(heart);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque, ManWheels.WheelParams wheelparams)

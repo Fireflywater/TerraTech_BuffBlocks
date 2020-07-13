@@ -186,6 +186,28 @@ namespace FFW_TT_BuffBlock
                 return true;
             }
         }
+
+        [HarmonyPatch(typeof(ModuleHeart), "OnAttach")]
+        class ModuleHeart_Attach_Patch
+        {
+            static bool Prefix(ref ModuleHeart __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddHeart(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleHeart), "OnDetach")]
+        class ModuleHeart_Detach_Patch
+        {
+            static bool Prefix(ref ModuleHeart __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveHeart(__instance);
+                return true;
+            }
+        }
     }
 }
 
