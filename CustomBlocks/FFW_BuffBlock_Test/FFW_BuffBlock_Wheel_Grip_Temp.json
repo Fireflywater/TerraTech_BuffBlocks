@@ -1,7 +1,7 @@
 {
-  "Name": "WEAPON SPREAD TEST TEST",
+  "Name": "WHEELS GRIP TEST TEST",
   "Description": "aaaaaa",
-  "ID": 6630006, 
+  "ID": 6630014, 
 
   "Faction": 0, 
   "Category": 5, 
@@ -41,8 +41,9 @@
   "KeepColliders": false,
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
-		"m_BuffType": ["WeaponSpread"],
-		"m_Strength": [2.0],
+		"m_BuffType": ["WheelsGrip"],
+		"m_Strength": [0.1],
+		"m_AddAfter": [0.0],
 		"m_NeedsToBeAnchored": [false]
 	}
   }

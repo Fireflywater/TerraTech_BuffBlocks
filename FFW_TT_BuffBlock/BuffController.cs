@@ -77,7 +77,11 @@ namespace FFW_TT_BuffBlock
 
         /* WHEELS : MAX TORQUE */
         public Dictionary<ModuleBuff, int> wheelsTorqueBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleWheels, float> wheelsTorqueOld = new Dictionary<ModuleWheels, float>(); // [0] = passiveBrakeMaxTorque, [1] = basicFrictionTorque
+        public Dictionary<ModuleWheels, float> wheelsTorqueOld = new Dictionary<ModuleWheels, float>();
+
+        /* WHEELS : GRIP */
+        public Dictionary<ModuleBuff, int> wheelsGripBuffBlocks = new Dictionary<ModuleBuff, int>();
+        public Dictionary<ModuleWheels, List<float>> wheelsGripOld = new Dictionary<ModuleWheels, List<float>>(); //[0] = gripFactorLong, [1] = gripFactorLat
 
         /* BOOSTER : BURN RATE */
         public Dictionary<ModuleBuff, int> boosterBurnRateBuffBlocks = new Dictionary<ModuleBuff, int>();
@@ -227,8 +231,9 @@ namespace FFW_TT_BuffBlock
                 foreach (ModuleWheels wheels in this.wheelsList)
                 {
                     ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
                     torque.torqueCurveMaxRpm = this.wheelsRpmOld[wheels] * this.GetBuffAverage("wheelsRpmBuffBlocks") + this.GetBuffAddAverage("wheelsRpmBuffBlocks");
-                    this.RefreshWheels(wheels, torque);
+                    this.RefreshWheels(wheels, torque, wheelparams);
                 }
             }
             if (type.Contains("WheelsBrake") || type.Contains("All"))
@@ -236,9 +241,10 @@ namespace FFW_TT_BuffBlock
                 foreach (ModuleWheels wheels in this.wheelsList)
                 {
                     ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
                     torque.passiveBrakeMaxTorque = this.wheelsBrakeOld[wheels][0] * this.GetBuffAverage("wheelsBrakeBuffBlocks") + this.GetBuffAddAverage("wheelsBrakeBuffBlocks");
                     torque.basicFrictionTorque = this.wheelsBrakeOld[wheels][1] * this.GetBuffAverage("wheelsBrakeBuffBlocks") + this.GetBuffAddAverage("wheelsBrakeBuffBlocks");
-                    this.RefreshWheels(wheels, torque);
+                    this.RefreshWheels(wheels, torque, wheelparams);
                 }
             }
             if (type.Contains("WheelsTorque") || type.Contains("All"))
@@ -246,8 +252,20 @@ namespace FFW_TT_BuffBlock
                 foreach (ModuleWheels wheels in this.wheelsList)
                 {
                     ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
                     torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels] * this.GetBuffAverage("wheelsTorqueBuffBlocks") + this.GetBuffAddAverage("wheelsTorqueBuffBlocks");
-                    this.RefreshWheels(wheels, torque);
+                    this.RefreshWheels(wheels, torque, wheelparams);
+                }
+            }
+            if (type.Contains("WheelsGrip") || type.Contains("All"))
+            {
+                foreach (ModuleWheels wheels in this.wheelsList)
+                {
+                    ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
+                    wheelparams.tireProperties.props.gripFactorLong = this.wheelsGripOld[wheels][0] * this.GetBuffAverage("wheelsGripBuffBlocks") + this.GetBuffAddAverage("wheelsGripBuffBlocks");
+                    wheelparams.tireProperties.props.gripFactorLat = this.wheelsGripOld[wheels][1] * this.GetBuffAverage("wheelsGripBuffBlocks") + this.GetBuffAddAverage("wheelsGripBuffBlocks");
+                    this.RefreshWheels(wheels, torque, wheelparams);
                 }
             }
             if (type.Contains("BoosterBurnRate") || type.Contains("All"))
@@ -342,6 +360,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.wheelsTorqueBuffBlocks.Add(buff, buff.GetEffect("WheelsTorque"));
             }
+            if (effects.Contains("WheelsGrip"))
+            {
+                this.wheelsGripBuffBlocks.Add(buff, buff.GetEffect("WheelsGrip"));
+            }
             if (effects.Contains("BoosterBurnRate"))
             {
                 this.boosterBurnRateBuffBlocks.Add(buff, buff.GetEffect("BoosterBurnRate"));
@@ -418,6 +440,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.wheelsTorqueBuffBlocks.Remove(buff);
             }
+            if (effects.Contains("WheelsGrip"))
+            {
+                this.wheelsGripBuffBlocks.Remove(buff);
+            }
             if (effects.Contains("BoosterBurnRate"))
             {
                 this.boosterBurnRateBuffBlocks.Remove(buff);
@@ -483,6 +509,7 @@ namespace FFW_TT_BuffBlock
         {
             this.wheelsList.Add(wheels);
             ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+            ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
             this.wheelsRpmOld.Add(wheels, torque.torqueCurveMaxRpm);
             this.wheelsBrakeOld.Add(wheels, new List<float>()
             {
@@ -490,7 +517,12 @@ namespace FFW_TT_BuffBlock
                 torque.basicFrictionTorque
             });
             this.wheelsTorqueOld.Add(wheels, torque.torqueCurveMaxTorque);
-            
+            this.wheelsGripOld.Add(wheels, new List<float>()
+            {
+                wheelparams.tireProperties.props.gripFactorLong,
+                wheelparams.tireProperties.props.gripFactorLat
+            });
+
             this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque"});
             //this.RefreshWheels(wheels, torque);
         }
@@ -498,15 +530,17 @@ namespace FFW_TT_BuffBlock
         public void RemoveWheels(ModuleWheels wheels)
         {
             ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+            ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
             torque.torqueCurveMaxRpm = this.wheelsRpmOld[wheels];
             torque.passiveBrakeMaxTorque = this.wheelsBrakeOld[wheels][0];
             torque.basicFrictionTorque = this.wheelsBrakeOld[wheels][1];
             torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels];
-            this.RefreshWheels(wheels, torque);
+            this.RefreshWheels(wheels, torque, wheelparams);
             this.wheelsList.Remove(wheels);
             this.wheelsRpmOld.Remove(wheels);
             this.wheelsBrakeOld.Remove(wheels);
             this.wheelsTorqueOld.Remove(wheels);
+            this.wheelsGripOld.Remove(wheels);
         }
 
         public void AddBooster(ModuleBooster booster)
@@ -620,14 +654,14 @@ namespace FFW_TT_BuffBlock
             this.itemConAnchorOld.Remove(item);
         }
 
-        public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque)
+        public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque, ManWheels.WheelParams wheelparams)
         {
             field_TorqueParams.SetValue(wheels, torque); // Apply new Torque to ModuleWheels
-
-            //ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
+            
             //wheelparams.strafeSteeringSpeed = 20.0f;
-
-            //field_WheelParams.SetValue(wheels, wheelparams);
+            //wheelparams.tireProperties.props.gripFactorLong = 0.0f;
+            //wheelparams.tireProperties.props.gripFactorLat = 0.0f;
+            field_WheelParams.SetValue(wheels, wheelparams); // Apply new WheelParams...
 
             List<ManWheels.Wheel> value_Wheels = (List<ManWheels.Wheel>)field_Wheels.GetValue(wheels);
             foreach (ManWheels.Wheel wheel in value_Wheels)
@@ -640,18 +674,19 @@ namespace FFW_TT_BuffBlock
                     object value_AttachedWheelState = value_WheelState.GetValue(value_WheelAttachedId); // AttachedWheelState is a PRIVATE STRUCT, `object` neccessary
                     FieldInfo field_p_TorqueParams = value_AttachedWheelState.GetType() // Get types of private struct...
                         .GetField("torqueParams", BindingFlags.NonPublic | BindingFlags.Instance);
+                    FieldInfo field_p_WheelParams = value_AttachedWheelState.GetType()
+                        .GetField("wheelParams", BindingFlags.NonPublic | BindingFlags.Instance);
+
+                    field_p_TorqueParams.SetValue(value_AttachedWheelState, torque); // Apply new Torque to ManWheels.Wheel
+                    field_p_WheelParams.SetValue(value_AttachedWheelState, wheelparams); // Apply new WheelParams...
+
                     FieldInfo field_p_Inertia = value_AttachedWheelState.GetType()
                         .GetField("inertia", BindingFlags.NonPublic | BindingFlags.Instance);
 
                     field_p_TorqueParams.SetValue(value_AttachedWheelState, torque); // Apply new Torque to ManWheels.Wheel
-                    //ManWheels.WheelParams value_WheelParams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels); // Note: Keep these incase inertia read causes issues
+                    ManWheels.WheelParams value_WheelParams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels); // Note: Keep these incase inertia read causes issues
                     //float i = wheels.block.CurrentMass * 0.9f / (float)value_Wheels.Count * value_WheelParams.radius * value_WheelParams.radius;
                     ModuleWheels.AttachData moduleData = new ModuleWheels.AttachData(wheels, (float)field_p_Inertia.GetValue(value_AttachedWheelState), value_Wheels.Count);
-
-                    //FieldInfo field_p_WheelParams = value_AttachedWheelState.GetType()
-                    //    .GetField("wheelParams", BindingFlags.NonPublic | BindingFlags.Instance);
-                    
-                    //field_p_WheelParams.SetValue(value_AttachedWheelState, wheelparams);
 
                     wheel.UpdateAttachData(moduleData); // Update it! Live! Do it!
                                                         // Also logs "only for use in Editor" error, annoying...
