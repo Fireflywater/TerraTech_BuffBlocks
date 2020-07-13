@@ -1,4 +1,4 @@
-## TerraTech Buff Blocks (v1.0.2)
+## TerraTech Buff Blocks (v1.0.3)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
@@ -39,7 +39,7 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 * "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity", "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip"...
 
-* "BoosterBurnRate", "DISABLEDShieldRadiusDISABLED", "DrillDps", "EnergyOps", "EnergyStoreCap"...
+* "BoosterBurnRate", "DISABLEDShieldRadiusDISABLED", "DrillDps", "EnergyOps", "EnergyStoreCap", "ItemPickupRange"...
 
 * Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. 1.0 for no change.
 
@@ -62,6 +62,12 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
+
+7/12/2020, v1.0.3:
+
+* Added `ItemPickupRange` buff type, increases range of collectors, SCUs, etc.
+
+* Added `HeartAnchored` buff type, for SCUs. Boolean buffs have limited support for now.
 
 7/12/2020, v1.0.2:
 

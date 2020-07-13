@@ -2,7 +2,7 @@
   "Id": "Fireflywater.BuffBlocks",
   "DisplayName": "Buff Blocks",
   "Author": "Fireflywater",
-  "Version": "1.0.0",
+  "Version": "1.0.3",
   "Enable": true,
   "AssemblyName": "FFW_TT_BuffBlock.dll",
   "EntryMethod": "FFW_TT_BuffBlock.QPatch.Main"
