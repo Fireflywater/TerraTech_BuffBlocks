@@ -22,10 +22,8 @@ namespace FFW_TT_BuffBlock
         public List<ModuleEnergyStore> energyStoreList = new List<ModuleEnergyStore>();
         public List<ModuleItemConsume> itemConList = new List<ModuleItemConsume>();
         public List<ModuleHeart> heartList = new List<ModuleHeart>();
-
-
-        //public Dictionary<ModuleBuff, bool> buffBlocksNeedsAnchor = new Dictionary<ModuleBuff, bool>();
-
+        public List<ModuleItemPickup> itemPickupList = new List<ModuleItemPickup>();
+        
         /* WEAPON : FIRE RATE */
         public Dictionary<ModuleBuff, int> weaponCooldownBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWeaponGun, List<float>> weaponCooldownOld = new Dictionary<ModuleWeaponGun, List<float>>(); // [0] = ShotCooldown, [1] = BurstCooldown
@@ -134,6 +132,13 @@ namespace FFW_TT_BuffBlock
         public bool HeartAnchorFixed { get { return itemConAnchorBuffBlocks.ContainsValue(true); } } // Priority on True
         public static FieldInfo field_HeartNeedsAnchor = typeof(ModuleHeart)
             .GetField("m_HasAnchor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        /* ITEM PICKUP : RANGE */
+
+        public Dictionary<ModuleBuff, int> itemPickupRangeBuffBlocks = new Dictionary<ModuleBuff, int>();
+        public Dictionary<ModuleItemPickup, float> itemPickupRangeOld = new Dictionary<ModuleItemPickup, float>();
+        public static FieldInfo field_ItemPickupRange = typeof(ModuleItemPickup)
+            .GetField("m_PickupRange", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -344,6 +349,13 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
+            if (type.Contains("ItemPickupRange") || type.Contains("All"))
+            {
+                foreach (ModuleItemPickup item in this.itemPickupList)
+                {
+                    field_ItemPickupRange.SetValue(item, this.itemPickupRangeOld[item] * this.GetBuffAverage("itemPickupRangeBuffBlocks") + this.GetBuffAddAverage("itemPickupRangeBuffBlocks"));
+                }
+            }
         }
 
         public void AddBuff(ModuleBuff buff)
@@ -425,6 +437,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.heartAnchorBuffBlocks.Add(buff, false);
             }
+            if (effects.Contains("ItemPickupRange"))
+            {
+                this.itemPickupRangeBuffBlocks.Add(buff, buff.GetEffect("ItemPickupRange"));
+            }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -491,6 +507,10 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("HeartAnchored"))
             {
                 this.heartAnchorBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("ItemPickupRange"))
+            {
+                this.itemPickupRangeBuffBlocks.Remove(buff);
             }
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -692,6 +712,21 @@ namespace FFW_TT_BuffBlock
             field_HeartNeedsAnchor.SetValue(heart, this.heartAnchorOld[heart]);
             this.heartList.Remove(heart);
             this.heartAnchorOld.Remove(heart);
+        }
+
+        public void AddItemPickup(ModuleItemPickup item)
+        {
+            this.itemPickupList.Add(item);
+            this.itemPickupRangeOld.Add(item, (float)field_ItemPickupRange.GetValue(item));
+
+            this.Update(new string[] { "ItemPickupRange" });
+        }
+
+        public void RemoveItemPickup(ModuleItemPickup item)
+        {
+            field_ItemPickupRange.SetValue(item, this.itemPickupRangeOld[item]);
+            this.itemPickupList.Remove(item);
+            this.itemPickupRangeOld.Remove(item);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque, ManWheels.WheelParams wheelparams)

@@ -208,6 +208,28 @@ namespace FFW_TT_BuffBlock
                 return true;
             }
         }
+
+        [HarmonyPatch(typeof(ModuleItemPickup), "OnAttach")]
+        class ModuleItemPickup_Attach_Patch
+        {
+            static bool Prefix(ref ModuleItemPickup __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddItemPickup(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleItemPickup), "OnDetach")]
+        class ModuleItemPickup_Detach_Patch
+        {
+            static bool Prefix(ref ModuleItemPickup __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveItemPickup(__instance);
+                return true;
+            }
+        }
     }
 }
 
