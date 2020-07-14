@@ -64,8 +64,12 @@ namespace FFW_TT_BuffBlock
         public static FieldInfo field_Explosion = typeof(Projectile)
             .GetField("m_Explosion", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         public static FieldInfo field_ExplDamage = typeof(Explosion)
-            .GetField("m_MaxDamageStrength", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);*/
-        
+            .GetField("m_MaxDamageStrength", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        public static FieldInfo field_CannonBarrels = typeof(ModuleWeaponGun)
+            .GetField("m_CannonBarrels", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        public static FieldInfo field_CannonBarrelFiringData = typeof(CannonBarrel)
+            .GetField("m_FiringData", BindingFlags.NonPublic | BindingFlags.Instance);*/
+
         /* WHEELS : MAX RPM */
         public Dictionary<ModuleBuff, int> wheelsRpmBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWheels, float> wheelsRpmOld = new Dictionary<ModuleWheels, float>();
@@ -253,7 +257,13 @@ namespace FFW_TT_BuffBlock
                     {
                         Projectile bullet = (Projectile)value_FiringData.m_BulletPrefab;
                         //this.weaponDamageOld[weapon].Add((float)field_Damage.GetValue(bullet));
+                        Console.WriteLine("ffw: in...");
+                        Console.WriteLine(this.GetBuffAverage("weaponDamageBuffBlocks"));
+                        Console.WriteLine("ffw: from...");
+                        Console.WriteLine(field_Damage.GetValue(bullet));
                         field_Damage.SetValue(bullet, (int)Math.Ceiling(this.weaponDamageOld[weapon][0] * this.GetBuffAverage("weaponDamageBuffBlocks") + this.GetBuffAddAverage("weaponDamageBuffBlocks")));
+                        Console.WriteLine("ffw: to...");
+                        Console.WriteLine(field_Damage.GetValue(bullet));
                         if (field_Explosion.GetValue(bullet) != null)
                         {
                             Transform transform = (Transform)field_Explosion.GetValue(bullet);
@@ -266,8 +276,21 @@ namespace FFW_TT_BuffBlock
                             }
                         }
                     }
+
+                    ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
+                    Array value_CannonBarrel = (Array)field_CannonBarrels.GetValue(weapon);
+                    if (value_CannonBarrel.Length != 0)
+                    {
+                        foreach (CannonBarrel cannonBarrel in value_CannonBarrel)
+                        {
+                            //cannonBarrel.Setup(value_FiringData, value_ModuleWeapon);
+                            field_CannonBarrelFiringData.SetValue(cannonBarrel, value_FiringData);
+                            Console.WriteLine("ffw: applied to barrel");
+                            //cannonBarrel.CapRecoilDuration(this.m_ShotCooldown);
+                        }
+                    }
                 }
-            }/*
+            }*/
             if (type.Contains("WheelsRpm") || type.Contains("All"))
             {
                 foreach (ModuleWheels wheels in this.wheelsList)
@@ -579,14 +602,21 @@ namespace FFW_TT_BuffBlock
             
             if (value_FiringData.m_BulletPrefab.GetType() == typeof(Projectile))
             {
+                Console.WriteLine("ffw 1");
                 Projectile bullet = (Projectile)value_FiringData.m_BulletPrefab;
+                Console.WriteLine("ffw 2");
                 this.weaponDamageOld[weapon][0] = Convert.ToSingle((int)field_Damage.GetValue(bullet));
+                Console.WriteLine("ffw 3");
                 if (field_Explosion.GetValue(bullet) != null)
                 {
+                    Console.WriteLine("ffw 4");
                     Transform transform = (Transform)field_Explosion.GetValue(bullet);
+                    Console.WriteLine("ffw 5");
                     Explosion explosion = transform.GetComponent<Explosion>();
+                    Console.WriteLine("ffw 6");
                     if (explosion != null)
                     {
+                        Console.WriteLine("ffw 7");
                         this.weaponDamageOld[weapon][1] = (float)field_ExplDamage.GetValue(explosion);
                         //field_ExplRadius.SetValue(explosion, 99.0f);
                     }
@@ -618,6 +648,17 @@ namespace FFW_TT_BuffBlock
                     {
                         field_ExplDamage.SetValue(explosion, this.weaponDamageOld[weapon][1]);
                     }
+                }
+            }
+            
+            Array value_CannonBarrel = (Array)field_CannonBarrels.GetValue(weapon);
+            if (value_CannonBarrel.Length != 0)
+            {
+                foreach (CannonBarrel cannonBarrel in value_CannonBarrel)
+                {
+                    //cannonBarrel.Setup(value_FiringData, value_ModuleWeapon);
+                    field_CannonBarrelFiringData.SetValue(cannonBarrel, value_FiringData);
+                    //cannonBarrel.CapRecoilDuration(this.m_ShotCooldown);
                 }
             }*/
 
