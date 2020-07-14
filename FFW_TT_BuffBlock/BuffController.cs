@@ -56,6 +56,16 @@ namespace FFW_TT_BuffBlock
         public static FieldInfo field_Velocity = typeof(FireData)
             .GetField("m_MuzzleVelocity", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
+        /* WEAPON : DAMAGE */
+        /*public Dictionary<ModuleBuff, int> weaponDamageBuffBlocks = new Dictionary<ModuleBuff, int>();
+        public Dictionary<ModuleWeaponGun, List<float>> weaponDamageOld = new Dictionary<ModuleWeaponGun, List<float>>(); // [0] = Projectile.m_Damage, Projectile.m_Explosion.m_MaxDamageStrength
+        public static FieldInfo field_Damage = typeof(Projectile)
+            .GetField("m_Damage", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        public static FieldInfo field_Explosion = typeof(Projectile)
+            .GetField("m_Explosion", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        public static FieldInfo field_ExplDamage = typeof(Explosion)
+            .GetField("m_MaxDamageStrength", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);*/
+        
         /* WHEELS : MAX RPM */
         public Dictionary<ModuleBuff, int> wheelsRpmBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWheels, float> wheelsRpmOld = new Dictionary<ModuleWheels, float>();
@@ -234,6 +244,30 @@ namespace FFW_TT_BuffBlock
                     field_Velocity.SetValue(value_FiringData, this.weaponVelocityOld[weapon] * this.GetBuffAverage("weaponVelocityBuffBlocks") + this.GetBuffAddAverage("weaponVelocityBuffBlocks"));
                 }
             }
+            /*if (type.Contains("WeaponDamage") || type.Contains("All"))
+            {
+                foreach (ModuleWeaponGun weapon in this.weaponList)
+                {
+                    FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
+                    if (value_FiringData.m_BulletPrefab.GetType() == typeof(Projectile))
+                    {
+                        Projectile bullet = (Projectile)value_FiringData.m_BulletPrefab;
+                        //this.weaponDamageOld[weapon].Add((float)field_Damage.GetValue(bullet));
+                        field_Damage.SetValue(bullet, (int)Math.Ceiling(this.weaponDamageOld[weapon][0] * this.GetBuffAverage("weaponDamageBuffBlocks") + this.GetBuffAddAverage("weaponDamageBuffBlocks")));
+                        if (field_Explosion.GetValue(bullet) != null)
+                        {
+                            Transform transform = (Transform)field_Explosion.GetValue(bullet);
+                            Explosion explosion = transform.GetComponent<Explosion>();
+                            if (explosion != null)
+                            {
+                                //this.weaponDamageOld[weapon].Add((float)field_ExplDamage.GetValue(explosion));
+                                field_ExplDamage.SetValue(explosion, this.weaponDamageOld[weapon][1] * this.GetBuffAverage("weaponDamageBuffBlocks") + this.GetBuffAddAverage("weaponDamageBuffBlocks"));
+                                //field_ExplRadius.SetValue(explosion, 99.0f);
+                            }
+                        }
+                    }
+                }
+            }/*
             if (type.Contains("WheelsRpm") || type.Contains("All"))
             {
                 foreach (ModuleWheels wheels in this.wheelsList)
@@ -377,6 +411,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.weaponVelocityBuffBlocks.Add(buff, buff.GetEffect("WeaponVelocity"));
             }
+            /*if (effects.Contains("WeaponDamage"))
+            {
+                this.weaponDamageBuffBlocks.Add(buff, buff.GetEffect("WeaponDamage"));
+            }*/
             if (effects.Contains("WheelsRpm"))
             {
                 this.wheelsRpmBuffBlocks.Add(buff, buff.GetEffect("WheelsRpm"));
@@ -465,6 +503,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.weaponVelocityBuffBlocks.Remove(buff);
             }
+            /*if (effects.Contains("WeaponDamage"))
+            {
+                this.weaponDamageBuffBlocks.Remove(buff);
+            }*/
             if (effects.Contains("WheelsRpm"))
             {
                 this.wheelsRpmBuffBlocks.Remove(buff);
@@ -529,8 +571,29 @@ namespace FFW_TT_BuffBlock
             FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
             this.weaponSpreadOld.Add(weapon, (float)field_Spread.GetValue(value_FiringData));
             this.weaponVelocityOld.Add(weapon, (float)field_Velocity.GetValue(value_FiringData));
+            /*this.weaponDamageOld.Add(weapon, new List<float>()
+            {
+                0.0f,
+                0.0f
+            });
+            
+            if (value_FiringData.m_BulletPrefab.GetType() == typeof(Projectile))
+            {
+                Projectile bullet = (Projectile)value_FiringData.m_BulletPrefab;
+                this.weaponDamageOld[weapon][0] = Convert.ToSingle((int)field_Damage.GetValue(bullet));
+                if (field_Explosion.GetValue(bullet) != null)
+                {
+                    Transform transform = (Transform)field_Explosion.GetValue(bullet);
+                    Explosion explosion = transform.GetComponent<Explosion>();
+                    if (explosion != null)
+                    {
+                        this.weaponDamageOld[weapon][1] = (float)field_ExplDamage.GetValue(explosion);
+                        //field_ExplRadius.SetValue(explosion, 99.0f);
+                    }
+                }
+            }*/
 
-            this.Update(new string[] { "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity" });
+            this.Update(new string[] { "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity" });//, "WeaponDamage" });
         }
 
         public void RemoveWeapon(ModuleWeaponGun weapon)
@@ -542,12 +605,28 @@ namespace FFW_TT_BuffBlock
             FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
             field_Spread.SetValue(value_FiringData, this.weaponSpreadOld[weapon]);
             field_Velocity.SetValue(value_FiringData, this.weaponVelocityOld[weapon]);
+            
+            /*if (value_FiringData.m_BulletPrefab.GetType() == typeof(Projectile))
+            {
+                Projectile bullet = (Projectile)value_FiringData.m_BulletPrefab;
+                field_Damage.SetValue(bullet, (int)Math.Ceiling(this.weaponDamageOld[weapon][0]));
+                if (field_Explosion.GetValue(bullet) != null)
+                {
+                    Transform transform = (Transform)field_Explosion.GetValue(bullet);
+                    Explosion explosion = transform.GetComponent<Explosion>();
+                    if (explosion != null)
+                    {
+                        field_ExplDamage.SetValue(explosion, this.weaponDamageOld[weapon][1]);
+                    }
+                }
+            }*/
 
             this.weaponList.Remove(weapon);
             this.weaponCooldownOld.Remove(weapon);
             this.weaponRotationOld.Remove(weapon);
             this.weaponSpreadOld.Remove(weapon);
             this.weaponVelocityOld.Remove(weapon);
+            //this.weaponDamageOld.Remove(weapon);
         }
 
         public void AddWheels(ModuleWheels wheels)
