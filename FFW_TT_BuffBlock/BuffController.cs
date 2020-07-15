@@ -880,14 +880,18 @@ namespace FFW_TT_BuffBlock
                     ModuleWheels.AttachData moduleData = new ModuleWheels.AttachData(wheels, (float)field_p_Inertia.GetValue(value_AttachedWheelState), value_Wheels.Count);
 
                     wheel.UpdateAttachData(moduleData); // Update it! Live! Do it!
-                                                        // Also logs "only for use in Editor" error, annoying...
-                    /*MethodInfo method_Init = value_AttachedWheelState.GetType().GetMethod("Init");
-                    MethodInfo method_RecalculateDotProducts = value_AttachedWheelState.GetType().GetMethod("RecalculateDotProducts");
+                    // Also logs "only for use in Editor" error, annoying...
 
-                    object[] parametersArray = new object[] { wheel, moduleData };
+                    /*MethodInfo method_Init = value_AttachedWheelState.GetType()
+                        .GetMethod("Init", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    MethodInfo method_RecalculateDotProducts = value_AttachedWheelState.GetType()
+                        .GetMethod("RecalculateDotProducts", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    Console.WriteLine("ffw: invoking...");
+                    //object[] parametersArray = new object[] { wheel, moduleData };
 
-                    method_Init.Invoke(value_AttachedWheelState, parametersArray);
-                    method_RecalculateDotProducts.Invoke(value_AttachedWheelState, null);*/
+                    method_Init.Invoke(value_AttachedWheelState, new object[] { wheel, moduleData });
+                    method_RecalculateDotProducts.Invoke(value_AttachedWheelState, null);
+                    Console.WriteLine("ffw: invoked.");*/
                 }
             }
         }

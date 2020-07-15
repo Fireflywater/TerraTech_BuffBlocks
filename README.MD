@@ -67,11 +67,13 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 * Anchoring now sends smaller Refresh requests, reducing On Anchor lagspikes.
 
-* Rebuilt ManWheels.Wheels.UpdateAttachData() to not log errors, cleaning up the Output_log spam.
+* ~~Rebuilt ManWheels.Wheels.UpdateAttachData() to not log errors, cleaning up the Output_log spam.~~ Rollback due to Reflection's MethodInfo.Invoke() not behaving.
 
 * m_Strength, m_AddAfter, and m_NeedsToBeAnchored now make default values if they're not stated in block JSON.
 
 * Added broken code for damage buff, further code and implementation TBD.
+
+* Fixed a bug where "index 0 wheels" were not affected.
 
 7/12/2020, v1.0.3:
 
