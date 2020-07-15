@@ -1,4 +1,4 @@
-## TerraTech Buff Blocks (v1.0.3)
+## TerraTech Buff Blocks (v1.0.4)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
@@ -41,11 +41,11 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 * "BoosterBurnRate", "DISABLEDShieldRadiusDISABLED", "DrillDps", "EnergyOps", "EnergyStoreCap", "ItemPickupRange"...
 
-* Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. 1.0 for no change.
+* Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. 1.0 for no change. Default 1.0.
 
-* Where <AddAfter> can be a float. AddAfter is added after Strength, go figure. Use this to force 0s to become positives. Be careful with extreme numbers. 0.0 for no change.
+* Where <AddAfter> can be a float. AddAfter is added after Strength, go figure. Use this to force 0s to become positives. Be careful with extreme numbers. 0.0 for no change. Default 0.0.
 
-* Where <Anchor> can be a boolean, true or false. Dictating if the tech must be anchored to benefit from the buff. There is no "If Not Anchored" flag, unless requested.
+* Where <Anchor> can be a boolean, true or false. Dictating if the tech must be anchored to benefit from the buff. There is no "If Not Anchored" flag, unless requested. Default false.
 
 * As arrays, you can put multiple variables in each. Matching indexes are read together. For example, the 1st m_BuffType will have the 1st m_Strength, ditto 2nd.
 
@@ -62,6 +62,16 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
+
+7/14/2020, v1.0.4:
+
+* Anchoring now sends smaller Refresh requests, reducing On Anchor lagspikes.
+
+* Rebuilt ManWheels.Wheels.UpdateAttachData() to not log errors, cleaning up the Output_log spam.
+
+* m_Strength, m_AddAfter, and m_NeedsToBeAnchored now make default values if they're not stated in block JSON.
+
+* Added broken code for damage buff, further code and implementation TBD.
 
 7/12/2020, v1.0.3:
 
