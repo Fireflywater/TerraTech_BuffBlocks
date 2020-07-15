@@ -12,6 +12,33 @@ namespace FFW_TT_BuffBlock
 {
     public static class WrappedDataHolder
     {
+
+
+        [HarmonyPatch(typeof(ManWheels.Wheel), "UpdateAttachData")]
+        class ManWheelsWheel_AttachData_Patch
+        {
+            static bool Prefix(ref ManWheels.Wheel __instance, ref ModuleWheels.AttachData moduleData)
+            {
+                FieldInfo field_WheelState = typeof(ManWheels)
+                    .GetField("m_WheelState", BindingFlags.NonPublic | BindingFlags.Instance);
+                FieldInfo field_AttachedId = typeof(ManWheels.Wheel)
+                    .GetField("attachedID", BindingFlags.NonPublic | BindingFlags.Instance);
+                
+                int value_WheelAttachedId = (int)field_AttachedId.GetValue(__instance);
+                Array value_WheelState = (Array)field_WheelState.GetValue(Singleton.Manager<ManWheels>.inst);
+                object value_AttachedWheelState = value_WheelState.GetValue(value_WheelAttachedId);
+                
+                MethodInfo method_Init = value_AttachedWheelState.GetType().GetMethod("Init");
+                MethodInfo method_RecalculateDotProducts = value_AttachedWheelState.GetType().GetMethod("RecalculateDotProducts");
+
+                object[] parametersArray = new object[] { __instance, moduleData };
+
+                method_Init.Invoke(value_AttachedWheelState, parametersArray);
+                method_RecalculateDotProducts.Invoke(value_AttachedWheelState, null);
+                return false;
+            }
+        }
+
         [HarmonyPatch(typeof(ModuleWeaponGun), "OnAttach")]
         class ModuleWeaponGun_Attach_Patch
         {

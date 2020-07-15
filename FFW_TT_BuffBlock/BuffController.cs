@@ -168,6 +168,7 @@ namespace FFW_TT_BuffBlock
                 tank = objTank
             };
             BuffController.AddObject(newObject);
+            Console.WriteLine("FFW: Active BuffControls: " + BuffController.allControllers.Count);
             return newObject;
         }
 
