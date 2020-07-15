@@ -14,7 +14,7 @@ namespace FFW_TT_BuffBlock
     {
 
 
-        [HarmonyPatch(typeof(ManWheels.Wheel), "UpdateAttachData")]
+        /*[HarmonyPatch(typeof(ManWheels.Wheel), "UpdateAttachData")]
         class ManWheelsWheel_AttachData_Patch
         {
             static bool Prefix(ref ManWheels.Wheel __instance, ref ModuleWheels.AttachData moduleData)
@@ -37,7 +37,7 @@ namespace FFW_TT_BuffBlock
                 method_RecalculateDotProducts.Invoke(value_AttachedWheelState, null);
                 return false;
             }
-        }
+        }*/
 
         [HarmonyPatch(typeof(ModuleWeaponGun), "OnAttach")]
         class ModuleWeaponGun_Attach_Patch

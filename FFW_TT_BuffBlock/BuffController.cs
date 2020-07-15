@@ -689,7 +689,7 @@ namespace FFW_TT_BuffBlock
                 wheelparams.tireProperties.props.gripFactorLat
             });
 
-            this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip"});
+            this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip" });
             //this.RefreshWheels(wheels, torque);
         }
 
@@ -853,10 +853,6 @@ namespace FFW_TT_BuffBlock
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque, ManWheels.WheelParams wheelparams)
         {
             field_TorqueParams.SetValue(wheels, torque); // Apply new Torque to ModuleWheels
-            
-            //wheelparams.strafeSteeringSpeed = 20.0f;
-            //wheelparams.tireProperties.props.gripFactorLong = 0.0f;
-            //wheelparams.tireProperties.props.gripFactorLat = 0.0f;
             field_WheelParams.SetValue(wheels, wheelparams); // Apply new WheelParams...
 
             List<ManWheels.Wheel> value_Wheels = (List<ManWheels.Wheel>)field_Wheels.GetValue(wheels);
@@ -865,7 +861,7 @@ namespace FFW_TT_BuffBlock
                 Array value_WheelState = (Array)field_WheelState.GetValue(Singleton.Manager<ManWheels>.inst);
 
                 int value_WheelAttachedId = (int)field_AttachedId.GetValue(wheel); // Important, determines what AttachedWheelState is associated
-                if (value_WheelAttachedId > 0) // value is -1 if it's unloaded, I think...
+                if (value_WheelAttachedId > -1) // value is -1 if it's unloaded, I think...
                 {
                     object value_AttachedWheelState = value_WheelState.GetValue(value_WheelAttachedId); // AttachedWheelState is a PRIVATE STRUCT, `object` neccessary
                     FieldInfo field_p_TorqueParams = value_AttachedWheelState.GetType() // Get types of private struct...
@@ -878,15 +874,20 @@ namespace FFW_TT_BuffBlock
 
                     FieldInfo field_p_Inertia = value_AttachedWheelState.GetType()
                         .GetField("inertia", BindingFlags.NonPublic | BindingFlags.Instance);
-
-                    field_p_TorqueParams.SetValue(value_AttachedWheelState, torque); // Apply new Torque to ManWheels.Wheel
+                    
                     ManWheels.WheelParams value_WheelParams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels); // Note: Keep these incase inertia read causes issues
                     //float i = wheels.block.CurrentMass * 0.9f / (float)value_Wheels.Count * value_WheelParams.radius * value_WheelParams.radius;
                     ModuleWheels.AttachData moduleData = new ModuleWheels.AttachData(wheels, (float)field_p_Inertia.GetValue(value_AttachedWheelState), value_Wheels.Count);
 
                     wheel.UpdateAttachData(moduleData); // Update it! Live! Do it!
                                                         // Also logs "only for use in Editor" error, annoying...
-                                                        
+                    /*MethodInfo method_Init = value_AttachedWheelState.GetType().GetMethod("Init");
+                    MethodInfo method_RecalculateDotProducts = value_AttachedWheelState.GetType().GetMethod("RecalculateDotProducts");
+
+                    object[] parametersArray = new object[] { wheel, moduleData };
+
+                    method_Init.Invoke(value_AttachedWheelState, parametersArray);
+                    method_RecalculateDotProducts.Invoke(value_AttachedWheelState, null);*/
                 }
             }
         }
