@@ -42,9 +42,7 @@
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
 		"m_BuffType": ["WheelsGrip"],
-		"m_Strength": [0.1],
-		"m_AddAfter": [0.0],
-		"m_NeedsToBeAnchored": [false]
+		"m_Strength": [0.1]
 	}
   }
 }

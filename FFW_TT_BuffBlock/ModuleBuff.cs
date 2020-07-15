@@ -59,6 +59,18 @@ namespace FFW_TT_BuffBlock
 
         private void OnPool()
         {
+            if ((this.m_Strength == null) || (this.m_Strength.Length != this.m_BuffType.Length))
+            {
+                this.m_Strength = this.m_BuffType.Select(x => 1.0f).ToArray();
+            }
+            if ((this.m_AddAfter == null) || (this.m_AddAfter.Length != this.m_BuffType.Length))
+            {
+                this.m_AddAfter = this.m_BuffType.Select(x => 0.0f).ToArray();
+            }
+            if ((this.m_NeedsToBeAnchored == null) || (this.m_NeedsToBeAnchored.Length != this.m_BuffType.Length))
+            {
+                this.m_NeedsToBeAnchored = this.m_BuffType.Select(x => false).ToArray();
+            }
             base.block.AttachEvent.Subscribe(new Action(this.OnAttach));
             base.block.DetachEvent.Subscribe(new Action(this.OnDetach));
         }
