@@ -1,4 +1,4 @@
-## TerraTech Buff Blocks (v1.0.4)
+## TerraTech Buff Blocks (v1.0.5)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
@@ -64,6 +64,12 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
+
+7/16/2020, v1.0.5:
+
+* Added `WheelsSuspension` buff type, allowing super rigid, or super loose wheel springs.
+
+* Added `ItemProSpeed` buff type, increases the speed at which item producers produce. Especially miners.
 
 7/14/2020, v1.0.4:
 
