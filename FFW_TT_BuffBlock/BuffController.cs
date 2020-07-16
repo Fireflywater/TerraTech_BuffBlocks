@@ -156,6 +156,10 @@ namespace FFW_TT_BuffBlock
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
+
+            Vector3 test = new Vector3(10, 10, 10);
+            Console.WriteLine("FFW!");
+            Console.WriteLine(test.RandomVariance(10));
             foreach (BuffController element in BuffController.allControllers)
             {
                 if (element.tank == objTank)
@@ -330,7 +334,7 @@ namespace FFW_TT_BuffBlock
                     ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
                     ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
                     wheelparams.tireProperties.props.gripFactorLong = this.wheelsGripOld[wheels][0] * this.GetBuffAverage("wheelsGripBuffBlocks") + this.GetBuffAddAverage("wheelsGripBuffBlocks");
-                    wheelparams.tireProperties.props.gripFactorLat = this.wheelsGripOld[wheels][1] * this.GetBuffAverage("wheelsGripBuffBlocks") + this.GetBuffAddAverage("wheelsGripBuffBlocks");
+                    //wheelparams.tireProperties.props.gripFactorLat = this.wheelsGripOld[wheels][1] * this.GetBuffAverage("wheelsGripBuffBlocks") + this.GetBuffAddAverage("wheelsGripBuffBlocks");
                     this.RefreshWheels(wheels, torque, wheelparams);
                 }
             }
@@ -701,6 +705,9 @@ namespace FFW_TT_BuffBlock
             torque.passiveBrakeMaxTorque = this.wheelsBrakeOld[wheels][0];
             torque.basicFrictionTorque = this.wheelsBrakeOld[wheels][1];
             torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels];
+            wheelparams.tireProperties.props.gripFactorLong = this.wheelsGripOld[wheels][0];
+            //wheelparams.tireProperties.props.gripFactorLat = this.wheelsGripOld[wheels][1];
+
             this.RefreshWheels(wheels, torque, wheelparams);
             this.wheelsList.Remove(wheels);
             this.wheelsRpmOld.Remove(wheels);
