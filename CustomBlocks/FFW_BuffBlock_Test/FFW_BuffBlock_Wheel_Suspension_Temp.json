@@ -1,7 +1,7 @@
 {
-  "Name": "WHEEL RPM TEST TEST",
+  "Name": "WHEEL SUSPENSION TEST TEST",
   "Description": "aaaaaa",
-  "ID": 6630001, 
+  "ID": 6630021, 
 
   "Faction": 0, 
   "Category": 5, 
@@ -41,8 +41,8 @@
   "KeepColliders": false,
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
-		"m_BuffType": ["WheelsRpm"],
-		"m_Strength": [2.0],
+		"m_BuffType": ["WheelsSuspension"],
+		"m_Strength": [0.01],
 		"m_AddAfter": [0.0],
 		"m_NeedsToBeAnchored": [false]
 	}

@@ -23,7 +23,8 @@ namespace FFW_TT_BuffBlock
         public List<ModuleItemConsume> itemConList = new List<ModuleItemConsume>();
         public List<ModuleHeart> heartList = new List<ModuleHeart>();
         public List<ModuleItemPickup> itemPickupList = new List<ModuleItemPickup>();
-        
+        public List<ModuleItemProducer> itemProList = new List<ModuleItemProducer>();
+
         /* WEAPON : FIRE RATE */
         public Dictionary<ModuleBuff, int> weaponCooldownBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWeaponGun, List<float>> weaponCooldownOld = new Dictionary<ModuleWeaponGun, List<float>>(); // [0] = ShotCooldown, [1] = BurstCooldown
@@ -144,7 +145,6 @@ namespace FFW_TT_BuffBlock
             .GetField("m_NeedsToBeAnchored", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* HEART SCU : NEEDS ANCHORED */
-
         public Dictionary<ModuleBuff, bool> heartAnchorBuffBlocks = new Dictionary<ModuleBuff, bool>();
         public Dictionary<ModuleHeart, bool> heartAnchorOld = new Dictionary<ModuleHeart, bool>();
         public bool HeartAnchorFixed { get { return itemConAnchorBuffBlocks.ContainsValue(true); } } // Priority on True
@@ -152,11 +152,18 @@ namespace FFW_TT_BuffBlock
             .GetField("m_HasAnchor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* ITEM PICKUP : RANGE */
-
         public Dictionary<ModuleBuff, int> itemPickupRangeBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleItemPickup, float> itemPickupRangeOld = new Dictionary<ModuleItemPickup, float>();
         public static FieldInfo field_ItemPickupRange = typeof(ModuleItemPickup)
             .GetField("m_PickupRange", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        /* ITEM PRODUCE : SPEED */
+        public Dictionary<ModuleBuff, int> itemProSpeedBuffBlocks = new Dictionary<ModuleBuff, int>();
+        public Dictionary<ModuleItemProducer, List<float>> itemProSpeedOld = new Dictionary<ModuleItemProducer, List<float>>(); //[0] = m_SecPerItemProduced, [1] = m_MinDispenseInterval
+        public static FieldInfo field_ItemProSpeed1 = typeof(ModuleItemProducer)
+            .GetField("m_SecPerItemProduced", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        public static FieldInfo field_ItemProSpeed2 = typeof(ModuleItemProducer)
+            .GetField("m_MinDispenseInterval", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -429,6 +436,14 @@ namespace FFW_TT_BuffBlock
                     field_ItemPickupRange.SetValue(item, this.itemPickupRangeOld[item] * this.GetBuffAverage("itemPickupRangeBuffBlocks") + this.GetBuffAddAverage("itemPickupRangeBuffBlocks"));
                 }
             }
+            if (type.Contains("ItemProSpeed") || type.Contains("All"))
+            {
+                foreach (ModuleItemProducer item in this.itemProList)
+                {
+                    field_ItemProSpeed1.SetValue(item, this.itemProSpeedOld[item][0] * this.GetBuffAverage("itemProSpeedBuffBlocks") + this.GetBuffAddAverage("itemProSpeedBuffBlocks"));
+                    field_ItemProSpeed2.SetValue(item, this.itemProSpeedOld[item][1] * this.GetBuffAverage("itemProSpeedBuffBlocks") + this.GetBuffAddAverage("itemProSpeedBuffBlocks"));
+                }
+            }
         }
 
         public void AddBuff(ModuleBuff buff)
@@ -522,6 +537,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.itemPickupRangeBuffBlocks.Add(buff, buff.GetEffect("ItemPickupRange"));
             }
+            if (effects.Contains("ItemProSpeed"))
+            {
+                this.itemProSpeedBuffBlocks.Add(buff, buff.GetEffect("ItemProSpeed"));
+            }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -600,6 +619,10 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("ItemPickupRange"))
             {
                 this.itemPickupRangeBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("ItemProSpeed"))
+            {
+                this.itemProSpeedBuffBlocks.Remove(buff);
             }
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -882,6 +905,26 @@ namespace FFW_TT_BuffBlock
             field_ItemPickupRange.SetValue(item, this.itemPickupRangeOld[item]);
             this.itemPickupList.Remove(item);
             this.itemPickupRangeOld.Remove(item);
+        }
+
+        public void AddItemPro(ModuleItemProducer item)
+        {
+            this.itemProList.Add(item);
+            this.itemProSpeedOld.Add(item, new List<float>()
+            {
+                (float)field_ItemProSpeed1.GetValue(item),
+                (float)field_ItemProSpeed2.GetValue(item)
+            });
+
+            this.Update(new string[] { "ItemProSpeed" });
+        }
+
+        public void RemoveItemPro(ModuleItemProducer item)
+        {
+            field_ItemProSpeed1.SetValue(item, this.itemProSpeedOld[item][0]);
+            field_ItemProSpeed2.SetValue(item, this.itemProSpeedOld[item][1]);
+            this.itemProList.Remove(item);
+            this.itemProSpeedOld.Remove(item);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque, ManWheels.WheelParams wheelparams)

@@ -1,7 +1,7 @@
 {
-  "Name": "WHEEL RPM TEST TEST",
+  "Name": "ITEMPRO SPEED TEST TEST",
   "Description": "aaaaaa",
-  "ID": 6630001, 
+  "ID": 6630022, 
 
   "Faction": 0, 
   "Category": 5, 
@@ -41,8 +41,8 @@
   "KeepColliders": false,
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
-		"m_BuffType": ["WheelsRpm"],
-		"m_Strength": [2.0],
+		"m_BuffType": ["ItemProSpeed"],
+		"m_Strength": [0.1],
 		"m_AddAfter": [0.0],
 		"m_NeedsToBeAnchored": [false]
 	}
