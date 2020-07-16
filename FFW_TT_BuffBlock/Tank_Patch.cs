@@ -39,6 +39,20 @@ namespace FFW_TT_BuffBlock
             }
         }*/
 
+        /*[HarmonyPatch(typeof(Extensions), "RandomVariance")]
+        class Vector3_RandomVariance_Patch
+        {
+            static Vector3 Postfix(ref Vector3 v, ref float variance, ref Vector3 __result)
+            {
+                Console.WriteLine("FFW?");
+                return new Vector3(
+                    v.x + UnityEngine.Random.Range(-variance, variance), 
+                    v.y + UnityEngine.Random.Range(-variance, variance), 
+                    v.z + UnityEngine.Random.Range(-variance, variance)
+                );
+            }
+        }*/
+        
         [HarmonyPatch(typeof(ModuleWeaponGun), "OnAttach")]
         class ModuleWeaponGun_Attach_Patch
         {

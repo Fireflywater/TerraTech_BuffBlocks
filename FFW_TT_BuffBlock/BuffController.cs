@@ -96,6 +96,10 @@ namespace FFW_TT_BuffBlock
         public Dictionary<ModuleBuff, int> wheelsGripBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWheels, List<float>> wheelsGripOld = new Dictionary<ModuleWheels, List<float>>(); //[0] = gripFactorLong, [1] = gripFactorLat
 
+        /* WHEELS : SUSPENSION */
+        public Dictionary<ModuleBuff, int> wheelsSuspensionBuffBlocks = new Dictionary<ModuleBuff, int>();
+        public Dictionary<ModuleWheels, List<float>> wheelsSuspensionOld = new Dictionary<ModuleWheels, List<float>>(); //[0] = suspensionSpring, [1] = suspensionDamper
+
         /* BOOSTER : BURN RATE */
         public Dictionary<ModuleBuff, int> boosterBurnRateBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleBooster, float> boosterBurnRateOld = new Dictionary<ModuleBooster, float>();
@@ -156,10 +160,6 @@ namespace FFW_TT_BuffBlock
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
-
-            Vector3 test = new Vector3(10, 10, 10);
-            Console.WriteLine("FFW!");
-            Console.WriteLine(test.RandomVariance(10));
             foreach (BuffController element in BuffController.allControllers)
             {
                 if (element.tank == objTank)
@@ -338,6 +338,17 @@ namespace FFW_TT_BuffBlock
                     this.RefreshWheels(wheels, torque, wheelparams);
                 }
             }
+            if (type.Contains("WheelsSuspension") || type.Contains("All"))
+            {
+                foreach (ModuleWheels wheels in this.wheelsList)
+                {
+                    ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
+                    wheelparams.suspensionSpring = this.wheelsSuspensionOld[wheels][0] * this.GetBuffAverage("wheelsSuspensionBuffBlocks") + this.GetBuffAddAverage("wheelsSuspensionBuffBlocks");
+                    wheelparams.suspensionDamper = this.wheelsSuspensionOld[wheels][1] * this.GetBuffAverage("wheelsSuspensionBuffBlocks") + this.GetBuffAddAverage("wheelsSuspensionBuffBlocks");
+                    this.RefreshWheels(wheels, torque, wheelparams);
+                }
+            }
             if (type.Contains("BoosterBurnRate") || type.Contains("All"))
             {
                 foreach (ModuleBooster booster in this.boosterList)
@@ -459,6 +470,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.wheelsGripBuffBlocks.Add(buff, buff.GetEffect("WheelsGrip"));
             }
+            if (effects.Contains("WheelsSuspension"))
+            {
+                this.wheelsSuspensionBuffBlocks.Add(buff, buff.GetEffect("WheelsSuspension"));
+            }
             if (effects.Contains("BoosterBurnRate"))
             {
                 this.boosterBurnRateBuffBlocks.Add(buff, buff.GetEffect("BoosterBurnRate"));
@@ -550,6 +565,10 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("WheelsGrip"))
             {
                 this.wheelsGripBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("WheelsSuspension"))
+            {
+                this.wheelsSuspensionBuffBlocks.Remove(buff);
             }
             if (effects.Contains("BoosterBurnRate"))
             {
@@ -692,8 +711,13 @@ namespace FFW_TT_BuffBlock
                 wheelparams.tireProperties.props.gripFactorLong,
                 wheelparams.tireProperties.props.gripFactorLat
             });
+            this.wheelsSuspensionOld.Add(wheels, new List<float>()
+            {
+                wheelparams.suspensionSpring,
+                wheelparams.suspensionDamper
+            });
 
-            this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip" });
+            this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip", "WheelsSuspension" });
             //this.RefreshWheels(wheels, torque);
         }
 
@@ -707,6 +731,8 @@ namespace FFW_TT_BuffBlock
             torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels];
             wheelparams.tireProperties.props.gripFactorLong = this.wheelsGripOld[wheels][0];
             //wheelparams.tireProperties.props.gripFactorLat = this.wheelsGripOld[wheels][1];
+            wheelparams.suspensionSpring = this.wheelsSuspensionOld[wheels][0];
+            wheelparams.suspensionDamper = this.wheelsSuspensionOld[wheels][1];
 
             this.RefreshWheels(wheels, torque, wheelparams);
             this.wheelsList.Remove(wheels);
@@ -714,6 +740,7 @@ namespace FFW_TT_BuffBlock
             this.wheelsBrakeOld.Remove(wheels);
             this.wheelsTorqueOld.Remove(wheels);
             this.wheelsGripOld.Remove(wheels);
+            this.wheelsSuspensionOld.Remove(wheels);
         }
 
         public void AddBooster(ModuleBooster booster)
