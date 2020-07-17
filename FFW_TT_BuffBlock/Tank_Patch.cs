@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Harmony;
 using System.Reflection;
+using System.Reflection.Emit;
 using UnityEngine;
 using System.Runtime.CompilerServices;
 
@@ -52,7 +53,36 @@ namespace FFW_TT_BuffBlock
                 );
             }
         }*/
-        
+
+        [HarmonyPatch(typeof(ManWheels.Wheel), "UpdateAttachData")] // Thanks Aceba!
+        private static class FixUpdateAttachData
+        {
+            public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+            {
+                var codes = new List<CodeInstruction>(instructions);
+                /*for (int i = 0; i < codes.Count; i++)
+                {
+                    if (codes[i].opcode == OpCodes.Ldstr)
+                    {
+                        codes.RemoveAt(i);
+                        break;
+                    }
+                }
+                for (int i = 0; i < codes.Count; i++)
+                {
+                    if (codes[i].opcode == OpCodes.Call)
+                    {
+                        codes.RemoveAt(i);
+                        break;
+                    }
+                }*/
+
+                codes = codes.Skip(2).ToList();
+                Console.WriteLine("FFW: Transpiled ManWheels.Wheel.UpdateAttachData()");
+                return codes;
+            }
+        }
+
         [HarmonyPatch(typeof(ModuleWeaponGun), "OnAttach")]
         class ModuleWeaponGun_Attach_Patch
         {

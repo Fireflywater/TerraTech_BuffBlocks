@@ -71,11 +71,15 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 * Added `ItemProSpeed` buff type, increases the speed at which item producers produce. Especially miners.
 
+* Refactored code so wheels refresh less often, improving performance. Especially when techs spawn with many wheels.
+
+* Thanks to Aceba, transpiled away the error message of `ManWheels.Wheels.UpdateAttachData()`, resulting in far less output_log spam.
+
 7/14/2020, v1.0.4:
 
 * Anchoring now sends smaller Refresh requests, reducing On Anchor lagspikes.
 
-* ~~Rebuilt ManWheels.Wheels.UpdateAttachData() to not log errors, cleaning up the Output_log spam.~~ Rollback due to Reflection's MethodInfo.Invoke() not behaving.
+* ~~Rebuilt `ManWheels.Wheels.UpdateAttachData()` to not log errors, cleaning up the Output_log spam.~~ Rollback due to Reflection's MethodInfo.Invoke() not behaving.
 
 * m_Strength, m_AddAfter, and m_NeedsToBeAnchored now make default values if they're not stated in block JSON.
 
