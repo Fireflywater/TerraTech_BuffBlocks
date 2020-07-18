@@ -43,24 +43,70 @@ namespace FFW_TT_BuffBlock
             return a;
         }
 
-        public object[] GetObjAndField(object x, string path) // [0] = OBJECT, [1] = FIELDINFO
+        public KeyValuePair<FieldInfo, List<object>>? GetObjAndField(object x, string path) // [0] = OBJECT, [1] = FIELDINFO
         {
             List<string> splitPath = path.Split('.').ToList();
-            object tgtObjPre = null;
-            object tgtObj = x;
-            FieldInfo tgtStat = null;
-            foreach(string e in splitPath)
+
+            List<object> lastIterObjs = null;
+            List<object> thisIterObjs = new List<object> { x };
+
+            FieldInfo field_lastIter = null;
+            FieldInfo field_thisIter = null;
+
+            Console.WriteLine("FFW! 01");
+            foreach (string e in splitPath)
             {
-                tgtStat = tgtObj.GetType()
-                    .GetField(e, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                tgtObjPre = tgtObj;
-                tgtObj = tgtStat.GetValue(tgtObj);
+                Console.WriteLine("FFW! 02");
+                field_lastIter = field_thisIter;
+                Console.WriteLine("FFW! 03");
+                lastIterObjs = new List<object>(thisIterObjs);
+                Console.WriteLine("FFW! 04");
+                thisIterObjs = new List<object>();
+                Console.WriteLine("FFW! 05");
+                foreach (object obj in lastIterObjs)
+                {
+                    Console.WriteLine("FFW! 06");
+                    field_thisIter = obj.GetType().GetField(e, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    Console.WriteLine("FFW! 07");
+                    object value_thisIter = field_thisIter.GetValue(obj);
+                    Console.WriteLine("FFW! 08");
+                    if (value_thisIter.GetType() == typeof(Array))
+                    {
+                        Console.WriteLine("FFW! 09 array");
+                        Array value_thisIterCasted = (Array)value_thisIter;
+                        Console.WriteLine("FFW! 10 array");
+                        foreach (object element in value_thisIterCasted)
+                        {
+                            Console.WriteLine("FFW! 11 array");
+                            thisIterObjs.Add(element);
+                        }
+                    }
+                    else if (value_thisIter.GetType() == typeof(List<HoverJet>))
+                    {
+                        Console.WriteLine("FFW! 09 list");
+                        List<HoverJet> value_thisIterCasted = (List<HoverJet>)value_thisIter;
+                        Console.WriteLine("FFW! 10 list");
+                        foreach (HoverJet element in value_thisIterCasted)
+                        {
+                            Console.WriteLine("FFW! 11 list");
+                            thisIterObjs.Add(element);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("FFW! 09 else");
+                        thisIterObjs.Add(value_thisIter);
+                    }
+                }
             }
-            if ((tgtStat != null) && (tgtStat.GetValue(tgtObjPre) != null))
+
+            Console.WriteLine("FFW! 21");
+            if (field_thisIter != null)
             {
-                return new object[] { tgtObjPre, tgtStat };
+                Console.WriteLine("FFW! 22");
+                return new KeyValuePair<FieldInfo, List<object>>(field_thisIter, lastIterObjs );
             }
-            return new object[] { null, null };
+            return null;
         }
 
         public void AddBuff(ModuleBuff buff)
@@ -78,11 +124,15 @@ namespace FFW_TT_BuffBlock
             this.effectMemory.Add(obj, new List<float>());
             foreach (string path in this.effectPaths)
             {
-                object[] y = this.GetObjAndField(obj, path);
-                if ((y[0] != null) && (y[1] != null))
+                KeyValuePair<FieldInfo, List<object>>? yNull = this.GetObjAndField(obj, path);
+                if (yNull != null)
                 {
-                    FieldInfo z = (FieldInfo)y[1];
-                    this.effectMemory[obj].Add((float)z.GetValue(y[0]));
+                    KeyValuePair<FieldInfo, List<object>> y = (KeyValuePair<FieldInfo, List<object>>)yNull;
+                    FieldInfo z = (FieldInfo)y.Key;
+                    foreach (object ara in y.Value)
+                    {
+                        this.effectMemory[obj].Add((float)z.GetValue(ara));
+                    }
                 }
             }
         }
@@ -94,11 +144,15 @@ namespace FFW_TT_BuffBlock
                 int i = 0;
                 foreach (string path in this.effectPaths)
                 {
-                    object[] y = this.GetObjAndField(element, path);
-                    if ((y[0] != null) && (y[1] != null))
+                    KeyValuePair<FieldInfo, List<object>>? yNull = this.GetObjAndField(element, path);
+                    if (yNull != null)
                     {
-                        FieldInfo z = (FieldInfo)y[1];
-                        z.SetValue(y[0], this.effectMemory[element][i] * this.GetBuffAverage() + this.GetBuffAddAverage());
+                        KeyValuePair<FieldInfo, List<object>> y = (KeyValuePair<FieldInfo, List<object>>)yNull;
+                        FieldInfo z = (FieldInfo)y.Key;
+                        foreach (object ara in y.Value)
+                        {
+                            z.SetValue(ara, this.effectMemory[element][i] * this.GetBuffAverage() + this.GetBuffAddAverage());
+                        }
                     }
                     i++;
                 }
@@ -110,11 +164,15 @@ namespace FFW_TT_BuffBlock
             int i = 0;
             foreach (string path in this.effectPaths)
             {
-                object[] y = this.GetObjAndField(obj, path);
-                if ((y[0] != null) && (y[1] != null))
+                KeyValuePair<FieldInfo, List<object>>? yNull = this.GetObjAndField(obj, path);
+                if (yNull != null)
                 {
-                    FieldInfo z = (FieldInfo)y[1];
-                    z.SetValue(y[0], this.effectMemory[obj][i]);
+                    KeyValuePair<FieldInfo, List<object>> y = (KeyValuePair<FieldInfo, List<object>>)yNull;
+                    FieldInfo z = (FieldInfo)y.Key;
+                    foreach (object ara in y.Value)
+                    {
+                        z.SetValue(ara, this.effectMemory[obj][i]);
+                    }
                 }
                 i++;
             }

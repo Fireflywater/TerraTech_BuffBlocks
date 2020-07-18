@@ -15,10 +15,14 @@ namespace FFW_TT_BuffBlock
             { "WeaponCooldown" , new string[] { "m_WeaponModule.m_ShotCooldown", "m_ShotCooldown", "m_BurstCooldown" } },
             { "WeaponRotation" , new string[] { "m_WeaponModule.m_RotateSpeed" } },
             { "WeaponSpread" , new string[] { "m_FiringData.m_BulletSprayVariance" } },
-            { "WeaponVelocity" , new string[] { "m_FiringData.m_MuzzleVelocity" } }
+            { "WeaponVelocity" , new string[] { "m_FiringData.m_MuzzleVelocity" } },
+            { "HoverForce" , new string[] { "jets.forceMax" } },
+            { "HoverRange" , new string[] { "jets.forceRangeMax" } },
+            { "HoverDamping" , new string[] { "jets.m_DampingScale" } }
         };
         public Dictionary<string, BuffSegment> allSegments = new Dictionary<string, BuffSegment>();
         public List<object> weaponListGeneric = new List<object>();
+        public List<object> hoverListGeneric = new List<object>();
 
         /* PRIME PROPERTIES */
         public static List<BuffController> allControllers = new List<BuffController>();
@@ -284,6 +288,9 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponRotation"].UpdateObject(this.weaponListGeneric);
             this.allSegments["WeaponSpread"].UpdateObject(this.weaponListGeneric);
             this.allSegments["WeaponVelocity"].UpdateObject(this.weaponListGeneric);
+            this.allSegments["HoverForce"].UpdateObject(this.hoverListGeneric);
+            this.allSegments["HoverRange"].UpdateObject(this.hoverListGeneric);
+            this.allSegments["HoverDamping"].UpdateObject(this.hoverListGeneric);
             // Use "All" to update all, use m_BuffType to update specifics
             /*if (type.Contains("WeaponCooldown") || type.Contains("All"))
             {
@@ -531,7 +538,7 @@ namespace FFW_TT_BuffBlock
                     field_ItemProSpeed2.SetValue(item, this.itemProSpeedOld[item][1] * this.GetBuffAverage("itemProSpeedBuffBlocks") + this.GetBuffAddAverage("itemProSpeedBuffBlocks"));
                 }
             }
-            if (type.Contains("HoverForce") ||
+            /*if (type.Contains("HoverForce") ||
                 type.Contains("HoverRange") ||
                 type.Contains("HoverDamping") ||
                 type.Contains("All"))
@@ -546,7 +553,7 @@ namespace FFW_TT_BuffBlock
                         field_Damping.SetValue(jet, this.hoverDampingOld[hover] * this.GetBuffAverage("hoverDampingBuffBlocks") + this.GetBuffAddAverage("hoverRangeBuffBlocks"));
                     }
                 }
-            }
+            }*/
         }
 
         public void AddBuff(ModuleBuff buff)
@@ -650,14 +657,17 @@ namespace FFW_TT_BuffBlock
             }
             if (effects.Contains("HoverForce"))
             {
+                this.allSegments["HoverForce"].AddBuff(buff);
                 this.hoverForceBuffBlocks.Add(buff, buff.GetEffect("HoverForce"));
             }
             if (effects.Contains("HoverRange"))
             {
+                this.allSegments["HoverRange"].AddBuff(buff);
                 this.hoverRangeBuffBlocks.Add(buff, buff.GetEffect("HoverRange"));
             }
             if (effects.Contains("HoverDamping"))
             {
+                this.allSegments["HoverDamping"].AddBuff(buff);
                 this.hoverDampingBuffBlocks.Add(buff, buff.GetEffect("HoverDamping"));
             }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
@@ -749,14 +759,17 @@ namespace FFW_TT_BuffBlock
             }
             if (effects.Contains("HoverForce"))
             {
+                this.allSegments["HoverForce"].RemoveBuff(buff);
                 this.hoverForceBuffBlocks.Remove(buff);
             }
             if (effects.Contains("HoverRange"))
             {
+                this.allSegments["HoverRange"].RemoveBuff(buff);
                 this.hoverRangeBuffBlocks.Remove(buff);
             }
             if (effects.Contains("HoverDamping"))
             {
+                this.allSegments["HoverDamping"].RemoveBuff(buff);
                 this.hoverDampingBuffBlocks.Remove(buff);
             }
             this.Update(buff.m_BuffType);
@@ -1076,6 +1089,12 @@ namespace FFW_TT_BuffBlock
 
         public void AddHover(ModuleHover hover)
         {
+            this.hoverListGeneric.Add(hover);
+            this.allSegments["HoverForce"].SaveObject(hover);
+            this.allSegments["HoverRange"].SaveObject(hover);
+            this.allSegments["HoverDamping"].SaveObject(hover);
+
+
             this.hoverList.Add(hover);
             /*this.hoverForceOld.Add(item, new List<float>()
             {
@@ -1120,6 +1139,12 @@ namespace FFW_TT_BuffBlock
             this.hoverForceOld.Remove(hover);
             this.hoverRangeOld.Remove(hover);
             this.hoverDampingOld.Remove(hover);
+
+
+            this.allSegments["HoverForce"].CleanObject(hover);
+            this.allSegments["HoverRange"].CleanObject(hover);
+            this.allSegments["HoverDamping"].CleanObject(hover);
+            this.hoverListGeneric.Remove(hover);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque, ManWheels.WheelParams wheelparams)
