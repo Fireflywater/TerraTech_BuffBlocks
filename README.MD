@@ -73,6 +73,8 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 * Added `HoverRange` buff type, which can increase or decrease the ride height of hoverpads.
 
+* Added `HoverDamping` buff type, which, uh, how do I explain it?
+
 7/16/2020, v1.0.5:
 
 * Added `WheelsSuspension` buff type, allowing super rigid, or super loose wheel springs.
