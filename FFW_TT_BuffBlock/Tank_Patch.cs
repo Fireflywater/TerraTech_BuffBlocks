@@ -323,6 +323,28 @@ namespace FFW_TT_BuffBlock
                 return true;
             }
         }
+
+        [HarmonyPatch(typeof(ModuleHover), "OnAttach")]
+        class ModuleHover_Attach_Patch
+        {
+            static bool Prefix(ref ModuleHover __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddHover(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleHover), "OnDetach")]
+        class ModuleHover_Detach_Patch
+        {
+            static bool Prefix(ref ModuleHover __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveHover(__instance);
+                return true;
+            }
+        }
     }
 }
 

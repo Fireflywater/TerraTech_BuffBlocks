@@ -24,6 +24,7 @@ namespace FFW_TT_BuffBlock
         public List<ModuleHeart> heartList = new List<ModuleHeart>();
         public List<ModuleItemPickup> itemPickupList = new List<ModuleItemPickup>();
         public List<ModuleItemProducer> itemProList = new List<ModuleItemProducer>();
+        public List<ModuleHover> hoverList = new List<ModuleHover>();
 
         /* WEAPON : FIRE RATE */
         public Dictionary<ModuleBuff, int> weaponCooldownBuffBlocks = new Dictionary<ModuleBuff, int>();
@@ -164,6 +165,14 @@ namespace FFW_TT_BuffBlock
             .GetField("m_SecPerItemProduced", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         public static FieldInfo field_ItemProSpeed2 = typeof(ModuleItemProducer)
             .GetField("m_MinDispenseInterval", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        /* HOVER : FORCE */
+        public Dictionary<ModuleBuff, int> hoverForceBuffBlocks = new Dictionary<ModuleBuff, int>();
+        public Dictionary<ModuleHover, float> hoverForceOld = new Dictionary<ModuleHover, float>();
+        public static FieldInfo field_HoverJets = typeof(ModuleHover)
+            .GetField("jets", BindingFlags.NonPublic | BindingFlags.Instance);
+        public static FieldInfo field_ForceMax = typeof(HoverJet)
+            .GetField("forceMax", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -471,6 +480,17 @@ namespace FFW_TT_BuffBlock
                     field_ItemProSpeed2.SetValue(item, this.itemProSpeedOld[item][1] * this.GetBuffAverage("itemProSpeedBuffBlocks") + this.GetBuffAddAverage("itemProSpeedBuffBlocks"));
                 }
             }
+            if (type.Contains("HoverForce") || type.Contains("All"))
+            {
+                foreach (ModuleHover hover in this.hoverList)
+                {
+                    List<HoverJet> value_HoverJets = (List<HoverJet>)field_HoverJets.GetValue(hover);
+                    foreach (HoverJet jet in value_HoverJets)
+                    {
+                        field_ForceMax.SetValue(jet, this.hoverForceOld[hover] * this.GetBuffAverage("hoverForceBuffBlocks") + this.GetBuffAddAverage("hoverForceBuffBlocks"));
+                    }
+                }
+            }
         }
 
         public void AddBuff(ModuleBuff buff)
@@ -568,6 +588,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.itemProSpeedBuffBlocks.Add(buff, buff.GetEffect("ItemProSpeed"));
             }
+            if (effects.Contains("HoverForce"))
+            {
+                this.hoverForceBuffBlocks.Add(buff, buff.GetEffect("HoverForce"));
+            }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -650,6 +674,10 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("ItemProSpeed"))
             {
                 this.itemProSpeedBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("HoverForce"))
+            {
+                this.hoverForceBuffBlocks.Remove(buff);
             }
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -952,6 +980,40 @@ namespace FFW_TT_BuffBlock
             field_ItemProSpeed2.SetValue(item, this.itemProSpeedOld[item][1]);
             this.itemProList.Remove(item);
             this.itemProSpeedOld.Remove(item);
+        }
+
+        public void AddHover(ModuleHover hover)
+        {
+            this.hoverList.Add(hover);
+            /*this.hoverForceOld.Add(item, new List<float>()
+            {
+                (float)field_ItemProSpeed1.GetValue(item),
+                (float)field_ItemProSpeed2.GetValue(item)
+            });*/
+            List<HoverJet> value_HoverJets = (List<HoverJet>)field_HoverJets.GetValue(hover);
+            foreach (HoverJet jet in value_HoverJets)
+            {
+                if (!hoverForceOld.ContainsKey(hover))
+                {
+                    float value_ForceMax = (float)field_ForceMax.GetValue(jet);
+                    this.hoverForceOld.Add(hover, value_ForceMax);
+                }
+            }
+            this.Update(new string[] { "HoverForce" });
+        }
+
+        public void RemoveHover(ModuleHover hover)
+        {
+            List<HoverJet> value_HoverJets = (List<HoverJet>)field_HoverJets.GetValue(hover);
+            foreach (HoverJet jet in value_HoverJets)
+            {
+                if (this.hoverForceOld.ContainsKey(hover))
+                {
+                    field_ForceMax.SetValue(jet, this.hoverForceOld[hover]);
+                }
+            }
+            this.hoverList.Remove(hover);
+            this.hoverForceOld.Remove(hover);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque, ManWheels.WheelParams wheelparams)
