@@ -11,9 +11,11 @@ namespace FFW_TT_BuffBlock
     class BuffController
     {
         /* TEST PROPERTIES */
-        public static string[] allEffects = new string[] { "WeaponCooldown" };
-        public static string[][] allPaths = new string[][] {
-            new string[] { "m_WeaponModule.m_ShotCooldown", "m_ShotCooldown", "m_BurstCooldown" }
+        public static Dictionary<string, string[]> allEffects = new Dictionary<string, string[]> {
+            { "WeaponCooldown" , new string[] { "m_WeaponModule.m_ShotCooldown", "m_ShotCooldown", "m_BurstCooldown" } },
+            { "WeaponRotation" , new string[] { "m_WeaponModule.m_RotateSpeed" } },
+            { "WeaponSpread" , new string[] { "m_FiringData.m_BulletSprayVariance" } },
+            { "WeaponVelocity" , new string[] { "m_FiringData.m_MuzzleVelocity" } }
         };
         public Dictionary<string, BuffSegment> allSegments = new Dictionary<string, BuffSegment>();
         public List<object> weaponListGeneric = new List<object>();
@@ -207,7 +209,7 @@ namespace FFW_TT_BuffBlock
             {
                 tank = objTank
             };
-            for (int i = 0; i < BuffController.allEffects.Length; i++)
+            /*for (int i = 0; i < BuffController.allEffects.Length; i++)
             {
                 BuffSegment newSegment = new BuffSegment
                 {
@@ -217,6 +219,18 @@ namespace FFW_TT_BuffBlock
                     effectPaths = BuffController.allPaths[i]
                 };
                 newObject.allSegments.Add(BuffController.allEffects[i], newSegment);
+            }*/
+            foreach (KeyValuePair<string, string[]> entry in BuffController.allEffects)
+            {
+                BuffSegment newSegment = new BuffSegment
+                {
+                    tank = newObject.tank,
+                    controller = newObject,
+                    effectType = entry.Key,
+                    effectPaths = entry.Value
+                };
+                newObject.allSegments.Add(entry.Key, newSegment);
+                //Console.WriteLine("FFW: Entry Key Type: " + entry.Key.GetType().Name + " / Entry Value Length: " + entry.Value.Length);
             }
             BuffController.AddObject(newObject);
             Console.WriteLine("FFW: Active BuffControls: " + BuffController.allControllers.Count);
@@ -266,9 +280,14 @@ namespace FFW_TT_BuffBlock
 
         public void Update(string[] type)
         {
+            this.allSegments["WeaponCooldown"].UpdateObject(this.weaponListGeneric);
+            this.allSegments["WeaponRotation"].UpdateObject(this.weaponListGeneric);
+            this.allSegments["WeaponSpread"].UpdateObject(this.weaponListGeneric);
+            this.allSegments["WeaponVelocity"].UpdateObject(this.weaponListGeneric);
             // Use "All" to update all, use m_BuffType to update specifics
-            if (type.Contains("WeaponCooldown") || type.Contains("All"))
+            /*if (type.Contains("WeaponCooldown") || type.Contains("All"))
             {
+                this.allSegments["WeaponCooldown"].UpdateObject(this.weaponListGeneric);
                 foreach (ModuleWeaponGun weapon in this.weaponList)
                 {
                     field_ShotCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][0] * this.GetBuffAverage("weaponCooldownBuffBlocks") + this.GetBuffAddAverage("weaponCooldownBuffBlocks"));
@@ -300,7 +319,7 @@ namespace FFW_TT_BuffBlock
                     FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
                     field_Velocity.SetValue(value_FiringData, this.weaponVelocityOld[weapon] * this.GetBuffAverage("weaponVelocityBuffBlocks") + this.GetBuffAddAverage("weaponVelocityBuffBlocks"));
                 }
-            }
+            }*/
             /*if (type.Contains("WeaponDamage") || type.Contains("All"))
             {
                 foreach (ModuleWeaponGun weapon in this.weaponList)
@@ -528,7 +547,6 @@ namespace FFW_TT_BuffBlock
                     }
                 }
             }
-            this.allSegments["WeaponCooldown"].UpdateObject(this.weaponListGeneric);
         }
 
         public void AddBuff(ModuleBuff buff)
@@ -541,14 +559,17 @@ namespace FFW_TT_BuffBlock
             }
             if (effects.Contains("WeaponRotation"))
             {
+                this.allSegments["WeaponRotation"].AddBuff(buff);
                 this.weaponRotationBuffBlocks.Add(buff, buff.GetEffect("WeaponRotation"));
             }
             if (effects.Contains("WeaponSpread"))
             {
+                this.allSegments["WeaponSpread"].AddBuff(buff);
                 this.weaponSpreadBuffBlocks.Add(buff, buff.GetEffect("WeaponSpread"));
             }
             if (effects.Contains("WeaponVelocity"))
             {
+                this.allSegments["WeaponVelocity"].AddBuff(buff);
                 this.weaponVelocityBuffBlocks.Add(buff, buff.GetEffect("WeaponVelocity"));
             }
             /*if (effects.Contains("WeaponDamage"))
@@ -654,14 +675,17 @@ namespace FFW_TT_BuffBlock
             }
             if (effects.Contains("WeaponRotation"))
             {
+                this.allSegments["WeaponRotation"].RemoveBuff(buff);
                 this.weaponRotationBuffBlocks.Remove(buff);
             }
             if (effects.Contains("WeaponSpread"))
             {
+                this.allSegments["WeaponSpread"].RemoveBuff(buff);
                 this.weaponSpreadBuffBlocks.Remove(buff);
             }
             if (effects.Contains("WeaponVelocity"))
             {
+                this.allSegments["WeaponVelocity"].RemoveBuff(buff);
                 this.weaponVelocityBuffBlocks.Remove(buff);
             }
             /*if (effects.Contains("WeaponDamage"))
@@ -743,6 +767,9 @@ namespace FFW_TT_BuffBlock
         {
             this.weaponListGeneric.Add(weapon);
             this.allSegments["WeaponCooldown"].SaveObject(weapon);
+            this.allSegments["WeaponRotation"].SaveObject(weapon);
+            this.allSegments["WeaponSpread"].SaveObject(weapon);
+            this.allSegments["WeaponVelocity"].SaveObject(weapon);
 
             this.weaponList.Add(weapon);
             this.weaponCooldownOld.Add(weapon, new List<float>()
@@ -790,6 +817,9 @@ namespace FFW_TT_BuffBlock
         public void RemoveWeapon(ModuleWeaponGun weapon)
         {
             this.allSegments["WeaponCooldown"].CleanObject(weapon);
+            this.allSegments["WeaponRotation"].CleanObject(weapon);
+            this.allSegments["WeaponSpread"].CleanObject(weapon);
+            this.allSegments["WeaponVelocity"].CleanObject(weapon);
             this.weaponListGeneric.Remove(weapon);
 
             field_ShotCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][0]);
