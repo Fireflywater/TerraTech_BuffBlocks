@@ -1,4 +1,4 @@
-## TerraTech Buff Blocks (v1.0.5)
+## TerraTech Buff Blocks (v1.0.6)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
@@ -41,6 +41,8 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 * "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip", "WheelsSuspension"...
 
+* "HoverForce", "HoverRange"...
+
 * "BoosterBurnRate", "DISABLEDShieldRadiusDISABLED", "DrillDps", "EnergyOps", "EnergyStoreCap", "ItemPickupRange", "ItemProSpeed"...
 
 * Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. 1.0 for no change. Default 1.0.
@@ -64,6 +66,12 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
+
+7/17/2020, v1.0.6:
+
+* Added `HoverForce` buff type, which can increase the weight handling capabilities of hoverpads.
+
+* Added `HoverRange` buff type, which can increase or decrease the ride height of hoverpads.
 
 7/16/2020, v1.0.5:
 

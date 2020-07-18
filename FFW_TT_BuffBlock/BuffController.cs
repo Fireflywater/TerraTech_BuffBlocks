@@ -174,11 +174,17 @@ namespace FFW_TT_BuffBlock
         public static FieldInfo field_ForceMax = typeof(HoverJet)
             .GetField("forceMax", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-        /* HOVER : FORCE */
+        /* HOVER : RANGE */
         public Dictionary<ModuleBuff, int> hoverRangeBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleHover, float> hoverRangeOld = new Dictionary<ModuleHover, float>();
         public static FieldInfo field_ForceRangeMax = typeof(HoverJet)
             .GetField("forceRangeMax", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+        /* HOVER : DAMPING */
+        public Dictionary<ModuleBuff, int> hoverDampingBuffBlocks = new Dictionary<ModuleBuff, int>();
+        public Dictionary<ModuleHover, float> hoverDampingOld = new Dictionary<ModuleHover, float>();
+        public static FieldInfo field_Damping = typeof(HoverJet)
+            .GetField("m_DampingScale", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -488,6 +494,7 @@ namespace FFW_TT_BuffBlock
             }
             if (type.Contains("HoverForce") ||
                 type.Contains("HoverRange") ||
+                type.Contains("HoverDamping") ||
                 type.Contains("All"))
             {
                 foreach (ModuleHover hover in this.hoverList)
@@ -497,6 +504,7 @@ namespace FFW_TT_BuffBlock
                     {
                         field_ForceMax.SetValue(jet, this.hoverForceOld[hover] * this.GetBuffAverage("hoverForceBuffBlocks") + this.GetBuffAddAverage("hoverForceBuffBlocks"));
                         field_ForceRangeMax.SetValue(jet, this.hoverRangeOld[hover] * this.GetBuffAverage("hoverRangeBuffBlocks") + this.GetBuffAddAverage("hoverRangeBuffBlocks"));
+                        field_Damping.SetValue(jet, this.hoverDampingOld[hover] * this.GetBuffAverage("hoverDampingBuffBlocks") + this.GetBuffAddAverage("hoverRangeBuffBlocks"));
                     }
                 }
             }
@@ -605,6 +613,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.hoverRangeBuffBlocks.Add(buff, buff.GetEffect("HoverRange"));
             }
+            if (effects.Contains("HoverDamping"))
+            {
+                this.hoverDampingBuffBlocks.Add(buff, buff.GetEffect("HoverDamping"));
+            }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -695,6 +707,10 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("HoverRange"))
             {
                 this.hoverRangeBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("HoverDamping"))
+            {
+                this.hoverDampingBuffBlocks.Remove(buff);
             }
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -1020,8 +1036,13 @@ namespace FFW_TT_BuffBlock
                     float value_ForceRangeMax = (float)field_ForceRangeMax.GetValue(jet);
                     this.hoverRangeOld.Add(hover, value_ForceRangeMax);
                 }
+                if (!hoverDampingOld.ContainsKey(hover))
+                {
+                    float value_Damping = (float)field_Damping.GetValue(jet);
+                    this.hoverDampingOld.Add(hover, value_Damping);
+                }
             }
-            this.Update(new string[] { "HoverForce" , "HoverRange" });
+            this.Update(new string[] { "HoverForce" , "HoverRange" , "HoverDamping" });
         }
 
         public void RemoveHover(ModuleHover hover)
@@ -1033,11 +1054,13 @@ namespace FFW_TT_BuffBlock
                 {
                     field_ForceMax.SetValue(jet, this.hoverForceOld[hover]);
                     field_ForceRangeMax.SetValue(jet, this.hoverRangeOld[hover]);
+                    field_Damping.SetValue(jet, this.hoverDampingOld[hover]);
                 }
             }
             this.hoverList.Remove(hover);
             this.hoverForceOld.Remove(hover);
             this.hoverRangeOld.Remove(hover);
+            this.hoverDampingOld.Remove(hover);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque, ManWheels.WheelParams wheelparams)
