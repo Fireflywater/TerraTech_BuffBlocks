@@ -174,6 +174,12 @@ namespace FFW_TT_BuffBlock
         public static FieldInfo field_ForceMax = typeof(HoverJet)
             .GetField("forceMax", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
+        /* HOVER : FORCE */
+        public Dictionary<ModuleBuff, int> hoverRangeBuffBlocks = new Dictionary<ModuleBuff, int>();
+        public Dictionary<ModuleHover, float> hoverRangeOld = new Dictionary<ModuleHover, float>();
+        public static FieldInfo field_ForceRangeMax = typeof(HoverJet)
+            .GetField("forceRangeMax", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
         public static BuffController MakeNewIfNone(Tank objTank)
         {
             foreach (BuffController element in BuffController.allControllers)
@@ -480,7 +486,9 @@ namespace FFW_TT_BuffBlock
                     field_ItemProSpeed2.SetValue(item, this.itemProSpeedOld[item][1] * this.GetBuffAverage("itemProSpeedBuffBlocks") + this.GetBuffAddAverage("itemProSpeedBuffBlocks"));
                 }
             }
-            if (type.Contains("HoverForce") || type.Contains("All"))
+            if (type.Contains("HoverForce") ||
+                type.Contains("HoverRange") ||
+                type.Contains("All"))
             {
                 foreach (ModuleHover hover in this.hoverList)
                 {
@@ -488,6 +496,7 @@ namespace FFW_TT_BuffBlock
                     foreach (HoverJet jet in value_HoverJets)
                     {
                         field_ForceMax.SetValue(jet, this.hoverForceOld[hover] * this.GetBuffAverage("hoverForceBuffBlocks") + this.GetBuffAddAverage("hoverForceBuffBlocks"));
+                        field_ForceRangeMax.SetValue(jet, this.hoverRangeOld[hover] * this.GetBuffAverage("hoverRangeBuffBlocks") + this.GetBuffAddAverage("hoverRangeBuffBlocks"));
                     }
                 }
             }
@@ -592,6 +601,10 @@ namespace FFW_TT_BuffBlock
             {
                 this.hoverForceBuffBlocks.Add(buff, buff.GetEffect("HoverForce"));
             }
+            if (effects.Contains("HoverRange"))
+            {
+                this.hoverRangeBuffBlocks.Add(buff, buff.GetEffect("HoverRange"));
+            }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -678,6 +691,10 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("HoverForce"))
             {
                 this.hoverForceBuffBlocks.Remove(buff);
+            }
+            if (effects.Contains("HoverRange"))
+            {
+                this.hoverRangeBuffBlocks.Remove(buff);
             }
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -998,8 +1015,13 @@ namespace FFW_TT_BuffBlock
                     float value_ForceMax = (float)field_ForceMax.GetValue(jet);
                     this.hoverForceOld.Add(hover, value_ForceMax);
                 }
+                if (!hoverRangeOld.ContainsKey(hover))
+                {
+                    float value_ForceRangeMax = (float)field_ForceRangeMax.GetValue(jet);
+                    this.hoverRangeOld.Add(hover, value_ForceRangeMax);
+                }
             }
-            this.Update(new string[] { "HoverForce" });
+            this.Update(new string[] { "HoverForce" , "HoverRange" });
         }
 
         public void RemoveHover(ModuleHover hover)
@@ -1010,10 +1032,12 @@ namespace FFW_TT_BuffBlock
                 if (this.hoverForceOld.ContainsKey(hover))
                 {
                     field_ForceMax.SetValue(jet, this.hoverForceOld[hover]);
+                    field_ForceRangeMax.SetValue(jet, this.hoverRangeOld[hover]);
                 }
             }
             this.hoverList.Remove(hover);
             this.hoverForceOld.Remove(hover);
+            this.hoverRangeOld.Remove(hover);
         }
 
         public void RefreshWheels(ModuleWheels wheels, ManWheels.TorqueParams torque, ManWheels.WheelParams wheelparams)
