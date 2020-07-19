@@ -18,17 +18,18 @@ namespace FFW_TT_BuffBlock
             { "WeaponVelocity" , new string[] { "m_FiringData.m_MuzzleVelocity" } },
             { "HoverForce" , new string[] { "jets.forceMax" } },
             { "HoverRange" , new string[] { "jets.forceRangeMax" } },
-            { "HoverDamping" , new string[] { "jets.m_DampingScale" } }
+            { "HoverDamping" , new string[] { "jets.m_DampingScale" } },
+            { "BoosterBurnRate" , new string[] { "jets.m_BurnRate" } }
         };
         public Dictionary<string, BuffSegment> allSegments = new Dictionary<string, BuffSegment>();
         public List<object> weaponListGeneric = new List<object>();
         public List<object> hoverListGeneric = new List<object>();
+        public List<object> boosterListGeneric = new List<object>();
 
         /* PRIME PROPERTIES */
         public static List<BuffController> allControllers = new List<BuffController>();
         public Tank tank;
         public List<ModuleWheels> wheelsList = new List<ModuleWheels>();
-        public List<ModuleBooster> boosterList = new List<ModuleBooster>();
         public List<ModuleShieldGenerator> shieldList = new List<ModuleShieldGenerator>();
         public List<ModuleDrill> drillList = new List<ModuleDrill>();
         public List<ModuleEnergy> energyList = new List<ModuleEnergy>();
@@ -82,14 +83,6 @@ namespace FFW_TT_BuffBlock
         /* WHEELS : SUSPENSION */
         public Dictionary<ModuleBuff, int> wheelsSuspensionBuffBlocks = new Dictionary<ModuleBuff, int>();
         public Dictionary<ModuleWheels, List<float>> wheelsSuspensionOld = new Dictionary<ModuleWheels, List<float>>(); //[0] = suspensionSpring, [1] = suspensionDamper
-
-        /* BOOSTER : BURN RATE */
-        public Dictionary<ModuleBuff, int> boosterBurnRateBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleBooster, float> boosterBurnRateOld = new Dictionary<ModuleBooster, float>();
-        public static FieldInfo field_Jets = typeof(ModuleBooster)
-            .GetField("jets", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_BurnRate = typeof(BoosterJet)
-            .GetField("m_BurnRate", BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* SHIELD : RADIUS */
         /*public Dictionary<ModuleBuff, int> shieldRadiusBuffBlocks = new List<ModuleBuff>();
@@ -238,138 +231,9 @@ namespace FFW_TT_BuffBlock
             this.allSegments["HoverForce"].UpdateObject(this.hoverListGeneric);
             this.allSegments["HoverRange"].UpdateObject(this.hoverListGeneric);
             this.allSegments["HoverDamping"].UpdateObject(this.hoverListGeneric);
+            this.allSegments["BoosterBurnRate"].UpdateObject(this.boosterListGeneric);
             // Use "All" to update all, use m_BuffType to update specifics
-            /*if (type.Contains("WeaponCooldown") || type.Contains("All"))
-            {
-                this.allSegments["WeaponCooldown"].UpdateObject(this.weaponListGeneric);
-                foreach (ModuleWeaponGun weapon in this.weaponList)
-                {
-                    field_ShotCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][0] * this.GetBuffAverage("weaponCooldownBuffBlocks") + this.GetBuffAddAverage("weaponCooldownBuffBlocks"));
-                    field_BurstCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][1] * this.GetBuffAverage("weaponCooldownBuffBlocks") + this.GetBuffAddAverage("weaponCooldownBuffBlocks"));
-                    ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
-                    field_MW_ShotCooldown.SetValue(value_ModuleWeapon, this.weaponCooldownOld[weapon][0] * this.GetBuffAverage("weaponCooldownBuffBlocks") + this.GetBuffAddAverage("weaponCooldownBuffBlocks"));
-                }
-            }
-            if (type.Contains("WeaponRotation") || type.Contains("All"))
-            {
-                foreach (ModuleWeaponGun weapon in this.weaponList)
-                {
-                    ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
-                    field_Rotation.SetValue(value_ModuleWeapon, this.weaponRotationOld[weapon] * this.GetBuffAverage("weaponRotationBuffBlocks") + this.GetBuffAddAverage("weaponRotationBuffBlocks"));
-                }
-            }
-            if (type.Contains("WeaponSpread") || type.Contains("All"))
-            {
-                foreach (ModuleWeaponGun weapon in this.weaponList)
-                {
-                    FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
-                    field_Spread.SetValue(value_FiringData, this.weaponSpreadOld[weapon] * this.GetBuffAverage("weaponSpreadBuffBlocks") + this.GetBuffAddAverage("weaponSpreadBuffBlocks"));
-                }
-            }
-            if (type.Contains("WeaponVelocity") || type.Contains("All"))
-            {
-                foreach (ModuleWeaponGun weapon in this.weaponList)
-                {
-                    FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
-                    field_Velocity.SetValue(value_FiringData, this.weaponVelocityOld[weapon] * this.GetBuffAverage("weaponVelocityBuffBlocks") + this.GetBuffAddAverage("weaponVelocityBuffBlocks"));
-                }
-            }*/
-            /*if (type.Contains("WeaponDamage") || type.Contains("All"))
-            {
-                foreach (ModuleWeaponGun weapon in this.weaponList)
-                {
-                    FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
-                    if (value_FiringData.m_BulletPrefab.GetType() == typeof(Projectile))
-                    {
-                        Projectile bullet = (Projectile)value_FiringData.m_BulletPrefab;
-                        //this.weaponDamageOld[weapon].Add((float)field_Damage.GetValue(bullet));
-                        Console.WriteLine("ffw: in...");
-                        Console.WriteLine(this.GetBuffAverage("weaponDamageBuffBlocks"));
-                        Console.WriteLine("ffw: from...");
-                        Console.WriteLine(field_Damage.GetValue(bullet));
-                        field_Damage.SetValue(bullet, (int)Math.Ceiling(this.weaponDamageOld[weapon][0] * this.GetBuffAverage("weaponDamageBuffBlocks") + this.GetBuffAddAverage("weaponDamageBuffBlocks")));
-                        Console.WriteLine("ffw: to...");
-                        Console.WriteLine(field_Damage.GetValue(bullet));
-                        if (field_Explosion.GetValue(bullet) != null)
-                        {
-                            Transform transform = (Transform)field_Explosion.GetValue(bullet);
-                            Explosion explosion = transform.GetComponent<Explosion>();
-                            if (explosion != null)
-                            {
-                                //this.weaponDamageOld[weapon].Add((float)field_ExplDamage.GetValue(explosion));
-                                field_ExplDamage.SetValue(explosion, this.weaponDamageOld[weapon][1] * this.GetBuffAverage("weaponDamageBuffBlocks") + this.GetBuffAddAverage("weaponDamageBuffBlocks"));
-                                //field_ExplRadius.SetValue(explosion, 99.0f);
-                            }
-                        }
-                    }
-
-                    ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
-                    Array value_CannonBarrel = (Array)field_CannonBarrels.GetValue(weapon);
-                    if (value_CannonBarrel.Length != 0)
-                    {
-                        foreach (CannonBarrel cannonBarrel in value_CannonBarrel)
-                        {
-                            //cannonBarrel.Setup(value_FiringData, value_ModuleWeapon);
-                            field_CannonBarrelFiringData.SetValue(cannonBarrel, value_FiringData);
-                            Console.WriteLine("ffw: applied to barrel");
-                            //cannonBarrel.CapRecoilDuration(this.m_ShotCooldown);
-                        }
-                    }
-                }
-            }*/
-            /*if (type.Contains("WheelsRpm") || type.Contains("All"))
-            {
-                foreach (ModuleWheels wheels in this.wheelsList)
-                {
-                    ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
-                    torque.torqueCurveMaxRpm = this.wheelsRpmOld[wheels] * this.GetBuffAverage("wheelsRpmBuffBlocks") + this.GetBuffAddAverage("wheelsRpmBuffBlocks");
-                    this.RefreshWheels(wheels, torque, wheelparams);
-                }
-            }
-            if (type.Contains("WheelsBrake") || type.Contains("All"))
-            {
-                foreach (ModuleWheels wheels in this.wheelsList)
-                {
-                    ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
-                    torque.passiveBrakeMaxTorque = this.wheelsBrakeOld[wheels][0] * this.GetBuffAverage("wheelsBrakeBuffBlocks") + this.GetBuffAddAverage("wheelsBrakeBuffBlocks");
-                    torque.basicFrictionTorque = this.wheelsBrakeOld[wheels][1] * this.GetBuffAverage("wheelsBrakeBuffBlocks") + this.GetBuffAddAverage("wheelsBrakeBuffBlocks");
-                    this.RefreshWheels(wheels, torque, wheelparams);
-                }
-            }
-            if (type.Contains("WheelsTorque") || type.Contains("All"))
-            {
-                foreach (ModuleWheels wheels in this.wheelsList)
-                {
-                    ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
-                    torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels] * this.GetBuffAverage("wheelsTorqueBuffBlocks") + this.GetBuffAddAverage("wheelsTorqueBuffBlocks");
-                    this.RefreshWheels(wheels, torque, wheelparams);
-                }
-            }
-            if (type.Contains("WheelsGrip") || type.Contains("All"))
-            {
-                foreach (ModuleWheels wheels in this.wheelsList)
-                {
-                    ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
-                    wheelparams.tireProperties.props.gripFactorLong = this.wheelsGripOld[wheels][0] * this.GetBuffAverage("wheelsGripBuffBlocks") + this.GetBuffAddAverage("wheelsGripBuffBlocks");
-                    //wheelparams.tireProperties.props.gripFactorLat = this.wheelsGripOld[wheels][1] * this.GetBuffAverage("wheelsGripBuffBlocks") + this.GetBuffAddAverage("wheelsGripBuffBlocks");
-                    this.RefreshWheels(wheels, torque, wheelparams);
-                }
-            }
-            if (type.Contains("WheelsSuspension") || type.Contains("All"))
-            {
-                foreach (ModuleWheels wheels in this.wheelsList)
-                {
-                    ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
-                    wheelparams.suspensionSpring = this.wheelsSuspensionOld[wheels][0] * this.GetBuffAverage("wheelsSuspensionBuffBlocks") + this.GetBuffAddAverage("wheelsSuspensionBuffBlocks");
-                    wheelparams.suspensionDamper = this.wheelsSuspensionOld[wheels][1] * this.GetBuffAverage("wheelsSuspensionBuffBlocks") + this.GetBuffAddAverage("wheelsSuspensionBuffBlocks");
-                    this.RefreshWheels(wheels, torque, wheelparams);
-                }
-            }*/
+            
             if (type.Contains("WheelsRpm") ||
                 type.Contains("WheelsBrake") ||
                 type.Contains("WheelsTorque") ||
@@ -395,17 +259,6 @@ namespace FFW_TT_BuffBlock
                     wheelparams.suspensionDamper = this.wheelsSuspensionOld[wheels][1] * this.GetBuffAverage("wheelsSuspensionBuffBlocks") + this.GetBuffAddAverage("wheelsSuspensionBuffBlocks");
 
                     this.RefreshWheels(wheels, torque, wheelparams);
-                }
-            }
-            if (type.Contains("BoosterBurnRate") || type.Contains("All"))
-            {
-                foreach (ModuleBooster booster in this.boosterList)
-                {
-                    List<BoosterJet> value_Jets = (List<BoosterJet>)field_Jets.GetValue(booster);
-                    foreach (BoosterJet jet in value_Jets)
-                    {
-                        field_BurnRate.SetValue(jet, this.boosterBurnRateOld[booster] * this.GetBuffAverage("boosterBurnRateBuffBlocks") + this.GetBuffAddAverage("boosterBurnRateBuffBlocks"));
-                    }
                 }
             }
             /*if (type.Contains("ShieldRadius") || type.Contains("All"))
@@ -548,7 +401,8 @@ namespace FFW_TT_BuffBlock
             }
             if (effects.Contains("BoosterBurnRate"))
             {
-                this.boosterBurnRateBuffBlocks.Add(buff, buff.GetEffect("BoosterBurnRate"));
+                this.allSegments["BoosterBurnRate"].AddBuff(buff);
+                /*this.boosterBurnRateBuffBlocks.Add(buff, buff.GetEffect("BoosterBurnRate"));
                 if (this.boosterBurnRateBuffBlocks.Count == 1)
                 {
                     foreach (ModuleBooster booster in this.boosterList)
@@ -563,7 +417,7 @@ namespace FFW_TT_BuffBlock
                             }
                         }
                     }
-                }
+                }*/
             }
             /*if (effects.Contains("ShieldRadius")) 
             {
@@ -660,7 +514,8 @@ namespace FFW_TT_BuffBlock
             }
             if (effects.Contains("BoosterBurnRate"))
             {
-                this.boosterBurnRateBuffBlocks.Remove(buff);
+                this.allSegments["BoosterBurnRate"].RemoveBuff(buff);
+                //this.boosterBurnRateBuffBlocks.Remove(buff);
             }
             /*if (effects.Contains("ShieldRadius")) {
                 this.shieldRadiusBuffBlocks.Remove(buff);
@@ -780,32 +635,16 @@ namespace FFW_TT_BuffBlock
 
         public void AddBooster(ModuleBooster booster)
         {
-            this.boosterList.Add(booster);
-            List<BoosterJet> value_Jets = (List<BoosterJet>)field_Jets.GetValue(booster);
-            foreach (BoosterJet jet in value_Jets)
-            {
-                if (!boosterBurnRateOld.ContainsKey(booster))
-                { 
-                    float value_BurnRate = (float)field_BurnRate.GetValue(jet);
-                    this.boosterBurnRateOld.Add(booster, value_BurnRate);
-                }
-            }
+            this.boosterListGeneric.Add(booster);
+            this.allSegments["BoosterBurnRate"].SaveObject(booster);
 
             this.Update(new string[] { "BoosterBurnRate" });
         }
 
         public void RemoveBooster(ModuleBooster booster)
         {
-            List<BoosterJet> value_Jets = (List<BoosterJet>)field_Jets.GetValue(booster);
-            foreach (BoosterJet jet in value_Jets)
-            {
-                if (this.boosterBurnRateOld.ContainsKey(booster))
-                {
-                    field_BurnRate.SetValue(jet, this.boosterBurnRateOld[booster]);
-                }
-            }
-            this.boosterList.Remove(booster);
-            this.boosterBurnRateOld.Remove(booster);
+            this.allSegments["BoosterBurnRate"].CleanObject(booster);
+            this.boosterListGeneric.Remove(booster);
         }
 
         /*public void AddShield(ModuleShieldGenerator shield)
