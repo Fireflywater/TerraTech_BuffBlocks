@@ -27,7 +27,6 @@ namespace FFW_TT_BuffBlock
             {
                 m = allMults.Average();
             }
-            Console.WriteLine("FFW: MULTs: " + allMults.Count + " " + m);
             return m;
         }
 
@@ -39,7 +38,6 @@ namespace FFW_TT_BuffBlock
             {
                 a = allAdds.Average();
             }
-            Console.WriteLine("FFW: ADDs: " + allAdds.Count + " " + a);
             return a;
         }
 
@@ -52,63 +50,46 @@ namespace FFW_TT_BuffBlock
 
             FieldInfo field_lastIter = null;
             FieldInfo field_thisIter = null;
-
-            Console.WriteLine("FFW! 01");
+            
             foreach (string e in splitPath)
             {
-                Console.WriteLine("FFW! 02");
                 field_lastIter = field_thisIter;
-                Console.WriteLine("FFW! 03");
                 lastIterObjs = new List<object>(thisIterObjs);
-                Console.WriteLine("FFW! 04");
                 thisIterObjs = new List<object>();
-                Console.WriteLine("FFW! 05");
                 foreach (object obj in lastIterObjs)
                 {
-                    Console.WriteLine("FFW! 06");
                     field_thisIter = obj.GetType().GetField(e, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    Console.WriteLine("FFW! 07");
                     if (field_thisIter != null)
                     {
                         object value_thisIter = field_thisIter.GetValue(obj);
-                        Console.WriteLine("FFW! 08");
                         var arrayTest = value_thisIter as Array;
                         var listTest = value_thisIter as System.Collections.IList;
                         if (arrayTest != null)
                         {
-                            Console.WriteLine("FFW! 09 array");
                             Array value_thisIterCasted = (Array)value_thisIter;
-                            Console.WriteLine("FFW! 10 array");
                             foreach (object element in value_thisIterCasted)
                             {
-                                Console.WriteLine("FFW! 11 array");
                                 thisIterObjs.Add(element);
                             }
                         }
                         else if (listTest != null)
                         {
-                            Console.WriteLine("FFW! 09 list");
                             System.Collections.IList value_thisIterCasted = (System.Collections.IList)value_thisIter;
-                            Console.WriteLine("FFW! 10 list");
                             foreach (object element in value_thisIterCasted)
                             {
-                                Console.WriteLine("FFW! 11 list");
                                 thisIterObjs.Add(element);
                             }
                         }
                         else
                         {
-                            Console.WriteLine("FFW! 09 else");
                             thisIterObjs.Add(value_thisIter);
                         }
                     }
                 }
             }
-
-            Console.WriteLine("FFW! 21");
+            
             if (field_thisIter != null)
             {
-                Console.WriteLine("FFW! 22");
                 return new KeyValuePair<FieldInfo, List<object>>(field_thisIter, lastIterObjs );
             }
             return null;

@@ -27,7 +27,6 @@ namespace FFW_TT_BuffBlock
         /* PRIME PROPERTIES */
         public static List<BuffController> allControllers = new List<BuffController>();
         public Tank tank;
-        public List<ModuleWeaponGun> weaponList = new List<ModuleWeaponGun>();
         public List<ModuleWheels> wheelsList = new List<ModuleWheels>();
         public List<ModuleBooster> boosterList = new List<ModuleBooster>();
         public List<ModuleShieldGenerator> shieldList = new List<ModuleShieldGenerator>();
@@ -38,39 +37,7 @@ namespace FFW_TT_BuffBlock
         public List<ModuleHeart> heartList = new List<ModuleHeart>();
         public List<ModuleItemPickup> itemPickupList = new List<ModuleItemPickup>();
         public List<ModuleItemProducer> itemProList = new List<ModuleItemProducer>();
-        public List<ModuleHover> hoverList = new List<ModuleHover>();
-
-        /* WEAPON : FIRE RATE */
-        public Dictionary<ModuleBuff, int> weaponCooldownBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleWeaponGun, List<float>> weaponCooldownOld = new Dictionary<ModuleWeaponGun, List<float>>(); // [0] = ShotCooldown, [1] = BurstCooldown
-        public static FieldInfo field_ShotCooldown = typeof(ModuleWeaponGun)
-            .GetField("m_ShotCooldown", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_BurstCooldown = typeof(ModuleWeaponGun)
-            .GetField("m_BurstCooldown", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_ModuleWeapon = typeof(ModuleWeaponGun)
-            .GetField("m_WeaponModule", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_MW_ShotCooldown = typeof(ModuleWeapon)
-            .GetField("m_ShotCooldown", BindingFlags.NonPublic | BindingFlags.Instance);
-
-        /* WEAPON : ROTATION SPEED */
-        public Dictionary<ModuleBuff, int> weaponRotationBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleWeaponGun, float> weaponRotationOld = new Dictionary<ModuleWeaponGun, float>();
-        public static FieldInfo field_Rotation = typeof(ModuleWeapon)
-            .GetField("m_RotateSpeed", BindingFlags.NonPublic | BindingFlags.Instance);
-
-        /* WEAPON : SPREAD */
-        public Dictionary<ModuleBuff, int> weaponSpreadBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleWeaponGun, float> weaponSpreadOld = new Dictionary<ModuleWeaponGun, float>();
-        public static FieldInfo field_FiringData = typeof(ModuleWeaponGun)
-            .GetField("m_FiringData", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_Spread = typeof(FireData)
-            .GetField("m_BulletSprayVariance", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-        /* WEAPON : VELOCITY */
-        public Dictionary<ModuleBuff, int> weaponVelocityBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleWeaponGun, float> weaponVelocityOld = new Dictionary<ModuleWeaponGun, float>();
-        public static FieldInfo field_Velocity = typeof(FireData)
-            .GetField("m_MuzzleVelocity", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        
 
         /* WEAPON : DAMAGE */
         /*public Dictionary<ModuleBuff, int> weaponDamageBuffBlocks = new Dictionary<ModuleBuff, int>();
@@ -179,26 +146,6 @@ namespace FFW_TT_BuffBlock
             .GetField("m_SecPerItemProduced", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         public static FieldInfo field_ItemProSpeed2 = typeof(ModuleItemProducer)
             .GetField("m_MinDispenseInterval", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-        /* HOVER : FORCE */
-        public Dictionary<ModuleBuff, int> hoverForceBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleHover, float> hoverForceOld = new Dictionary<ModuleHover, float>();
-        public static FieldInfo field_HoverJets = typeof(ModuleHover)
-            .GetField("jets", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_ForceMax = typeof(HoverJet)
-            .GetField("forceMax", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-        /* HOVER : RANGE */
-        public Dictionary<ModuleBuff, int> hoverRangeBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleHover, float> hoverRangeOld = new Dictionary<ModuleHover, float>();
-        public static FieldInfo field_ForceRangeMax = typeof(HoverJet)
-            .GetField("forceRangeMax", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-        /* HOVER : DAMPING */
-        public Dictionary<ModuleBuff, int> hoverDampingBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleHover, float> hoverDampingOld = new Dictionary<ModuleHover, float>();
-        public static FieldInfo field_Damping = typeof(HoverJet)
-            .GetField("m_DampingScale", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -562,22 +509,18 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("WeaponCooldown"))
             {
                 this.allSegments["WeaponCooldown"].AddBuff(buff);
-                this.weaponCooldownBuffBlocks.Add(buff, buff.GetEffect("WeaponCooldown"));
             }
             if (effects.Contains("WeaponRotation"))
             {
                 this.allSegments["WeaponRotation"].AddBuff(buff);
-                this.weaponRotationBuffBlocks.Add(buff, buff.GetEffect("WeaponRotation"));
             }
             if (effects.Contains("WeaponSpread"))
             {
                 this.allSegments["WeaponSpread"].AddBuff(buff);
-                this.weaponSpreadBuffBlocks.Add(buff, buff.GetEffect("WeaponSpread"));
             }
             if (effects.Contains("WeaponVelocity"))
             {
                 this.allSegments["WeaponVelocity"].AddBuff(buff);
-                this.weaponVelocityBuffBlocks.Add(buff, buff.GetEffect("WeaponVelocity"));
             }
             /*if (effects.Contains("WeaponDamage"))
             {
@@ -658,17 +601,14 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("HoverForce"))
             {
                 this.allSegments["HoverForce"].AddBuff(buff);
-                this.hoverForceBuffBlocks.Add(buff, buff.GetEffect("HoverForce"));
             }
             if (effects.Contains("HoverRange"))
             {
                 this.allSegments["HoverRange"].AddBuff(buff);
-                this.hoverRangeBuffBlocks.Add(buff, buff.GetEffect("HoverRange"));
             }
             if (effects.Contains("HoverDamping"))
             {
                 this.allSegments["HoverDamping"].AddBuff(buff);
-                this.hoverDampingBuffBlocks.Add(buff, buff.GetEffect("HoverDamping"));
             }
             //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
             this.Update(buff.m_BuffType);
@@ -681,22 +621,18 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("WeaponCooldown"))
             {
                 this.allSegments["WeaponCooldown"].RemoveBuff(buff);
-                this.weaponCooldownBuffBlocks.Remove(buff);
             }
             if (effects.Contains("WeaponRotation"))
             {
                 this.allSegments["WeaponRotation"].RemoveBuff(buff);
-                this.weaponRotationBuffBlocks.Remove(buff);
             }
             if (effects.Contains("WeaponSpread"))
             {
                 this.allSegments["WeaponSpread"].RemoveBuff(buff);
-                this.weaponSpreadBuffBlocks.Remove(buff);
             }
             if (effects.Contains("WeaponVelocity"))
             {
                 this.allSegments["WeaponVelocity"].RemoveBuff(buff);
-                this.weaponVelocityBuffBlocks.Remove(buff);
             }
             /*if (effects.Contains("WeaponDamage"))
             {
@@ -760,17 +696,14 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("HoverForce"))
             {
                 this.allSegments["HoverForce"].RemoveBuff(buff);
-                this.hoverForceBuffBlocks.Remove(buff);
             }
             if (effects.Contains("HoverRange"))
             {
                 this.allSegments["HoverRange"].RemoveBuff(buff);
-                this.hoverRangeBuffBlocks.Remove(buff);
             }
             if (effects.Contains("HoverDamping"))
             {
                 this.allSegments["HoverDamping"].RemoveBuff(buff);
-                this.hoverDampingBuffBlocks.Remove(buff);
             }
             this.Update(buff.m_BuffType);
             //this.Update(new string[] { buff.m_BuffType });
@@ -784,47 +717,7 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponSpread"].SaveObject(weapon);
             this.allSegments["WeaponVelocity"].SaveObject(weapon);
 
-            this.weaponList.Add(weapon);
-            this.weaponCooldownOld.Add(weapon, new List<float>()
-            {
-                (float)field_ShotCooldown.GetValue(weapon),
-                (float)field_BurstCooldown.GetValue(weapon)
-            });
-            ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
-            this.weaponRotationOld.Add(weapon, (float)field_Rotation.GetValue(value_ModuleWeapon));
-            FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
-            this.weaponSpreadOld.Add(weapon, (float)field_Spread.GetValue(value_FiringData));
-            this.weaponVelocityOld.Add(weapon, (float)field_Velocity.GetValue(value_FiringData));
-            /*this.weaponDamageOld.Add(weapon, new List<float>()
-            {
-                0.0f,
-                0.0f
-            });
-            
-            if (value_FiringData.m_BulletPrefab.GetType() == typeof(Projectile))
-            {
-                Console.WriteLine("ffw 1");
-                Projectile bullet = (Projectile)value_FiringData.m_BulletPrefab;
-                Console.WriteLine("ffw 2");
-                this.weaponDamageOld[weapon][0] = Convert.ToSingle((int)field_Damage.GetValue(bullet));
-                Console.WriteLine("ffw 3");
-                if (field_Explosion.GetValue(bullet) != null)
-                {
-                    Console.WriteLine("ffw 4");
-                    Transform transform = (Transform)field_Explosion.GetValue(bullet);
-                    Console.WriteLine("ffw 5");
-                    Explosion explosion = transform.GetComponent<Explosion>();
-                    Console.WriteLine("ffw 6");
-                    if (explosion != null)
-                    {
-                        Console.WriteLine("ffw 7");
-                        this.weaponDamageOld[weapon][1] = (float)field_ExplDamage.GetValue(explosion);
-                        //field_ExplRadius.SetValue(explosion, 99.0f);
-                    }
-                }
-            }*/
-
-            this.Update(new string[] { "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity" });//, "WeaponDamage" });
+            this.Update(new string[] { "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity" });
         }
 
         public void RemoveWeapon(ModuleWeaponGun weapon)
@@ -834,47 +727,6 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponSpread"].CleanObject(weapon);
             this.allSegments["WeaponVelocity"].CleanObject(weapon);
             this.weaponListGeneric.Remove(weapon);
-
-            field_ShotCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][0]);
-            field_BurstCooldown.SetValue(weapon, this.weaponCooldownOld[weapon][1]);
-            ModuleWeapon value_ModuleWeapon = (ModuleWeapon)field_ModuleWeapon.GetValue(weapon);
-            field_MW_ShotCooldown.SetValue(value_ModuleWeapon, this.weaponCooldownOld[weapon][0]);
-            FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
-            field_Spread.SetValue(value_FiringData, this.weaponSpreadOld[weapon]);
-            field_Velocity.SetValue(value_FiringData, this.weaponVelocityOld[weapon]);
-            
-            /*if (value_FiringData.m_BulletPrefab.GetType() == typeof(Projectile))
-            {
-                Projectile bullet = (Projectile)value_FiringData.m_BulletPrefab;
-                field_Damage.SetValue(bullet, (int)Math.Ceiling(this.weaponDamageOld[weapon][0]));
-                if (field_Explosion.GetValue(bullet) != null)
-                {
-                    Transform transform = (Transform)field_Explosion.GetValue(bullet);
-                    Explosion explosion = transform.GetComponent<Explosion>();
-                    if (explosion != null)
-                    {
-                        field_ExplDamage.SetValue(explosion, this.weaponDamageOld[weapon][1]);
-                    }
-                }
-            }
-            
-            Array value_CannonBarrel = (Array)field_CannonBarrels.GetValue(weapon);
-            if (value_CannonBarrel.Length != 0)
-            {
-                foreach (CannonBarrel cannonBarrel in value_CannonBarrel)
-                {
-                    //cannonBarrel.Setup(value_FiringData, value_ModuleWeapon);
-                    field_CannonBarrelFiringData.SetValue(cannonBarrel, value_FiringData);
-                    //cannonBarrel.CapRecoilDuration(this.m_ShotCooldown);
-                }
-            }*/
-
-            this.weaponList.Remove(weapon);
-            this.weaponCooldownOld.Remove(weapon);
-            this.weaponRotationOld.Remove(weapon);
-            this.weaponSpreadOld.Remove(weapon);
-            this.weaponVelocityOld.Remove(weapon);
-            //this.weaponDamageOld.Remove(weapon);
         }
 
         public void AddWheels(ModuleWheels wheels)
@@ -1093,54 +945,12 @@ namespace FFW_TT_BuffBlock
             this.allSegments["HoverForce"].SaveObject(hover);
             this.allSegments["HoverRange"].SaveObject(hover);
             this.allSegments["HoverDamping"].SaveObject(hover);
-
-
-            this.hoverList.Add(hover);
-            /*this.hoverForceOld.Add(item, new List<float>()
-            {
-                (float)field_ItemProSpeed1.GetValue(item),
-                (float)field_ItemProSpeed2.GetValue(item)
-            });*/
-            List<HoverJet> value_HoverJets = (List<HoverJet>)field_HoverJets.GetValue(hover);
-            foreach (HoverJet jet in value_HoverJets)
-            {
-                if (!hoverForceOld.ContainsKey(hover))
-                {
-                    float value_ForceMax = (float)field_ForceMax.GetValue(jet);
-                    this.hoverForceOld.Add(hover, value_ForceMax);
-                }
-                if (!hoverRangeOld.ContainsKey(hover))
-                {
-                    float value_ForceRangeMax = (float)field_ForceRangeMax.GetValue(jet);
-                    this.hoverRangeOld.Add(hover, value_ForceRangeMax);
-                }
-                if (!hoverDampingOld.ContainsKey(hover))
-                {
-                    float value_Damping = (float)field_Damping.GetValue(jet);
-                    this.hoverDampingOld.Add(hover, value_Damping);
-                }
-            }
+            
             this.Update(new string[] { "HoverForce" , "HoverRange" , "HoverDamping" });
         }
 
         public void RemoveHover(ModuleHover hover)
         {
-            List<HoverJet> value_HoverJets = (List<HoverJet>)field_HoverJets.GetValue(hover);
-            foreach (HoverJet jet in value_HoverJets)
-            {
-                if (this.hoverForceOld.ContainsKey(hover))
-                {
-                    field_ForceMax.SetValue(jet, this.hoverForceOld[hover]);
-                    field_ForceRangeMax.SetValue(jet, this.hoverRangeOld[hover]);
-                    field_Damping.SetValue(jet, this.hoverDampingOld[hover]);
-                }
-            }
-            this.hoverList.Remove(hover);
-            this.hoverForceOld.Remove(hover);
-            this.hoverRangeOld.Remove(hover);
-            this.hoverDampingOld.Remove(hover);
-
-
             this.allSegments["HoverForce"].CleanObject(hover);
             this.allSegments["HoverRange"].CleanObject(hover);
             this.allSegments["HoverDamping"].CleanObject(hover);
