@@ -25,6 +25,7 @@ namespace FFW_TT_BuffBlock
             { "WheelsTorque" , new string[] { "m_TorqueParams.torqueCurveMaxTorque" } },
             { "WheelsGrip" , new string[] { "m_WheelParams.tireProperties.props.gripFactorLong" } },
             { "WheelsSuspension" , new string[] { "m_WheelParams.suspensionSpring", "m_WheelParams.suspensionDamper" } },
+            { "WheelsTurnAngle" , new string[] { "m_WheelParams.steerAngleMax" } },
 
             { "HoverForce" , new string[] { "jets.forceMax" } },
             { "HoverRange" , new string[] { "jets.forceRangeMax" } },
@@ -50,6 +51,7 @@ namespace FFW_TT_BuffBlock
             { "WheelsTorque" , "wheelsListGeneric" },
             { "WheelsGrip" , "wheelsListGeneric" },
             { "WheelsSuspension" , "wheelsListGeneric" },
+            { "WheelsTurnAngle" , "wheelsListGeneric" },
 
             { "HoverForce" , "hoverListGeneric" },
             { "HoverRange" , "hoverListGeneric" },
@@ -141,6 +143,7 @@ namespace FFW_TT_BuffBlock
                 effects.Contains("WheelsTorque") ||
                 effects.Contains("WheelsGrip") ||
                 effects.Contains("WheelsSuspension") ||
+                effects.Contains("WheelsTurnAngle") ||
                 effects.Contains("All"))
             {
                 this.RefreshWheels(this.wheelsList);
@@ -182,12 +185,7 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponVelocity"].ManipulateObj(new List<object> { weapon }, "SAVE");
 
             this.ManipulateBarrels(new List<ModuleWeaponGun> { weapon }, "SAVE");
-
-            this.allSegments["WeaponCooldown"].ManipulateObj(new List<object> { weapon }, "UPDATE");
-            this.allSegments["WeaponRotation"].ManipulateObj(new List<object> { weapon }, "UPDATE");
-            this.allSegments["WeaponSpread"].ManipulateObj(new List<object> { weapon }, "UPDATE");
-            this.allSegments["WeaponVelocity"].ManipulateObj(new List<object> { weapon }, "UPDATE");
-
+            
             this.ManipulateBarrels(new List<ModuleWeaponGun> { weapon }, "UPDATE");
         }
 
@@ -214,12 +212,7 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WheelsTorque"].ManipulateObj(new List<object> { wheels }, "SAVE");
             this.allSegments["WheelsGrip"].ManipulateObj(new List<object> { wheels }, "SAVE");
             this.allSegments["WheelsSuspension"].ManipulateObj(new List<object> { wheels }, "SAVE");
-
-            this.allSegments["WheelsRpm"].ManipulateObj(new List<object> { wheels }, "UPDATE");
-            this.allSegments["WheelsBrake"].ManipulateObj(new List<object> { wheels }, "UPDATE");
-            this.allSegments["WheelsTorque"].ManipulateObj(new List<object> { wheels }, "UPDATE");
-            this.allSegments["WheelsGrip"].ManipulateObj(new List<object> { wheels }, "UPDATE");
-            this.allSegments["WheelsSuspension"].ManipulateObj(new List<object> { wheels }, "UPDATE");
+            this.allSegments["WheelsTurnAngle"].ManipulateObj(new List<object> { wheels }, "SAVE");
             
             this.RefreshWheels( new List<ModuleWheels> { wheels });
         }
@@ -231,6 +224,7 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WheelsTorque"].ManipulateObj(new List<object> { wheels }, "CLEAN");
             this.allSegments["WheelsGrip"].ManipulateObj(new List<object> { wheels }, "CLEAN");
             this.allSegments["WheelsSuspension"].ManipulateObj(new List<object> { wheels }, "CLEAN");
+            this.allSegments["WheelsTurnAngle"].ManipulateObj(new List<object> { wheels }, "CLEAN");
 
             this.RefreshWheels(new List<ModuleWheels> { wheels });
 
@@ -243,8 +237,6 @@ namespace FFW_TT_BuffBlock
             this.boosterListGeneric.Add(booster);
 
             this.allSegments["BoosterBurnRate"].ManipulateObj(new List<object> { booster }, "SAVE");
-
-            this.allSegments["BoosterBurnRate"].ManipulateObj(new List<object> { booster }, "UPDATE");
         }
 
         public void RemoveBooster(ModuleBooster booster)
@@ -259,8 +251,6 @@ namespace FFW_TT_BuffBlock
             this.drillListGeneric.Add(drill);
 
             this.allSegments["DrillDps"].ManipulateObj(new List<object> { drill }, "SAVE");
-
-            this.allSegments["DrillDps"].ManipulateObj(new List<object> { drill }, "UPDATE");
         }
 
         public void RemoveDrill(ModuleDrill drill)
@@ -275,8 +265,6 @@ namespace FFW_TT_BuffBlock
             this.itemPickupListGeneric.Add(item);
 
             this.allSegments["ItemPickupRange"].ManipulateObj(new List<object> { item }, "SAVE");
-
-            this.allSegments["ItemPickupRange"].ManipulateObj(new List<object> { item }, "UPDATE");
         }
 
         public void RemoveItemPickup(ModuleItemPickup item)
@@ -291,8 +279,6 @@ namespace FFW_TT_BuffBlock
             this.itemProListGeneric.Add(item);
 
             this.allSegments["ItemProSpeed"].ManipulateObj(new List<object> { item }, "SAVE");
-
-            this.allSegments["ItemProSpeed"].ManipulateObj(new List<object> { item }, "UPDATE");
         }
 
         public void RemoveItemPro(ModuleItemProducer item)
@@ -309,10 +295,6 @@ namespace FFW_TT_BuffBlock
             this.allSegments["HoverForce"].ManipulateObj(new List<object> { hover }, "SAVE");
             this.allSegments["HoverRange"].ManipulateObj(new List<object> { hover }, "SAVE");
             this.allSegments["HoverDamping"].ManipulateObj(new List<object> { hover }, "SAVE");
-
-            this.allSegments["HoverForce"].ManipulateObj(new List<object> { hover }, "UPDATE");
-            this.allSegments["HoverRange"].ManipulateObj(new List<object> { hover }, "UPDATE");
-            this.allSegments["HoverDamping"].ManipulateObj(new List<object> { hover }, "UPDATE");
         }
 
         public void RemoveHover(ModuleHover hover)

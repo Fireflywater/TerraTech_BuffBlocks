@@ -116,6 +116,10 @@ namespace FFW_TT_BuffBlock
                     this.effectMemory.Remove(tgt);
                 }
             }
+            if (request == "SAVE")
+            {
+                this.ManipulateObj(tgtPool, "UPDATE");
+            }
         }
 
         public float GetBuffAverage()
