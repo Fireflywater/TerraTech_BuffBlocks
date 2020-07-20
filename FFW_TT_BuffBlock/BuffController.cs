@@ -50,27 +50,9 @@ namespace FFW_TT_BuffBlock
         /* PRIME PROPERTIES */
         public static List<BuffController> allControllers = new List<BuffController>();
         public Tank tank;
-        public List<ModuleDrill> drillList = new List<ModuleDrill>();
-        public List<ModuleEnergy> energyList = new List<ModuleEnergy>();
-        public List<ModuleEnergyStore> energyStoreList = new List<ModuleEnergyStore>();
         public List<ModuleItemConsume> itemConList = new List<ModuleItemConsume>();
         public List<ModuleHeart> heartList = new List<ModuleHeart>();
-        public List<ModuleItemPickup> itemPickupList = new List<ModuleItemPickup>();
-        public List<ModuleItemProducer> itemProList = new List<ModuleItemProducer>();
-
-        /* ENERGY : OUTPUT PER SECOND */
-        public Dictionary<ModuleBuff, int> energyOpsBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleEnergy, float> energyOpsOld = new Dictionary<ModuleEnergy, float>();
-        public static FieldInfo field_Ops = typeof(ModuleEnergy)
-            .GetField("m_OutputPerSecond", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-        /* ENERGY STORE : CAPACITY */
-        public Dictionary<ModuleBuff, int> energyStoreCapBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleEnergyStore, float> energyStoreCapOld = new Dictionary<ModuleEnergyStore, float>();
-        public static FieldInfo field_Capacity = typeof(ModuleEnergyStore)
-            .GetField("m_Capacity", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        public static PropertyInfo prop_Current = typeof(ModuleEnergyStore)
-            .GetProperty("CurrentAmount", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        
 
         /* ITEM CONSUME : NEEDS ANCHORED */
         public Dictionary<ModuleBuff, bool> itemConAnchorBuffBlocks = new Dictionary<ModuleBuff, bool>();
@@ -86,14 +68,6 @@ namespace FFW_TT_BuffBlock
         public static FieldInfo field_HeartNeedsAnchor = typeof(ModuleHeart)
             .GetField("m_HasAnchor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-        /* ITEM PRODUCE : SPEED */
-        public Dictionary<ModuleBuff, int> itemProSpeedBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleItemProducer, List<float>> itemProSpeedOld = new Dictionary<ModuleItemProducer, List<float>>(); //[0] = m_SecPerItemProduced, [1] = m_MinDispenseInterval
-        public static FieldInfo field_ItemProSpeed1 = typeof(ModuleItemProducer)
-            .GetField("m_SecPerItemProduced", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_ItemProSpeed2 = typeof(ModuleItemProducer)
-            .GetField("m_MinDispenseInterval", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
         public static BuffController MakeNewIfNone(Tank objTank)
         {
             foreach (BuffController element in BuffController.allControllers)
@@ -107,17 +81,6 @@ namespace FFW_TT_BuffBlock
             {
                 tank = objTank
             };
-            /*for (int i = 0; i < BuffController.allEffects.Length; i++)
-            {
-                BuffSegment newSegment = new BuffSegment
-                {
-                    tank = newObject.tank,
-                    controller = newObject,
-                    effectType = BuffController.allEffects[i],
-                    effectPaths = BuffController.allPaths[i]
-                };
-                newObject.allSegments.Add(BuffController.allEffects[i], newSegment);
-            }*/
             foreach (KeyValuePair<string, string[]> entry in BuffController.allEffects)
             {
                 BuffSegment newSegment = new BuffSegment
@@ -205,24 +168,7 @@ namespace FFW_TT_BuffBlock
             this.allSegments["ItemProSpeed"].ManipulateObj(this.itemProListGeneric, "UPDATE");
 
 
-            if (type.Contains("EnergyOps") || type.Contains("All"))
-            {
-                foreach (ModuleEnergy energy in this.energyList)
-                {
-                    field_Ops.SetValue(energy, this.energyOpsOld[energy] * this.GetBuffAverage("energyOpsBuffBlocks") + this.GetBuffAddAverage("energyOpsBuffBlocks"));
-                }
-            }
-            if (type.Contains("EnergyStoreCap") || type.Contains("All"))
-            {
-                foreach (ModuleEnergyStore store in this.energyStoreList)
-                {
-                    if (this.energyStoreCapBuffBlocks.Count > 0 && !type.Contains("Anchor"))
-                    {
-                        prop_Current.SetValue(store, 0.0f);
-                    }
-                    field_Capacity.SetValue(store, this.energyStoreCapOld[store] * this.GetBuffAverage("energyStoreCapBuffBlocks") + this.GetBuffAddAverage("energyStoreCapBuffBlocks"));
-                }
-            }
+            
             if (type.Contains("ItemConAnchored") || type.Contains("All"))
             {
                 foreach (ModuleItemConsume item in this.itemConList)
@@ -300,14 +246,6 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("DrillDps"))
             {
                 this.allSegments["DrillDps"].AddBuff(buff);
-            }
-            if (effects.Contains("EnergyOps"))
-            {
-                this.energyOpsBuffBlocks.Add(buff, buff.GetEffect("EnergyOps"));
-            }
-            if (effects.Contains("EnergyStoreCap"))
-            {
-                this.energyStoreCapBuffBlocks.Add(buff, buff.GetEffect("EnergyStoreCap"));
             }
             if (effects.Contains("ItemConAnchored"))
             {
@@ -392,14 +330,6 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("DrillDps"))
             {
                 this.allSegments["DrillDps"].RemoveBuff(buff);
-            }
-            if (effects.Contains("EnergyOps"))
-            {
-                this.energyOpsBuffBlocks.Remove(buff);
-            }
-            if (effects.Contains("EnergyStoreCap"))
-            {
-                this.energyStoreCapBuffBlocks.Remove(buff);
             }
             if (effects.Contains("ItemConAnchored"))
             {
@@ -527,40 +457,6 @@ namespace FFW_TT_BuffBlock
             this.allSegments["DrillDps"].ManipulateObj(new List<object> { drill }, "CLEAN");
 
             this.drillListGeneric.Remove(drill);
-        }
-
-        public void AddEnergy(ModuleEnergy energy)
-        {
-            this.energyList.Add(energy);
-            this.energyOpsOld.Add(energy, (float)field_Ops.GetValue(energy));
-
-            this.Update(new string[] { "EnergyOps" });
-        }
-
-        public void RemoveEnergy(ModuleEnergy energy)
-        {
-            field_Ops.SetValue(energy, this.energyOpsOld[energy]);
-            this.energyList.Remove(energy);
-            this.energyOpsOld.Remove(energy);
-        }
-
-        public void AddEnergyStore(ModuleEnergyStore store)
-        {
-            this.energyStoreList.Add(store);
-            this.energyStoreCapOld.Add(store, (float)field_Capacity.GetValue(store));
-            
-            this.Update(new string[] { "EnergyStoreCap" });
-        }
-
-        public void RemoveEnergyStore(ModuleEnergyStore store)
-        {
-            if (this.energyStoreCapBuffBlocks.Count > 0)
-            {
-                prop_Current.SetValue(store, 0.0f);
-                field_Capacity.SetValue(store, this.energyStoreCapOld[store]);
-            }
-            this.energyStoreList.Remove(store);
-            this.energyStoreCapOld.Remove(store);
         }
 
         public void AddItemCon(ModuleItemConsume item)

@@ -44,7 +44,7 @@
 		"m_BuffType": ["WeaponCooldown"],
 		"m_Strength": [0.2],
 		"m_AddAfter": [0.0],
-		"m_NeedsToBeAnchored": [true]
+		"m_NeedsToBeAnchored": [false]
 	}
   }
 }

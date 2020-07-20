@@ -42,7 +42,7 @@
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
 		"m_BuffType": ["WheelsTorque"],
-		"m_Strength": [1.0],
+		"m_Strength": [0.1],
 		"m_AddAfter": [100.0],
 		"m_NeedsToBeAnchored": [false]
 	}
