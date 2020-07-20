@@ -13,47 +13,6 @@ namespace FFW_TT_BuffBlock
 {
     public static class WrappedDataHolder
     {
-
-
-        /*[HarmonyPatch(typeof(ManWheels.Wheel), "UpdateAttachData")]
-        class ManWheelsWheel_AttachData_Patch
-        {
-            static bool Prefix(ref ManWheels.Wheel __instance, ref ModuleWheels.AttachData moduleData)
-            {
-                FieldInfo field_WheelState = typeof(ManWheels)
-                    .GetField("m_WheelState", BindingFlags.NonPublic | BindingFlags.Instance);
-                FieldInfo field_AttachedId = typeof(ManWheels.Wheel)
-                    .GetField("attachedID", BindingFlags.NonPublic | BindingFlags.Instance);
-                
-                int value_WheelAttachedId = (int)field_AttachedId.GetValue(__instance);
-                Array value_WheelState = (Array)field_WheelState.GetValue(Singleton.Manager<ManWheels>.inst);
-                object value_AttachedWheelState = value_WheelState.GetValue(value_WheelAttachedId);
-                
-                MethodInfo method_Init = value_AttachedWheelState.GetType().GetMethod("Init");
-                MethodInfo method_RecalculateDotProducts = value_AttachedWheelState.GetType().GetMethod("RecalculateDotProducts");
-
-                object[] parametersArray = new object[] { __instance, moduleData };
-
-                method_Init.Invoke(value_AttachedWheelState, parametersArray);
-                method_RecalculateDotProducts.Invoke(value_AttachedWheelState, null);
-                return false;
-            }
-        }*/
-
-        /*[HarmonyPatch(typeof(Extensions), "RandomVariance")]
-        class Vector3_RandomVariance_Patch
-        {
-            static Vector3 Postfix(ref Vector3 v, ref float variance, ref Vector3 __result)
-            {
-                Console.WriteLine("FFW?");
-                return new Vector3(
-                    v.x + UnityEngine.Random.Range(-variance, variance), 
-                    v.y + UnityEngine.Random.Range(-variance, variance), 
-                    v.z + UnityEngine.Random.Range(-variance, variance)
-                );
-            }
-        }*/
-
         [HarmonyPatch(typeof(ManWheels.Wheel), "UpdateAttachData")] // Thanks Aceba!
         private static class FixUpdateAttachData
         {
@@ -147,28 +106,6 @@ namespace FFW_TT_BuffBlock
                 return true;
             }
         }
-
-        /*[HarmonyPatch(typeof(ModuleShieldGenerator), "OnAttach")]
-        class ModuleShieldGenerator_Attach_Patch
-        {
-            static bool Prefix(ref ModuleShieldGenerator __instance)
-            {
-                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
-                buff.AddShield(__instance);
-                return true;
-            }
-        }
-
-        [HarmonyPatch(typeof(ModuleShieldGenerator), "OnDetach")]
-        class ModuleShieldGenerator_Detach_Patch
-        {
-            static bool Prefix(ref ModuleShieldGenerator __instance)
-            {
-                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
-                buff.RemoveShield(__instance);
-                return true;
-            }
-        }*/
 
         [HarmonyPatch(typeof(ModuleDrill), "OnAttach")]
         class ModuleDrill_Attach_Patch

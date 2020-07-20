@@ -17,6 +17,8 @@ namespace FFW_TT_BuffBlock
             { "WeaponSpread" , new string[] { "m_FiringData.m_BulletSprayVariance" } },
             { "WeaponVelocity" , new string[] { "m_FiringData.m_MuzzleVelocity" } },
 
+            { "DrillDps" , new string[] { "damagePerSecond" } },
+
             { "WheelsRpm" , new string[] { "m_TorqueParams.torqueCurveMaxRpm" } },
             { "WheelsBrake" , new string[] { "m_TorqueParams.passiveBrakeMaxTorque", "m_TorqueParams.basicFrictionTorque" } },
             { "WheelsTorque" , new string[] { "m_TorqueParams.torqueCurveMaxTorque" } },
@@ -26,17 +28,18 @@ namespace FFW_TT_BuffBlock
             { "HoverForce" , new string[] { "jets.forceMax" } },
             { "HoverRange" , new string[] { "jets.forceRangeMax" } },
             { "HoverDamping" , new string[] { "jets.m_DampingScale" } },
+
             { "BoosterBurnRate" , new string[] { "jets.m_BurnRate" } },
+            
             { "ItemProSpeed" , new string[] { "m_SecPerItemProduced", "m_MinDispenseInterval" } }
         };
         public Dictionary<string, BuffSegment> allSegments = new Dictionary<string, BuffSegment>();
 
         public List<object> weaponListGeneric = new List<object>();
         public List<ModuleWeaponGun> weaponList = new List<ModuleWeaponGun>();
-
+        public List<object> drillListGeneric = new List<object>();
         public List<object> wheelsListGeneric = new List<object>();
         public List<ModuleWheels> wheelsList = new List<ModuleWheels>();
-
         public List<object> hoverListGeneric = new List<object>();
         public List<object> boosterListGeneric = new List<object>();
         public List<object> itemProListGeneric = new List<object>();
@@ -44,7 +47,6 @@ namespace FFW_TT_BuffBlock
         /* PRIME PROPERTIES */
         public static List<BuffController> allControllers = new List<BuffController>();
         public Tank tank;
-        public List<ModuleShieldGenerator> shieldList = new List<ModuleShieldGenerator>();
         public List<ModuleDrill> drillList = new List<ModuleDrill>();
         public List<ModuleEnergy> energyList = new List<ModuleEnergy>();
         public List<ModuleEnergyStore> energyStoreList = new List<ModuleEnergyStore>();
@@ -52,34 +54,6 @@ namespace FFW_TT_BuffBlock
         public List<ModuleHeart> heartList = new List<ModuleHeart>();
         public List<ModuleItemPickup> itemPickupList = new List<ModuleItemPickup>();
         public List<ModuleItemProducer> itemProList = new List<ModuleItemProducer>();
-        
-        /* WHEELS : MAX RPM */
-        public Dictionary<ModuleBuff, int> wheelsRpmBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleWheels, float> wheelsRpmOld = new Dictionary<ModuleWheels, float>();
-        public static FieldInfo field_TorqueParams = typeof(ModuleWheels)
-            .GetField("m_TorqueParams", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_Wheels = typeof(ModuleWheels)
-            .GetField("m_Wheels", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_WheelParams = typeof(ModuleWheels)
-            .GetField("m_WheelParams", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_AttachedId = typeof(ManWheels.Wheel)
-            .GetField("attachedID", BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_WheelState = typeof(ManWheels)
-            .GetField("m_WheelState", BindingFlags.NonPublic | BindingFlags.Instance);
-        
-        /* SHIELD : RADIUS */
-        /*public Dictionary<ModuleBuff, int> shieldRadiusBuffBlocks = new List<ModuleBuff>();
-        public Dictionary<ModuleShieldGenerator, float> shieldRadiusOld = new Dictionary<ModuleShieldGenerator, float>();
-        public static FieldInfo field_Radius = typeof(ModuleShieldGenerator)
-            .GetField("m_Radius", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        public static FieldInfo field_State = typeof(ModuleShieldGenerator)
-            .GetField("m_State", BindingFlags.NonPublic | BindingFlags.Instance);*/
-
-        /* DRILL : DAMAGE PER SECOND */
-        public Dictionary<ModuleBuff, int> drillDpsBuffBlocks = new Dictionary<ModuleBuff, int>();
-        public Dictionary<ModuleDrill, float> drillDpsOld = new Dictionary<ModuleDrill, float>();
-        public static FieldInfo field_Dps = typeof(ModuleDrill)
-            .GetField("damagePerSecond", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         /* ENERGY : OUTPUT PER SECOND */
         public Dictionary<ModuleBuff, int> energyOpsBuffBlocks = new Dictionary<ModuleBuff, int>();
@@ -215,6 +189,8 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponVelocity"].ManipulateObj(this.weaponListGeneric, "UPDATE");
             this.RefreshBarrels(this.weaponList);
 
+            this.allSegments["DrillDps"].ManipulateObj(this.drillListGeneric, "UPDATE");
+
             this.allSegments["WheelsRpm"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
             this.allSegments["WheelsBrake"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
             this.allSegments["WheelsTorque"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
@@ -225,52 +201,12 @@ namespace FFW_TT_BuffBlock
             this.allSegments["HoverForce"].ManipulateObj(this.hoverListGeneric, "UPDATE");
             this.allSegments["HoverRange"].ManipulateObj(this.hoverListGeneric, "UPDATE");
             this.allSegments["HoverDamping"].ManipulateObj(this.hoverListGeneric, "UPDATE");
+
             this.allSegments["BoosterBurnRate"].ManipulateObj(this.boosterListGeneric, "UPDATE");
+
             this.allSegments["ItemProSpeed"].ManipulateObj(this.itemProListGeneric, "UPDATE");
 
-            /*if (type.Contains("WheelsRpm") ||
-                type.Contains("WheelsBrake") ||
-                type.Contains("WheelsTorque") ||
-                type.Contains("WheelsGrip") ||
-                type.Contains("WheelsSuspension") ||
-                type.Contains("All"))
-            {
-                foreach (ModuleWheels wheels in this.wheelsList)
-                {
-                    ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                    ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
-                    torque.torqueCurveMaxRpm = this.wheelsRpmOld[wheels] * this.GetBuffAverage("wheelsRpmBuffBlocks") + this.GetBuffAddAverage("wheelsRpmBuffBlocks");
-                    
-                    torque.passiveBrakeMaxTorque = this.wheelsBrakeOld[wheels][0] * this.GetBuffAverage("wheelsBrakeBuffBlocks") + this.GetBuffAddAverage("wheelsBrakeBuffBlocks");
-                    torque.basicFrictionTorque = this.wheelsBrakeOld[wheels][1] * this.GetBuffAverage("wheelsBrakeBuffBlocks") + this.GetBuffAddAverage("wheelsBrakeBuffBlocks");
-                    
-                    torque.torqueCurveMaxTorque = this.wheelsTorqueOld[wheels] * this.GetBuffAverage("wheelsTorqueBuffBlocks") + this.GetBuffAddAverage("wheelsTorqueBuffBlocks");
-                    
-                    wheelparams.tireProperties.props.gripFactorLong = this.wheelsGripOld[wheels][0] * this.GetBuffAverage("wheelsGripBuffBlocks") + this.GetBuffAddAverage("wheelsGripBuffBlocks");
-                    //wheelparams.tireProperties.props.gripFactorLat = this.wheelsGripOld[wheels][1] * this.GetBuffAverage("wheelsGripBuffBlocks") + this.GetBuffAddAverage("wheelsGripBuffBlocks");
-                    
-                    wheelparams.suspensionSpring = this.wheelsSuspensionOld[wheels][0] * this.GetBuffAverage("wheelsSuspensionBuffBlocks") + this.GetBuffAddAverage("wheelsSuspensionBuffBlocks");
-                    wheelparams.suspensionDamper = this.wheelsSuspensionOld[wheels][1] * this.GetBuffAverage("wheelsSuspensionBuffBlocks") + this.GetBuffAddAverage("wheelsSuspensionBuffBlocks");
-
-                    this.RefreshWheels(wheels, torque, wheelparams);
-                }
-            }*/
-            /*if (type.Contains("ShieldRadius") || type.Contains("All"))
-            {
-                foreach (ModuleShieldGenerator shield in this.shieldList)
-                {
-                    Type stateEnum = field_State.GetValue(shield).GetType();
-                    field_Radius.SetValue(shield, this.shieldRadiusOld[shield] * this.GetBuffAverage("shieldRadiusBuffBlocks"));
-                    field_State.SetValue(shield, Enum.ToObject(stateEnum, 0));
-                }
-            }*/
-            if (type.Contains("DrillDps") || type.Contains("All"))
-            {
-                foreach (ModuleDrill drill in this.drillList)
-                {
-                    field_Dps.SetValue(drill, this.drillDpsOld[drill] * this.GetBuffAverage("drillDpsBuffBlocks") + this.GetBuffAddAverage("drillDpsBuffBlocks"));
-                }
-            }
+            
             if (type.Contains("EnergyOps") || type.Contains("All"))
             {
                 foreach (ModuleEnergy energy in this.energyList)
@@ -370,13 +306,9 @@ namespace FFW_TT_BuffBlock
                 this.allSegments["BoosterBurnRate"].AddBuff(buff);
                 
             }
-            /*if (effects.Contains("ShieldRadius")) 
-            {
-                this.shieldRadiusBuffBlocks.Add(buff, buff.GetEffect("WeaponCooldown"));
-            }*/
             if (effects.Contains("DrillDps"))
             {
-                this.drillDpsBuffBlocks.Add(buff, buff.GetEffect("DrillDps"));
+                this.allSegments["DrillDps"].AddBuff(buff);
             }
             if (effects.Contains("EnergyOps"))
             {
@@ -468,7 +400,7 @@ namespace FFW_TT_BuffBlock
             }*/
             if (effects.Contains("DrillDps"))
             {
-                this.drillDpsBuffBlocks.Remove(buff);
+                this.allSegments["DrillDps"].RemoveBuff(buff);
             }
             if (effects.Contains("EnergyOps"))
             {
@@ -579,6 +511,7 @@ namespace FFW_TT_BuffBlock
             this.boosterListGeneric.Add(booster);
 
             this.allSegments["BoosterBurnRate"].ManipulateObj(new List<object> { booster }, "SAVE");
+
             this.allSegments["BoosterBurnRate"].ManipulateObj(new List<object> { booster }, "UPDATE");
         }
 
@@ -589,36 +522,20 @@ namespace FFW_TT_BuffBlock
             this.boosterListGeneric.Remove(booster);
         }
 
-        /*public void AddShield(ModuleShieldGenerator shield)
-        {
-            this.shieldList.Add(shield);
-            float value_Radius = (float)field_Radius.GetValue(shield);
-            this.shieldRadiusOld.Add(shield, value_Radius);
-            
-            this.Update(new string[] { "ShieldRadius" });
-        }
-
-
-        public void RemoveShield(ModuleShieldGenerator shield)
-        {
-            field_Radius.SetValue(shield, this.shieldRadiusOld[shield]);
-            this.shieldList.Remove(shield);
-            this.shieldRadiusOld.Remove(shield);
-        }*/
-
         public void AddDrill(ModuleDrill drill)
         {
-            this.drillList.Add(drill);
-            this.drillDpsOld.Add(drill, (float)field_Dps.GetValue(drill));
+            this.drillListGeneric.Add(drill);
 
-            this.Update(new string[] { "DrillDps" });
+            this.allSegments["DrillDps"].ManipulateObj(new List<object> { drill }, "SAVE");
+
+            this.allSegments["DrillDps"].ManipulateObj(new List<object> { drill }, "UPDATE");
         }
 
         public void RemoveDrill(ModuleDrill drill)
         {
-            field_Dps.SetValue(drill, this.drillDpsOld[drill]);
-            this.drillList.Remove(drill);
-            this.drillDpsOld.Remove(drill);
+            this.allSegments["DrillDps"].ManipulateObj(new List<object> { drill }, "CLEAN");
+
+            this.drillListGeneric.Remove(drill);
         }
 
         public void AddEnergy(ModuleEnergy energy)
@@ -646,7 +563,7 @@ namespace FFW_TT_BuffBlock
 
         public void RemoveEnergyStore(ModuleEnergyStore store)
         {
-            if (this.drillDpsBuffBlocks.Count > 0)
+            if (this.energyStoreCapBuffBlocks.Count > 0)
             {
                 prop_Current.SetValue(store, 0.0f);
                 field_Capacity.SetValue(store, this.energyStoreCapOld[store]);
@@ -740,7 +657,7 @@ namespace FFW_TT_BuffBlock
         
         public void RefreshWheels(List<ModuleWheels> wheelsList)
         {
-            FieldInfo field_TorqueParams = typeof(ModuleWheels)
+            FieldInfo field_TorqueParams = typeof(ModuleWheels) // Maybe I should find a way to compress these?
                 .GetField("m_TorqueParams", BindingFlags.NonPublic | BindingFlags.Instance);
             FieldInfo field_Wheels = typeof(ModuleWheels)
                 .GetField("m_Wheels", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -752,10 +669,8 @@ namespace FFW_TT_BuffBlock
                 .GetField("m_WheelState", BindingFlags.NonPublic | BindingFlags.Instance);
             foreach (ModuleWheels wheels in wheelsList)
             {
-                /*field_TorqueParams.SetValue(wheels, torque); // Apply new Torque to ModuleWheels
-                field_WheelParams.SetValue(wheels, wheelparams); // Apply new WheelParams...*/
-                ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
-                ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
+                ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels); // Read active Torque... 
+                ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels); // Read active WheelParams... 
 
                 List<ManWheels.Wheel> value_Wheels = (List<ManWheels.Wheel>)field_Wheels.GetValue(wheels);
                 foreach (ManWheels.Wheel wheel in value_Wheels)
@@ -790,7 +705,7 @@ namespace FFW_TT_BuffBlock
 
         public void RefreshBarrels(List<ModuleWeaponGun> weaponList)
         {
-            FieldInfo field_NumCannonBarrels = typeof(ModuleWeaponGun)
+            FieldInfo field_NumCannonBarrels = typeof(ModuleWeaponGun) // Holy mess!
                 .GetField("m_NumCannonBarrels", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             FieldInfo field_CannonBarrels = typeof(ModuleWeaponGun)
                 .GetField("m_CannonBarrels", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -808,52 +723,26 @@ namespace FFW_TT_BuffBlock
                 .GetMethod("Setup", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo method_CapRecoilDuration = typeof(CannonBarrel)
                 .GetMethod("CapRecoilDuration", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            Console.WriteLine("FFW? 1");
+
             foreach (ModuleWeaponGun weapon in weaponList)
             {
-                Console.WriteLine("FFW? 2");
                 int value_NumCannonBarrels = (int)field_NumCannonBarrels.GetValue(weapon);
-                Console.WriteLine("FFW? 3");
                 if (value_NumCannonBarrels != 0)
                 {
-                    Console.WriteLine("FFW? 4");
                     Array value_CannonBarrels = (Array)field_CannonBarrels.GetValue(weapon);
-                    Console.WriteLine("FFW? 5");
                     for (int i = 0; i < value_CannonBarrels.Length; i++)
                     {
-                        Console.WriteLine("FFW? 6");
                         Transform value_BarrelTransform = (Transform)field_BarrelTransform.GetValue(weapon);
-                        Console.WriteLine("FFW? 7");
-                        if (value_BarrelTransform == null)
+                        if (value_BarrelTransform == null) // Will this ever check true?
                         {
-                            Console.WriteLine("FFW? 8");
                             field_BarrelTransform.SetValue(weapon, field_transform.GetValue(value_CannonBarrels.GetValue(i)));
                         }
-                        Console.WriteLine("FFW? 9");
                         FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
-                        Console.WriteLine("FFW? 10");
                         ModuleWeapon value_WeaponModule = (ModuleWeapon)field_WeaponModule.GetValue(weapon);
-                        Console.WriteLine("FFW? 11");
                         float value_ShotCooldown = (float)field_ShotCooldown.GetValue(weapon);
-                        Console.WriteLine("FFW? 12");
                         method_Setup.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_FiringData, value_WeaponModule });
-                        Console.WriteLine("FFW? 13");
                         method_CapRecoilDuration.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_ShotCooldown });
-                        Console.WriteLine("FFW? 14");
-                        //value_CannonBarrels.GetValue(i).Setup(value_FiringData, value_WeaponModule)
-                        //value_CannonBarrels.GetValue(i).CapRecoilDuration(value_ShotCooldown)
-
-
                     }
-                    /*foreach (CannonBarrel cannonBarrel in weapon.m_CannonBarrels)
-                    {
-                        if (weapon.m_BarrelTransform == null)
-                        {
-                            weapon.m_BarrelTransform = cannonBarrel.transform;
-                        }
-                        cannonBarrel.Setup(weapon.FiringData, weapon.m_WeaponModule);
-                        cannonBarrel.CapRecoilDuration(weapon.m_ShotCooldown);
-                    }*/
                 }
             }
         }
