@@ -64,6 +64,7 @@ namespace FFW_TT_BuffBlock
 
         public List<object> weaponListGeneric = new List<object>();
         public List<ModuleWeaponGun> weaponList = new List<ModuleWeaponGun>();
+        public Dictionary<CannonBarrel, float> weaponSpeedMemory = new Dictionary<CannonBarrel, float>();
         public List<object> drillListGeneric = new List<object>();
         public List<object> wheelsListGeneric = new List<object>();
         public List<ModuleWheels> wheelsList = new List<ModuleWheels>();
@@ -133,7 +134,7 @@ namespace FFW_TT_BuffBlock
             }
             if (effects.Contains("WeaponCooldown"))
             {
-                this.RefreshBarrels(this.weaponList);
+                this.ManipulateBarrels(this.weaponList, "UPDATE");
             }
             if (effects.Contains("WheelsRpm") ||
                 effects.Contains("WheelsBrake") ||
@@ -180,12 +181,14 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponSpread"].ManipulateObj(new List<object> { weapon }, "SAVE");
             this.allSegments["WeaponVelocity"].ManipulateObj(new List<object> { weapon }, "SAVE");
 
+            this.ManipulateBarrels(new List<ModuleWeaponGun> { weapon }, "SAVE");
+
             this.allSegments["WeaponCooldown"].ManipulateObj(new List<object> { weapon }, "UPDATE");
             this.allSegments["WeaponRotation"].ManipulateObj(new List<object> { weapon }, "UPDATE");
             this.allSegments["WeaponSpread"].ManipulateObj(new List<object> { weapon }, "UPDATE");
             this.allSegments["WeaponVelocity"].ManipulateObj(new List<object> { weapon }, "UPDATE");
 
-            this.RefreshBarrels(new List<ModuleWeaponGun> { weapon });
+            this.ManipulateBarrels(new List<ModuleWeaponGun> { weapon }, "UPDATE");
         }
 
         public void RemoveWeapon(ModuleWeaponGun weapon)
@@ -195,7 +198,7 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponSpread"].ManipulateObj(new List<object> { weapon }, "CLEAN");
             this.allSegments["WeaponVelocity"].ManipulateObj(new List<object> { weapon }, "CLEAN");
 
-            //this.RefreshBarrels(new List<ModuleWeaponGun> { weapon }); // Breaks
+            this.ManipulateBarrels(new List<ModuleWeaponGun> { weapon }, "CLEAN");
 
             this.weaponListGeneric.Remove(weapon);
             this.weaponList.Remove(weapon);
@@ -369,7 +372,7 @@ namespace FFW_TT_BuffBlock
             }
         }
 
-        public void RefreshBarrels(List<ModuleWeaponGun> weaponList)
+        public void ManipulateBarrels(List<ModuleWeaponGun> weaponList, string request)
         {
             FieldInfo field_NumCannonBarrels = typeof(ModuleWeaponGun) // Holy mess!
                 .GetField("m_NumCannonBarrels", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -405,24 +408,52 @@ namespace FFW_TT_BuffBlock
                         {
                             field_BarrelTransform.SetValue(weapon, field_transform.GetValue(value_CannonBarrels.GetValue(i)));
                         }*/
+                        CannonBarrel thisBarrel = (CannonBarrel)value_CannonBarrels.GetValue(i);
                         FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
                         ModuleWeapon value_WeaponModule = (ModuleWeapon)field_WeaponModule.GetValue(weapon);
                         float value_ShotCooldown = (float)field_ShotCooldown.GetValue(weapon);
                         //method_Setup.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_FiringData, value_WeaponModule });
                         //method_CapRecoilDuration.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_ShotCooldown });
-                        object value_AnimState = field_AnimState.GetValue(value_CannonBarrels.GetValue(i));
+                        object value_AnimState = field_AnimState.GetValue(thisBarrel);
                         if (value_AnimState != null)
                         {
-                            PropertyInfo field_Speed = value_AnimState.GetType()
+                            PropertyInfo prop_GetSpeed = value_AnimState.GetType()
+                                .GetProperty("speed", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetProperty);
+                            PropertyInfo prop_SetSpeed = value_AnimState.GetType()
                                 .GetProperty("speed", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty);
-                            PropertyInfo field_Length = value_AnimState.GetType()
+                            PropertyInfo prop_GetLength = value_AnimState.GetType()
                                 .GetProperty("length", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetProperty);
-                            float value_length = (float)field_Length.GetValue(value_AnimState);
-                            /*if (value_length > value_ShotCooldown)
+                            PropertyInfo prop_SetLength = value_AnimState.GetType()
+                                .GetProperty("length", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty);
+                            if (request == "SAVE")
                             {
-                                field_Speed.SetValue(value_AnimState, value_length / value_ShotCooldown);
+                                this.weaponSpeedMemory.Add(thisBarrel, (float)prop_GetSpeed.GetValue(value_AnimState));
+                            }
+                            else if (request == "UPDATE")
+                            {
+                                prop_SetSpeed.SetValue(value_AnimState, this.weaponSpeedMemory[thisBarrel] / this.allSegments["WeaponCooldown"].GetAverages());
+                            }
+                            else if (request == "CLEAN")
+                            {
+                                prop_SetSpeed.SetValue(value_AnimState, this.weaponSpeedMemory[thisBarrel]);
+                                this.weaponSpeedMemory.Remove(thisBarrel);
+                            }
+                            //float value_length = (float)prop_GetLength.GetValue(value_AnimState);
+                            //Console.WriteLine("FFW! Pre. Length = " + (float)prop_GetLength.GetValue(value_AnimState) + " . Speed = " + (float)prop_GetSpeed.GetValue(value_AnimState));
+                            /*float modifier = this.allSegments["WeaponCooldown"].GetAveragesByKey(weapon, 2);
+                            if (modifier == 0.0f)
+                            {
+                                modifier = this.allSegments["WeaponCooldown"].GetAveragesByKey(weapon, 1);
+                            }
+                            if (value_length > modifier)
+                            {
+                                //prop_SetSpeed.SetValue(value_AnimState, value_length / modifier);
                             }*/
-                            field_Speed.SetValue(value_AnimState, value_length / this.allSegments["WeaponCooldown"].GetAveragesByKey(weapon, 0));
+                            //Console.WriteLine("FFW! Post. Length = " + (float)prop_GetLength.GetValue(value_AnimState) + " . Speed = " + (float)prop_GetSpeed.GetValue(value_AnimState));
+                            /*if (value_length > this.allSegments["WeaponCooldown"].GetAveragesByKey(weapon, 2))
+                            {
+                                prop_SetSpeed.SetValue(value_AnimState, value_length / this.allSegments["WeaponCooldown"].GetAveragesByKey(weapon, 2));
+                            }*/
                         }
 
                     }

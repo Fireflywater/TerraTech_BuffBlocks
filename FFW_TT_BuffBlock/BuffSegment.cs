@@ -140,9 +140,9 @@ namespace FFW_TT_BuffBlock
             return a;
         }
 
-        public float GetAveragesByKey(object x, int i)
+        public float GetAverages()
         {
-            return this.effectMemory[x][i] * GetBuffAverage() + GetBuffAddAverage();
+            return GetBuffAverage() + GetBuffAddAverage();
         }
 
         public void AddBuff(ModuleBuff buff)
