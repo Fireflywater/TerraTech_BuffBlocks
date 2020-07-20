@@ -190,12 +190,14 @@ namespace FFW_TT_BuffBlock
 
         public void RemoveWeapon(ModuleWeaponGun weapon)
         {
+            this.RefreshBarrels(new List<ModuleWeaponGun> { weapon });
+
             this.allSegments["WeaponCooldown"].ManipulateObj(new List<object> { weapon }, "CLEAN");
             this.allSegments["WeaponRotation"].ManipulateObj(new List<object> { weapon }, "CLEAN");
             this.allSegments["WeaponSpread"].ManipulateObj(new List<object> { weapon }, "CLEAN");
             this.allSegments["WeaponVelocity"].ManipulateObj(new List<object> { weapon }, "CLEAN");
 
-            this.RefreshBarrels(new List<ModuleWeaponGun> { weapon });
+            //this.RefreshBarrels(new List<ModuleWeaponGun> { weapon });
 
             this.weaponListGeneric.Remove(weapon);
             this.weaponList.Remove(weapon);
@@ -385,6 +387,8 @@ namespace FFW_TT_BuffBlock
                 .GetField("m_ShotCooldown", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             FieldInfo field_transform = typeof(Transform)
                 .GetField("transform", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo field_AnimState = typeof(CannonBarrel)
+                .GetField("animState", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo method_Setup = typeof(CannonBarrel)
                 .GetMethod("Setup", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             MethodInfo method_CapRecoilDuration = typeof(CannonBarrel)
@@ -398,16 +402,36 @@ namespace FFW_TT_BuffBlock
                     Array value_CannonBarrels = (Array)field_CannonBarrels.GetValue(weapon);
                     for (int i = 0; i < value_CannonBarrels.Length; i++)
                     {
-                        Transform value_BarrelTransform = (Transform)field_BarrelTransform.GetValue(weapon);
+                        /*Transform value_BarrelTransform = (Transform)field_BarrelTransform.GetValue(weapon);
                         if (value_BarrelTransform == null) // Will this ever check true?
                         {
                             field_BarrelTransform.SetValue(weapon, field_transform.GetValue(value_CannonBarrels.GetValue(i)));
-                        }
+                        }*/
                         FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
                         ModuleWeapon value_WeaponModule = (ModuleWeapon)field_WeaponModule.GetValue(weapon);
                         float value_ShotCooldown = (float)field_ShotCooldown.GetValue(weapon);
-                        method_Setup.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_FiringData, value_WeaponModule });
-                        method_CapRecoilDuration.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_ShotCooldown });
+                        //method_Setup.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_FiringData, value_WeaponModule });
+                        //method_CapRecoilDuration.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_ShotCooldown });
+                        Console.WriteLine("FFW! 1!");
+                        object value_AnimState = field_AnimState.GetValue(value_CannonBarrels.GetValue(i));
+                        Console.WriteLine("FFW! 2!");
+                        if (value_AnimState != null)
+                        {
+                            PropertyInfo field_Speed = value_AnimState.GetType()
+                                .GetProperty("speed", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty);
+                            Console.WriteLine("FFW! 3!");
+                            PropertyInfo field_Length = value_AnimState.GetType()
+                                .GetProperty("length", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetProperty);
+                            Console.WriteLine("FFW! 4!");
+                            float value_length = (float)field_Length.GetValue(value_AnimState);
+                            Console.WriteLine("FFW! 5!");
+                            /*if (value_length > value_ShotCooldown)
+                            {
+                                field_Speed.SetValue(value_AnimState, value_length / value_ShotCooldown);
+                            }*/
+                            field_Speed.SetValue(value_AnimState, value_length / this.allSegments["WeaponCooldown"].GetAveragesByKey(weapon, 0));
+                        }
+
                     }
                 }
             }
