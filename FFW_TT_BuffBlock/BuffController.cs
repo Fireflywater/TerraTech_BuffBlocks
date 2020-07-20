@@ -30,8 +30,13 @@ namespace FFW_TT_BuffBlock
             { "ItemProSpeed" , new string[] { "m_SecPerItemProduced", "m_MinDispenseInterval" } }
         };
         public Dictionary<string, BuffSegment> allSegments = new Dictionary<string, BuffSegment>();
+
         public List<object> weaponListGeneric = new List<object>();
+        public List<ModuleWeaponGun> weaponList = new List<ModuleWeaponGun>();
+
         public List<object> wheelsListGeneric = new List<object>();
+        public List<ModuleWheels> wheelsList = new List<ModuleWheels>();
+
         public List<object> hoverListGeneric = new List<object>();
         public List<object> boosterListGeneric = new List<object>();
         public List<object> itemProListGeneric = new List<object>();
@@ -39,7 +44,6 @@ namespace FFW_TT_BuffBlock
         /* PRIME PROPERTIES */
         public static List<BuffController> allControllers = new List<BuffController>();
         public Tank tank;
-        public List<ModuleWheels> wheelsList = new List<ModuleWheels>();
         public List<ModuleShieldGenerator> shieldList = new List<ModuleShieldGenerator>();
         public List<ModuleDrill> drillList = new List<ModuleDrill>();
         public List<ModuleEnergy> energyList = new List<ModuleEnergy>();
@@ -209,11 +213,7 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponRotation"].ManipulateObj(this.weaponListGeneric, "UPDATE");
             this.allSegments["WeaponSpread"].ManipulateObj(this.weaponListGeneric, "UPDATE");
             this.allSegments["WeaponVelocity"].ManipulateObj(this.weaponListGeneric, "UPDATE");
-            this.allSegments["HoverForce"].ManipulateObj(this.hoverListGeneric, "UPDATE");
-            this.allSegments["HoverRange"].ManipulateObj(this.hoverListGeneric, "UPDATE");
-            this.allSegments["HoverDamping"].ManipulateObj(this.hoverListGeneric, "UPDATE");
-            this.allSegments["BoosterBurnRate"].ManipulateObj(this.boosterListGeneric, "UPDATE");
-            this.allSegments["ItemProSpeed"].ManipulateObj(this.itemProListGeneric, "UPDATE");
+            this.RefreshBarrels(this.weaponList);
 
             this.allSegments["WheelsRpm"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
             this.allSegments["WheelsBrake"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
@@ -221,6 +221,12 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WheelsGrip"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
             this.allSegments["WheelsSuspension"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
             this.RefreshWheels(this.wheelsList);
+
+            this.allSegments["HoverForce"].ManipulateObj(this.hoverListGeneric, "UPDATE");
+            this.allSegments["HoverRange"].ManipulateObj(this.hoverListGeneric, "UPDATE");
+            this.allSegments["HoverDamping"].ManipulateObj(this.hoverListGeneric, "UPDATE");
+            this.allSegments["BoosterBurnRate"].ManipulateObj(this.boosterListGeneric, "UPDATE");
+            this.allSegments["ItemProSpeed"].ManipulateObj(this.itemProListGeneric, "UPDATE");
 
             /*if (type.Contains("WheelsRpm") ||
                 type.Contains("WheelsBrake") ||
@@ -506,6 +512,7 @@ namespace FFW_TT_BuffBlock
         public void AddWeapon(ModuleWeaponGun weapon)
         {
             this.weaponListGeneric.Add(weapon);
+            this.weaponList.Add(weapon);
 
             this.allSegments["WeaponCooldown"].ManipulateObj(new List<object> { weapon }, "SAVE");
             this.allSegments["WeaponRotation"].ManipulateObj(new List<object> { weapon }, "SAVE");
@@ -516,6 +523,8 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponRotation"].ManipulateObj(new List<object> { weapon }, "UPDATE");
             this.allSegments["WeaponSpread"].ManipulateObj(new List<object> { weapon }, "UPDATE");
             this.allSegments["WeaponVelocity"].ManipulateObj(new List<object> { weapon }, "UPDATE");
+
+            this.RefreshBarrels(new List<ModuleWeaponGun> { weapon });
         }
 
         public void RemoveWeapon(ModuleWeaponGun weapon)
@@ -525,7 +534,10 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WeaponSpread"].ManipulateObj(new List<object> { weapon }, "CLEAN");
             this.allSegments["WeaponVelocity"].ManipulateObj(new List<object> { weapon }, "CLEAN");
 
+            this.RefreshBarrels(new List<ModuleWeaponGun> { weapon });
+
             this.weaponListGeneric.Remove(weapon);
+            this.weaponList.Remove(weapon);
         }
 
         public void AddWheels(ModuleWheels wheels)
@@ -544,7 +556,7 @@ namespace FFW_TT_BuffBlock
             this.allSegments["WheelsTorque"].ManipulateObj(new List<object> { wheels }, "UPDATE");
             this.allSegments["WheelsGrip"].ManipulateObj(new List<object> { wheels }, "UPDATE");
             this.allSegments["WheelsSuspension"].ManipulateObj(new List<object> { wheels }, "UPDATE");
-
+            
             this.RefreshWheels( new List<ModuleWheels> { wheels });
         }
 
@@ -772,6 +784,76 @@ namespace FFW_TT_BuffBlock
                         wheel.UpdateAttachData(moduleData); // Update it! Live! Do it!
                                                             
                     }
+                }
+            }
+        }
+
+        public void RefreshBarrels(List<ModuleWeaponGun> weaponList)
+        {
+            FieldInfo field_NumCannonBarrels = typeof(ModuleWeaponGun)
+                .GetField("m_NumCannonBarrels", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo field_CannonBarrels = typeof(ModuleWeaponGun)
+                .GetField("m_CannonBarrels", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo field_BarrelTransform = typeof(ModuleWeaponGun)
+                .GetField("m_BarrelTransform", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo field_FiringData = typeof(ModuleWeaponGun)
+                .GetField("m_FiringData", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo field_WeaponModule = typeof(ModuleWeaponGun)
+                .GetField("m_WeaponModule", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo field_ShotCooldown = typeof(ModuleWeaponGun)
+                .GetField("m_ShotCooldown", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo field_transform = typeof(Transform)
+                .GetField("transform", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo method_Setup = typeof(CannonBarrel)
+                .GetMethod("Setup", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo method_CapRecoilDuration = typeof(CannonBarrel)
+                .GetMethod("CapRecoilDuration", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            Console.WriteLine("FFW? 1");
+            foreach (ModuleWeaponGun weapon in weaponList)
+            {
+                Console.WriteLine("FFW? 2");
+                int value_NumCannonBarrels = (int)field_NumCannonBarrels.GetValue(weapon);
+                Console.WriteLine("FFW? 3");
+                if (value_NumCannonBarrels != 0)
+                {
+                    Console.WriteLine("FFW? 4");
+                    Array value_CannonBarrels = (Array)field_CannonBarrels.GetValue(weapon);
+                    Console.WriteLine("FFW? 5");
+                    for (int i = 0; i < value_CannonBarrels.Length; i++)
+                    {
+                        Console.WriteLine("FFW? 6");
+                        Transform value_BarrelTransform = (Transform)field_BarrelTransform.GetValue(weapon);
+                        Console.WriteLine("FFW? 7");
+                        if (value_BarrelTransform == null)
+                        {
+                            Console.WriteLine("FFW? 8");
+                            field_BarrelTransform.SetValue(weapon, field_transform.GetValue(value_CannonBarrels.GetValue(i)));
+                        }
+                        Console.WriteLine("FFW? 9");
+                        FireData value_FiringData = (FireData)field_FiringData.GetValue(weapon);
+                        Console.WriteLine("FFW? 10");
+                        ModuleWeapon value_WeaponModule = (ModuleWeapon)field_WeaponModule.GetValue(weapon);
+                        Console.WriteLine("FFW? 11");
+                        float value_ShotCooldown = (float)field_ShotCooldown.GetValue(weapon);
+                        Console.WriteLine("FFW? 12");
+                        method_Setup.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_FiringData, value_WeaponModule });
+                        Console.WriteLine("FFW? 13");
+                        method_CapRecoilDuration.Invoke(value_CannonBarrels.GetValue(i), new object[] { value_ShotCooldown });
+                        Console.WriteLine("FFW? 14");
+                        //value_CannonBarrels.GetValue(i).Setup(value_FiringData, value_WeaponModule)
+                        //value_CannonBarrels.GetValue(i).CapRecoilDuration(value_ShotCooldown)
+
+
+                    }
+                    /*foreach (CannonBarrel cannonBarrel in weapon.m_CannonBarrels)
+                    {
+                        if (weapon.m_BarrelTransform == null)
+                        {
+                            weapon.m_BarrelTransform = cannonBarrel.transform;
+                        }
+                        cannonBarrel.Setup(weapon.FiringData, weapon.m_WeaponModule);
+                        cannonBarrel.CapRecoilDuration(weapon.m_ShotCooldown);
+                    }*/
                 }
             }
         }
