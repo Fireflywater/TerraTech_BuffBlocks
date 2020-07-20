@@ -1,4 +1,4 @@
-## TerraTech Buff Blocks (v1.0.6)
+## TerraTech Buff Blocks (v1.1.0)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
@@ -37,13 +37,10 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 * Where <BuffType> can be...
 
-* "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity"...
-
+* "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity", "WeaponDamage", "DrillDps"...
 * "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip", "WheelsSuspension"...
-
-* "HoverForce", "HoverRange"...
-
-* "BoosterBurnRate", "DISABLEDShieldRadiusDISABLED", "DrillDps", "EnergyOps", "EnergyStoreCap", "ItemPickupRange", "ItemProSpeed"...
+* "HoverForce", "HoverRange", "HoverDamping", "BoosterBurnRate"...
+* "ItemPickupRange", "ItemProSpeed"...
 
 * Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. 1.0 for no change. Default 1.0.
 
@@ -66,6 +63,13 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
+7/19/2020, v1.1.0:
+
+* Absolutely massive refactor, greatly increases speed of new variable implementation.
+
+* Refactor prepares for future "raw" variable, allowing modders to point directly at variables.
+
+* Recoil Animations of weapons are now consistant with WeaponCooldown buffs, allowing even faster weapon shooting.
 
 7/17/2020, v1.0.6:
 

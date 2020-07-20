@@ -121,7 +121,6 @@ namespace FFW_TT_BuffBlock
 
         public void Update(string[] effects)
         {
-            // Use "All" to update all, use m_BuffType to update specifics
             foreach (string effect in effects)
             {
                 if (this.allSegments.ContainsKey(effect))
@@ -145,30 +144,6 @@ namespace FFW_TT_BuffBlock
             {
                 this.RefreshWheels(this.wheelsList);
             }
-            /*
-            this.allSegments["WeaponCooldown"].ManipulateObj(this.weaponListGeneric, "UPDATE");
-            this.allSegments["WeaponRotation"].ManipulateObj(this.weaponListGeneric, "UPDATE");
-            this.allSegments["WeaponSpread"].ManipulateObj(this.weaponListGeneric, "UPDATE");
-            this.allSegments["WeaponVelocity"].ManipulateObj(this.weaponListGeneric, "UPDATE");
-            this.RefreshBarrels(this.weaponList);
-
-            this.allSegments["DrillDps"].ManipulateObj(this.drillListGeneric, "UPDATE");
-
-            this.allSegments["WheelsRpm"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
-            this.allSegments["WheelsBrake"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
-            this.allSegments["WheelsTorque"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
-            this.allSegments["WheelsGrip"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
-            this.allSegments["WheelsSuspension"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
-            this.RefreshWheels(this.wheelsList);
-
-            this.allSegments["HoverForce"].ManipulateObj(this.hoverListGeneric, "UPDATE");
-            this.allSegments["HoverRange"].ManipulateObj(this.hoverListGeneric, "UPDATE");
-            this.allSegments["HoverDamping"].ManipulateObj(this.hoverListGeneric, "UPDATE");
-
-            this.allSegments["BoosterBurnRate"].ManipulateObj(this.boosterListGeneric, "UPDATE");
-
-            this.allSegments["ItemPickupRange"].ManipulateObj(this.itemPickupListGeneric, "UPDATE");
-            this.allSegments["ItemProSpeed"].ManipulateObj(this.itemProListGeneric, "UPDATE");*/
         }
 
         public void AddBuff(ModuleBuff buff)
@@ -291,36 +266,6 @@ namespace FFW_TT_BuffBlock
 
             this.drillListGeneric.Remove(drill);
         }
-
-        /*public void AddItemCon(ModuleItemConsume item)
-        {
-            this.itemConList.Add(item);
-            this.itemConAnchorOld.Add(item, (bool)field_ItemConNeedsAnchor.GetValue(item));
-
-            this.Update(new string[] { "ItemConAnchored" });
-        }
-
-        public void RemoveItemCon(ModuleItemConsume item)
-        {
-            field_ItemConNeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
-            this.itemConList.Remove(item);
-            this.itemConAnchorOld.Remove(item);
-        }
-
-        public void AddHeart(ModuleHeart heart)
-        {
-            this.heartList.Add(heart);
-            this.heartAnchorOld.Add(heart, (bool)field_HeartNeedsAnchor.GetValue(heart));
-
-            this.Update(new string[] { "HeartAnchored" });
-        }
-
-        public void RemoveHeart(ModuleHeart heart)
-        {
-            field_HeartNeedsAnchor.SetValue(heart, this.heartAnchorOld[heart]);
-            this.heartList.Remove(heart);
-            this.heartAnchorOld.Remove(heart);
-        }*/
 
         public void AddItemPickup(ModuleItemPickup item)
         {
