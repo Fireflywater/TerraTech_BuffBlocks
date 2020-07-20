@@ -52,21 +52,6 @@ namespace FFW_TT_BuffBlock
         public Tank tank;
         public List<ModuleItemConsume> itemConList = new List<ModuleItemConsume>();
         public List<ModuleHeart> heartList = new List<ModuleHeart>();
-        
-
-        /* ITEM CONSUME : NEEDS ANCHORED */
-        public Dictionary<ModuleBuff, bool> itemConAnchorBuffBlocks = new Dictionary<ModuleBuff, bool>();
-        public Dictionary<ModuleItemConsume, bool> itemConAnchorOld = new Dictionary<ModuleItemConsume, bool>();
-        public bool ItemConAnchorFixed { get { return itemConAnchorBuffBlocks.ContainsValue(true); } } // Priority on True
-        public static FieldInfo field_ItemConNeedsAnchor = typeof(ModuleItemConsume)
-            .GetField("m_NeedsToBeAnchored", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-        /* HEART SCU : NEEDS ANCHORED */
-        public Dictionary<ModuleBuff, bool> heartAnchorBuffBlocks = new Dictionary<ModuleBuff, bool>();
-        public Dictionary<ModuleHeart, bool> heartAnchorOld = new Dictionary<ModuleHeart, bool>();
-        public bool HeartAnchorFixed { get { return itemConAnchorBuffBlocks.ContainsValue(true); } } // Priority on True
-        public static FieldInfo field_HeartNeedsAnchor = typeof(ModuleHeart)
-            .GetField("m_HasAnchor", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
@@ -108,37 +93,6 @@ namespace FFW_TT_BuffBlock
             BuffController.allControllers.Remove(obj);
         }
 
-        public float GetBuffAverage(string prop)
-        {
-            FieldInfo field_LocalProp = this.GetType().GetField(prop);
-            Dictionary<ModuleBuff, int> value_LocalProp = (Dictionary<ModuleBuff, int>)field_LocalProp.GetValue(this);
-
-            float m = 1.0f;
-            List<float> allMults = (List<float>)value_LocalProp.Select(x => x.Key.Strength(x.Key, x.Value)).ToList();
-            if (allMults.Count > 0)
-            { 
-                m = allMults.Average();
-            }
-
-            return (value_LocalProp.Count > 0) ? m : 1.0f;
-            
-        }
-
-        public float GetBuffAddAverage(string prop)
-        {
-            FieldInfo field_LocalProp = this.GetType().GetField(prop);
-            Dictionary<ModuleBuff, int> value_LocalProp = (Dictionary<ModuleBuff, int>)field_LocalProp.GetValue(this);
-
-            float a = 0.0f;
-            List<float> allAdds = (List<float>)value_LocalProp.Select(x => x.Key.AddAfter(x.Key, x.Value)).ToList();
-            if (allAdds.Count > 0)
-            {
-                a = allAdds.Average();
-            }
-
-            return (value_LocalProp.Count > 0) ? a : 0.0f;
-        }
-
         public void Update(string[] type)
         {
             // Use "All" to update all, use m_BuffType to update specifics
@@ -166,37 +120,6 @@ namespace FFW_TT_BuffBlock
 
             this.allSegments["ItemPickupRange"].ManipulateObj(this.itemPickupListGeneric, "UPDATE");
             this.allSegments["ItemProSpeed"].ManipulateObj(this.itemProListGeneric, "UPDATE");
-
-
-            
-            if (type.Contains("ItemConAnchored") || type.Contains("All"))
-            {
-                foreach (ModuleItemConsume item in this.itemConList)
-                {
-                    if (itemConAnchorBuffBlocks.Count > 0)
-                    {
-                        field_ItemConNeedsAnchor.SetValue(item, ItemConAnchorFixed);
-                    }
-                    else
-                    {
-                        field_ItemConNeedsAnchor.SetValue(item, this.itemConAnchorOld[item]);
-                    }
-                }
-            }
-            if (type.Contains("HeartAnchored") || type.Contains("All"))
-            {
-                foreach (ModuleHeart heart in this.heartList)
-                {
-                    if (heartAnchorBuffBlocks.Count > 0)
-                    {
-                        field_HeartNeedsAnchor.SetValue(heart, HeartAnchorFixed);
-                    }
-                    else
-                    {
-                        field_HeartNeedsAnchor.SetValue(heart, this.heartAnchorOld[heart]);
-                    }
-                }
-            }
         }
 
         public void AddBuff(ModuleBuff buff)
@@ -246,15 +169,6 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("DrillDps"))
             {
                 this.allSegments["DrillDps"].AddBuff(buff);
-            }
-            if (effects.Contains("ItemConAnchored"))
-            {
-                //this.itemConAnchorBuffBlocks.Add(buff, buff.m_Strength == 1.0f); // true if 1, false if not
-                this.itemConAnchorBuffBlocks.Add(buff, false); // true if 1, false if not
-            }
-            if (effects.Contains("HeartAnchored"))
-            {
-                this.heartAnchorBuffBlocks.Add(buff, false);
             }
             if (effects.Contains("ItemPickupRange"))
             {
@@ -330,14 +244,6 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("DrillDps"))
             {
                 this.allSegments["DrillDps"].RemoveBuff(buff);
-            }
-            if (effects.Contains("ItemConAnchored"))
-            {
-                this.itemConAnchorBuffBlocks.Remove(buff);
-            }
-            if (effects.Contains("HeartAnchored"))
-            {
-                this.heartAnchorBuffBlocks.Remove(buff);
             }
             if (effects.Contains("ItemPickupRange"))
             {
@@ -459,7 +365,7 @@ namespace FFW_TT_BuffBlock
             this.drillListGeneric.Remove(drill);
         }
 
-        public void AddItemCon(ModuleItemConsume item)
+        /*public void AddItemCon(ModuleItemConsume item)
         {
             this.itemConList.Add(item);
             this.itemConAnchorOld.Add(item, (bool)field_ItemConNeedsAnchor.GetValue(item));
@@ -487,7 +393,7 @@ namespace FFW_TT_BuffBlock
             field_HeartNeedsAnchor.SetValue(heart, this.heartAnchorOld[heart]);
             this.heartList.Remove(heart);
             this.heartAnchorOld.Remove(heart);
-        }
+        }*/
 
         public void AddItemPickup(ModuleItemPickup item)
         {
