@@ -16,15 +16,21 @@ namespace FFW_TT_BuffBlock
             { "WeaponRotation" , new string[] { "m_WeaponModule.m_RotateSpeed" } },
             { "WeaponSpread" , new string[] { "m_FiringData.m_BulletSprayVariance" } },
             { "WeaponVelocity" , new string[] { "m_FiringData.m_MuzzleVelocity" } },
+
+            { "WheelsRpm" , new string[] { "m_TorqueParams.torqueCurveMaxRpm" } },
+
             { "HoverForce" , new string[] { "jets.forceMax" } },
             { "HoverRange" , new string[] { "jets.forceRangeMax" } },
             { "HoverDamping" , new string[] { "jets.m_DampingScale" } },
-            { "BoosterBurnRate" , new string[] { "jets.m_BurnRate" } }
+            { "BoosterBurnRate" , new string[] { "jets.m_BurnRate" } },
+            { "ItemProSpeed" , new string[] { "m_SecPerItemProduced", "m_MinDispenseInterval" } }
         };
         public Dictionary<string, BuffSegment> allSegments = new Dictionary<string, BuffSegment>();
         public List<object> weaponListGeneric = new List<object>();
+        public List<object> wheelsListGeneric = new List<object>();
         public List<object> hoverListGeneric = new List<object>();
         public List<object> boosterListGeneric = new List<object>();
+        public List<object> itemProListGeneric = new List<object>();
 
         /* PRIME PROPERTIES */
         public static List<BuffController> allControllers = new List<BuffController>();
@@ -224,7 +230,7 @@ namespace FFW_TT_BuffBlock
 
         public void Update(string[] type)
         {
-            this.allSegments["WeaponCooldown"].UpdateObject(this.weaponListGeneric);
+            //this.allSegments["WeaponCooldown"].UpdateObject(this.weaponListGeneric);
             this.allSegments["WeaponRotation"].UpdateObject(this.weaponListGeneric);
             this.allSegments["WeaponSpread"].UpdateObject(this.weaponListGeneric);
             this.allSegments["WeaponVelocity"].UpdateObject(this.weaponListGeneric);
@@ -232,9 +238,15 @@ namespace FFW_TT_BuffBlock
             this.allSegments["HoverRange"].UpdateObject(this.hoverListGeneric);
             this.allSegments["HoverDamping"].UpdateObject(this.hoverListGeneric);
             this.allSegments["BoosterBurnRate"].UpdateObject(this.boosterListGeneric);
+            this.allSegments["ItemProSpeed"].UpdateObject(this.itemProListGeneric);
             // Use "All" to update all, use m_BuffType to update specifics
-            
-            if (type.Contains("WheelsRpm") ||
+            //this.allSegments["WheelsRpm"].UpdateObject(this.wheelsListGeneric);
+
+            this.allSegments["WeaponCooldown"].ManipulateObj(this.weaponListGeneric, "UPDATE");
+            this.allSegments["WheelsRpm"].ManipulateObj(this.wheelsListGeneric, "UPDATE");
+            this.RefreshWheels2(this.wheelsList);
+
+            /*if (type.Contains("WheelsRpm") ||
                 type.Contains("WheelsBrake") ||
                 type.Contains("WheelsTorque") ||
                 type.Contains("WheelsGrip") ||
@@ -260,7 +272,7 @@ namespace FFW_TT_BuffBlock
 
                     this.RefreshWheels(wheels, torque, wheelparams);
                 }
-            }
+            }*/
             /*if (type.Contains("ShieldRadius") || type.Contains("All"))
             {
                 foreach (ModuleShieldGenerator shield in this.shieldList)
@@ -330,14 +342,14 @@ namespace FFW_TT_BuffBlock
                     field_ItemPickupRange.SetValue(item, this.itemPickupRangeOld[item] * this.GetBuffAverage("itemPickupRangeBuffBlocks") + this.GetBuffAddAverage("itemPickupRangeBuffBlocks"));
                 }
             }
-            if (type.Contains("ItemProSpeed") || type.Contains("All"))
+            /*if (type.Contains("ItemProSpeed") || type.Contains("All"))
             {
                 foreach (ModuleItemProducer item in this.itemProList)
                 {
                     field_ItemProSpeed1.SetValue(item, this.itemProSpeedOld[item][0] * this.GetBuffAverage("itemProSpeedBuffBlocks") + this.GetBuffAddAverage("itemProSpeedBuffBlocks"));
                     field_ItemProSpeed2.SetValue(item, this.itemProSpeedOld[item][1] * this.GetBuffAverage("itemProSpeedBuffBlocks") + this.GetBuffAddAverage("itemProSpeedBuffBlocks"));
                 }
-            }
+            }*/
             /*if (type.Contains("HoverForce") ||
                 type.Contains("HoverRange") ||
                 type.Contains("HoverDamping") ||
@@ -381,9 +393,10 @@ namespace FFW_TT_BuffBlock
             }*/
             if (effects.Contains("WheelsRpm"))
             {
-                this.wheelsRpmBuffBlocks.Add(buff, buff.GetEffect("WheelsRpm"));
+                this.allSegments["WheelsRpm"].AddBuff(buff);
+                //this.wheelsRpmBuffBlocks.Add(buff, buff.GetEffect("WheelsRpm"));
             }
-            if (effects.Contains("WheelsBrake"))
+            /*if (effects.Contains("WheelsBrake"))
             {
                 this.wheelsBrakeBuffBlocks.Add(buff, buff.GetEffect("WheelsBrake"));
             }
@@ -398,7 +411,7 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("WheelsSuspension"))
             {
                 this.wheelsSuspensionBuffBlocks.Add(buff, buff.GetEffect("WheelsSuspension"));
-            }
+            }*/
             if (effects.Contains("BoosterBurnRate"))
             {
                 this.allSegments["BoosterBurnRate"].AddBuff(buff);
@@ -450,7 +463,8 @@ namespace FFW_TT_BuffBlock
             }
             if (effects.Contains("ItemProSpeed"))
             {
-                this.itemProSpeedBuffBlocks.Add(buff, buff.GetEffect("ItemProSpeed"));
+                this.allSegments["ItemProSpeed"].AddBuff(buff);
+                //this.itemProSpeedBuffBlocks.Add(buff, buff.GetEffect("ItemProSpeed"));
             }
             if (effects.Contains("HoverForce"))
             {
@@ -494,9 +508,10 @@ namespace FFW_TT_BuffBlock
             }*/
             if (effects.Contains("WheelsRpm"))
             {
-                this.wheelsRpmBuffBlocks.Remove(buff);
+                this.allSegments["WheelsRpm"].RemoveBuff(buff);
+                //this.wheelsRpmBuffBlocks.Remove(buff);
             }
-            if (effects.Contains("WheelsBrake"))
+            /*if (effects.Contains("WheelsBrake"))
             {
                 this.wheelsBrakeBuffBlocks.Remove(buff);
             }
@@ -511,7 +526,7 @@ namespace FFW_TT_BuffBlock
             if (effects.Contains("WheelsSuspension"))
             {
                 this.wheelsSuspensionBuffBlocks.Remove(buff);
-            }
+            }*/
             if (effects.Contains("BoosterBurnRate"))
             {
                 this.allSegments["BoosterBurnRate"].RemoveBuff(buff);
@@ -546,7 +561,8 @@ namespace FFW_TT_BuffBlock
             }
             if (effects.Contains("ItemProSpeed"))
             {
-                this.itemProSpeedBuffBlocks.Remove(buff);
+                this.allSegments["ItemProSpeed"].RemoveBuff(buff);
+                //this.itemProSpeedBuffBlocks.Remove(buff);
             }
             if (effects.Contains("HoverForce"))
             {
@@ -567,25 +583,39 @@ namespace FFW_TT_BuffBlock
         public void AddWeapon(ModuleWeaponGun weapon)
         {
             this.weaponListGeneric.Add(weapon);
-            this.allSegments["WeaponCooldown"].SaveObject(weapon);
+            /*this.allSegments["WeaponCooldown"].SaveObject(weapon);
             this.allSegments["WeaponRotation"].SaveObject(weapon);
             this.allSegments["WeaponSpread"].SaveObject(weapon);
-            this.allSegments["WeaponVelocity"].SaveObject(weapon);
+            this.allSegments["WeaponVelocity"].SaveObject(weapon);*/
 
-            this.Update(new string[] { "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity" });
+            this.allSegments["WeaponCooldown"].ManipulateObj(new List<object> { weapon }, "SAVE");
+            this.allSegments["WeaponCooldown"].ManipulateObj(new List<object> { weapon }, "UPDATE");
+
+            //this.Update(new string[] { "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity" });
         }
 
         public void RemoveWeapon(ModuleWeaponGun weapon)
         {
-            this.allSegments["WeaponCooldown"].CleanObject(weapon);
+            /*this.allSegments["WeaponCooldown"].CleanObject(weapon);
             this.allSegments["WeaponRotation"].CleanObject(weapon);
             this.allSegments["WeaponSpread"].CleanObject(weapon);
-            this.allSegments["WeaponVelocity"].CleanObject(weapon);
+            this.allSegments["WeaponVelocity"].CleanObject(weapon);*/
+
+
+            this.allSegments["WeaponCooldown"].ManipulateObj(new List<object> { weapon }, "CLEAN");
             this.weaponListGeneric.Remove(weapon);
         }
 
         public void AddWheels(ModuleWheels wheels)
         {
+            this.wheelsListGeneric.Add(wheels);
+            this.wheelsList.Add(wheels);
+            //this.allSegments["WheelsRpm"].SaveObject(wheels);
+
+            this.allSegments["WheelsRpm"].ManipulateObj(new List<object> { wheels }, "SAVE");
+            this.allSegments["WheelsRpm"].ManipulateObj(new List<object> { wheels }, "UPDATE");
+            this.RefreshWheels2( new List<ModuleWheels> { wheels });
+            /*
             this.wheelsList.Add(wheels);
             ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
             ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
@@ -607,13 +637,20 @@ namespace FFW_TT_BuffBlock
                 wheelparams.suspensionDamper
             });
 
-            this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip", "WheelsSuspension" });
+            this.Update(new string[] { "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip", "WheelsSuspension" });*/
             //this.RefreshWheels(wheels, torque);
         }
 
         public void RemoveWheels(ModuleWheels wheels)
         {
-            ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+            //this.allSegments["WheelsRpm"].CleanObject(wheels);
+            this.allSegments["WheelsRpm"].ManipulateObj(new List<object> { wheels }, "CLEAN");
+            this.RefreshWheels2(new List<ModuleWheels> { wheels });
+
+            this.wheelsListGeneric.Remove(wheels);
+            this.wheelsList.Remove(wheels);
+
+            /*ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
             ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
             torque.torqueCurveMaxRpm = this.wheelsRpmOld[wheels];
             torque.passiveBrakeMaxTorque = this.wheelsBrakeOld[wheels][0];
@@ -630,7 +667,7 @@ namespace FFW_TT_BuffBlock
             this.wheelsBrakeOld.Remove(wheels);
             this.wheelsTorqueOld.Remove(wheels);
             this.wheelsGripOld.Remove(wheels);
-            this.wheelsSuspensionOld.Remove(wheels);
+            this.wheelsSuspensionOld.Remove(wheels);*/
         }
 
         public void AddBooster(ModuleBooster booster)
@@ -760,22 +797,29 @@ namespace FFW_TT_BuffBlock
 
         public void AddItemPro(ModuleItemProducer item)
         {
-            this.itemProList.Add(item);
+            this.itemProListGeneric.Add(item);
+            this.allSegments["ItemProSpeed"].SaveObject(item);
+
+            /*this.itemProList.Add(item);
             this.itemProSpeedOld.Add(item, new List<float>()
             {
                 (float)field_ItemProSpeed1.GetValue(item),
                 (float)field_ItemProSpeed2.GetValue(item)
-            });
+            });*/
 
             this.Update(new string[] { "ItemProSpeed" });
         }
 
         public void RemoveItemPro(ModuleItemProducer item)
         {
-            field_ItemProSpeed1.SetValue(item, this.itemProSpeedOld[item][0]);
+            
+            this.allSegments["ItemProSpeed"].CleanObject(item);
+            this.itemProListGeneric.Remove(item);
+
+            /*field_ItemProSpeed1.SetValue(item, this.itemProSpeedOld[item][0]);
             field_ItemProSpeed2.SetValue(item, this.itemProSpeedOld[item][1]);
             this.itemProList.Remove(item);
-            this.itemProSpeedOld.Remove(item);
+            this.itemProSpeedOld.Remove(item);*/
         }
 
         public void AddHover(ModuleHover hover)
@@ -838,6 +882,46 @@ namespace FFW_TT_BuffBlock
                     method_Init.Invoke(value_AttachedWheelState, new object[] { wheel, moduleData });
                     method_RecalculateDotProducts.Invoke(value_AttachedWheelState, null);
                     Console.WriteLine("ffw: invoked.");*/
+                }
+            }
+        }
+
+        public void RefreshWheels2(List<ModuleWheels> wheelsList)
+        {
+            foreach (ModuleWheels wheels in wheelsList)
+            {
+                /*field_TorqueParams.SetValue(wheels, torque); // Apply new Torque to ModuleWheels
+                field_WheelParams.SetValue(wheels, wheelparams); // Apply new WheelParams...*/
+                ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels);
+                ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels);
+
+                List<ManWheels.Wheel> value_Wheels = (List<ManWheels.Wheel>)field_Wheels.GetValue(wheels);
+                foreach (ManWheels.Wheel wheel in value_Wheels)
+                {
+                    Array value_WheelState = (Array)field_WheelState.GetValue(Singleton.Manager<ManWheels>.inst);
+
+                    int value_WheelAttachedId = (int)field_AttachedId.GetValue(wheel); // Important, determines what AttachedWheelState is associated
+                    if (value_WheelAttachedId > -1) // value is -1 if it's unloaded, I think...
+                    {
+                        object value_AttachedWheelState = value_WheelState.GetValue(value_WheelAttachedId); // AttachedWheelState is a PRIVATE STRUCT, `object` neccessary
+                        FieldInfo field_p_TorqueParams = value_AttachedWheelState.GetType() // Get types of private struct...
+                            .GetField("torqueParams", BindingFlags.NonPublic | BindingFlags.Instance);
+                        FieldInfo field_p_WheelParams = value_AttachedWheelState.GetType()
+                            .GetField("wheelParams", BindingFlags.NonPublic | BindingFlags.Instance);
+
+                        field_p_TorqueParams.SetValue(value_AttachedWheelState, torque); // Apply new Torque to ManWheels.Wheel
+                        field_p_WheelParams.SetValue(value_AttachedWheelState, wheelparams); // Apply new WheelParams...
+
+                        FieldInfo field_p_Inertia = value_AttachedWheelState.GetType()
+                            .GetField("inertia", BindingFlags.NonPublic | BindingFlags.Instance);
+
+                        ManWheels.WheelParams value_WheelParams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels); // Note: Keep these incase inertia read causes issues
+                                                                                                                             //float i = wheels.block.CurrentMass * 0.9f / (float)value_Wheels.Count * value_WheelParams.radius * value_WheelParams.radius;
+                        ModuleWheels.AttachData moduleData = new ModuleWheels.AttachData(wheels, (float)field_p_Inertia.GetValue(value_AttachedWheelState), value_Wheels.Count);
+
+                        wheel.UpdateAttachData(moduleData); // Update it! Live! Do it!
+                                                            
+                    }
                 }
             }
         }
