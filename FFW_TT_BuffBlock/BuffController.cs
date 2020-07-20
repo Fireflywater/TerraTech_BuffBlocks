@@ -11,7 +11,8 @@ namespace FFW_TT_BuffBlock
     class BuffController
     {
         /* TEST PROPERTIES */
-        public static Dictionary<string, string[]> allEffects = new Dictionary<string, string[]> {
+        public static readonly Dictionary<string, string[]> allEffects = new Dictionary<string, string[]>
+        {
             { "WeaponCooldown" , new string[] { "m_WeaponModule.m_ShotCooldown", "m_ShotCooldown", "m_BurstCooldown" } },
             { "WeaponRotation" , new string[] { "m_WeaponModule.m_RotateSpeed" } },
             { "WeaponSpread" , new string[] { "m_FiringData.m_BulletSprayVariance" } },
@@ -33,6 +34,31 @@ namespace FFW_TT_BuffBlock
             
             { "ItemPickupRange" , new string[] { "m_PickupRange" } },
             { "ItemProSpeed" , new string[] { "m_SecPerItemProduced", "m_MinDispenseInterval" } }
+        };
+
+        public static readonly Dictionary<string, string> segmentListAssociation = new Dictionary<string, string>
+        {
+            { "WeaponCooldown" , "weaponListGeneric" },
+            { "WeaponRotation" , "weaponListGeneric" },
+            { "WeaponSpread" , "weaponListGeneric" },
+            { "WeaponVelocity" , "weaponListGeneric" },
+
+            { "DrillDps" , "drillListGeneric" },
+
+            { "WheelsRpm" , "wheelsListGeneric" },
+            { "WheelsBrake" , "wheelsListGeneric" },
+            { "WheelsTorque" , "wheelsListGeneric" },
+            { "WheelsGrip" , "wheelsListGeneric" },
+            { "WheelsSuspension" , "wheelsListGeneric" },
+
+            { "HoverForce" , "hoverListGeneric" },
+            { "HoverRange" , "hoverListGeneric" },
+            { "HoverDamping" , "hoverListGeneric" },
+
+            { "BoosterBurnRate" , "boosterListGeneric" },
+
+            { "ItemPickupRange" , "itemPickupListGeneric" },
+            { "ItemProSpeed" , "itemProListGeneric" }
         };
         public Dictionary<string, BuffSegment> allSegments = new Dictionary<string, BuffSegment>();
 
@@ -93,10 +119,33 @@ namespace FFW_TT_BuffBlock
             BuffController.allControllers.Remove(obj);
         }
 
-        public void Update(string[] type)
+        public void Update(string[] effects)
         {
             // Use "All" to update all, use m_BuffType to update specifics
-
+            foreach (string effect in effects)
+            {
+                if (this.allSegments.ContainsKey(effect))
+                {
+                    FieldInfo field_associatedArray = typeof(BuffController)
+                        .GetField(BuffController.segmentListAssociation[effect], BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    List<object> value_associatedArray = (List<object>)field_associatedArray.GetValue(this);
+                    this.allSegments[effect].ManipulateObj(value_associatedArray, "UPDATE");
+                }
+            }
+            if (effects.Contains("WeaponCooldown"))
+            {
+                this.RefreshBarrels(this.weaponList);
+            }
+            if (effects.Contains("WheelsRpm") ||
+                effects.Contains("WheelsBrake") ||
+                effects.Contains("WheelsTorque") ||
+                effects.Contains("WheelsGrip") ||
+                effects.Contains("WheelsSuspension") ||
+                effects.Contains("All"))
+            {
+                this.RefreshWheels(this.wheelsList);
+            }
+            /*
             this.allSegments["WeaponCooldown"].ManipulateObj(this.weaponListGeneric, "UPDATE");
             this.allSegments["WeaponRotation"].ManipulateObj(this.weaponListGeneric, "UPDATE");
             this.allSegments["WeaponSpread"].ManipulateObj(this.weaponListGeneric, "UPDATE");
@@ -119,151 +168,29 @@ namespace FFW_TT_BuffBlock
             this.allSegments["BoosterBurnRate"].ManipulateObj(this.boosterListGeneric, "UPDATE");
 
             this.allSegments["ItemPickupRange"].ManipulateObj(this.itemPickupListGeneric, "UPDATE");
-            this.allSegments["ItemProSpeed"].ManipulateObj(this.itemProListGeneric, "UPDATE");
+            this.allSegments["ItemProSpeed"].ManipulateObj(this.itemProListGeneric, "UPDATE");*/
         }
 
         public void AddBuff(ModuleBuff buff)
         {
-            List<string> effects = buff.AllEffects;
-            if (effects.Contains("WeaponCooldown"))
+            foreach (string effect in buff.AllEffects)
             {
-                this.allSegments["WeaponCooldown"].AddBuff(buff);
+                if (this.allSegments.ContainsKey(effect))
+                {
+                    this.allSegments[effect].AddBuff(buff);
+                }
             }
-            if (effects.Contains("WeaponRotation"))
-            {
-                this.allSegments["WeaponRotation"].AddBuff(buff);
-            }
-            if (effects.Contains("WeaponSpread"))
-            {
-                this.allSegments["WeaponSpread"].AddBuff(buff);
-            }
-            if (effects.Contains("WeaponVelocity"))
-            {
-                this.allSegments["WeaponVelocity"].AddBuff(buff);
-            }
-            if (effects.Contains("WheelsRpm"))
-            {
-                this.allSegments["WheelsRpm"].AddBuff(buff);
-            }
-            if (effects.Contains("WheelsBrake"))
-            {
-                this.allSegments["WheelsBrake"].AddBuff(buff);
-            }
-            if (effects.Contains("WheelsTorque"))
-            {
-                this.allSegments["WheelsTorque"].AddBuff(buff);
-            }
-            if (effects.Contains("WheelsGrip"))
-            {
-                this.allSegments["WheelsGrip"].AddBuff(buff);
-            }
-            if (effects.Contains("WheelsSuspension"))
-            {
-                this.allSegments["WheelsSuspension"].AddBuff(buff);
-            }
-            if (effects.Contains("BoosterBurnRate"))
-            {
-                this.allSegments["BoosterBurnRate"].AddBuff(buff);
-                
-            }
-            if (effects.Contains("DrillDps"))
-            {
-                this.allSegments["DrillDps"].AddBuff(buff);
-            }
-            if (effects.Contains("ItemPickupRange"))
-            {
-                this.allSegments["ItemPickupRange"].AddBuff(buff);
-            }
-            if (effects.Contains("ItemProSpeed"))
-            {
-                this.allSegments["ItemProSpeed"].AddBuff(buff);
-            }
-            if (effects.Contains("HoverForce"))
-            {
-                this.allSegments["HoverForce"].AddBuff(buff);
-            }
-            if (effects.Contains("HoverRange"))
-            {
-                this.allSegments["HoverRange"].AddBuff(buff);
-            }
-            if (effects.Contains("HoverDamping"))
-            {
-                this.allSegments["HoverDamping"].AddBuff(buff);
-            }
-            //this.buffBlocksNeedsAnchor.Add(buff, buff.m_NeedsToBeAnchored);
             this.Update(buff.m_BuffType);
-            //this.Update(new string[] { buff.m_BuffType });
         }
 
         public void RemoveBuff(ModuleBuff buff)
         {
-            List<string> effects = buff.AllEffects;
-            if (effects.Contains("WeaponCooldown"))
+            foreach (string effect in buff.AllEffects)
             {
-                this.allSegments["WeaponCooldown"].RemoveBuff(buff);
-            }
-            if (effects.Contains("WeaponRotation"))
-            {
-                this.allSegments["WeaponRotation"].RemoveBuff(buff);
-            }
-            if (effects.Contains("WeaponSpread"))
-            {
-                this.allSegments["WeaponSpread"].RemoveBuff(buff);
-            }
-            if (effects.Contains("WeaponVelocity"))
-            {
-                this.allSegments["WeaponVelocity"].RemoveBuff(buff);
-            }
-            if (effects.Contains("WheelsRpm"))
-            {
-                this.allSegments["WheelsRpm"].RemoveBuff(buff);
-            }
-            if (effects.Contains("WheelsBrake"))
-            {
-                this.allSegments["WheelsBrake"].RemoveBuff(buff);
-            }
-            if (effects.Contains("WheelsTorque"))
-            {
-                this.allSegments["WheelsTorque"].RemoveBuff(buff);
-            }
-            if (effects.Contains("WheelsGrip"))
-            {
-                this.allSegments["WheelsGrip"].RemoveBuff(buff);
-            }
-            if (effects.Contains("WheelsSuspension"))
-            {
-                this.allSegments["WheelsSuspension"].RemoveBuff(buff);
-            }
-            if (effects.Contains("BoosterBurnRate"))
-            {
-                this.allSegments["BoosterBurnRate"].RemoveBuff(buff);
-            }
-            /*if (effects.Contains("ShieldRadius")) {
-                this.shieldRadiusBuffBlocks.Remove(buff);
-            }*/
-            if (effects.Contains("DrillDps"))
-            {
-                this.allSegments["DrillDps"].RemoveBuff(buff);
-            }
-            if (effects.Contains("ItemPickupRange"))
-            {
-                this.allSegments["ItemPickupRange"].RemoveBuff(buff);
-            }
-            if (effects.Contains("ItemProSpeed"))
-            {
-                this.allSegments["ItemProSpeed"].RemoveBuff(buff);
-            }
-            if (effects.Contains("HoverForce"))
-            {
-                this.allSegments["HoverForce"].RemoveBuff(buff);
-            }
-            if (effects.Contains("HoverRange"))
-            {
-                this.allSegments["HoverRange"].RemoveBuff(buff);
-            }
-            if (effects.Contains("HoverDamping"))
-            {
-                this.allSegments["HoverDamping"].RemoveBuff(buff);
+                if (this.allSegments.ContainsKey(effect))
+                {
+                    this.allSegments[effect].RemoveBuff(buff);
+                }
             }
             this.Update(buff.m_BuffType);
         }
