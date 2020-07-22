@@ -238,6 +238,50 @@ namespace FFW_TT_BuffBlock
                 return true;
             }
         }
+
+        [HarmonyPatch(typeof(ModuleItemHolder), "OnAttach")]
+        class ModuleItemHolder_Attach_Patch
+        {
+            static bool Prefix(ref ModuleItemHolder __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddItemHolder(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleItemHolder), "OnDetach")]
+        class ModuleItemHolder_Detach_Patch
+        {
+            static bool Prefix(ref ModuleItemHolder __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveItemHolder(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleItemStore), "OnAttach")]
+        class ModuleItemStore_Attach_Patch
+        {
+            static bool Prefix(ref ModuleItemStore __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddItemStore(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleItemStore), "OnDetach")]
+        class ModuleItemStore_Detach_Patch
+        {
+            static bool Prefix(ref ModuleItemStore __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveItemStore(__instance);
+                return true;
+            }
+        }
     }
 }
 

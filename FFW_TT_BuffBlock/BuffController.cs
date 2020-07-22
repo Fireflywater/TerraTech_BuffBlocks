@@ -34,7 +34,9 @@ namespace FFW_TT_BuffBlock
             { "BoosterBurnRate" , new string[] { "jets.m_BurnRate" } },
             
             { "ItemPickupRange" , new string[] { "m_PickupRange" } },
-            { "ItemProSpeed" , new string[] { "m_SecPerItemProduced", "m_MinDispenseInterval" } }
+            { "ItemProSpeed" , new string[] { "m_SecPerItemProduced", "m_MinDispenseInterval" } },
+            { "ItemStoreCap" , new string[] { "m_Capacity" } },
+            { "ItemHoldCap" , new string[] { "m_CapacityPerStack" } }
         };
 
         public static readonly Dictionary<string, string> segmentListAssociation = new Dictionary<string, string>
@@ -60,7 +62,9 @@ namespace FFW_TT_BuffBlock
             { "BoosterBurnRate" , "boosterListGeneric" },
 
             { "ItemPickupRange" , "itemPickupListGeneric" },
-            { "ItemProSpeed" , "itemProListGeneric" }
+            { "ItemProSpeed" , "itemProListGeneric" },
+            { "ItemStoreCap" , "itemStoreListGeneric" },
+            { "ItemHoldCap" , "itemHoldListGeneric" }
         };
         public Dictionary<string, BuffSegment> allSegments = new Dictionary<string, BuffSegment>();
 
@@ -75,6 +79,8 @@ namespace FFW_TT_BuffBlock
 
         public List<object> itemPickupListGeneric = new List<object>();
         public List<object> itemProListGeneric = new List<object>();
+        public List<object> itemStoreListGeneric = new List<object>();
+        public List<object> itemHoldListGeneric = new List<object>();
 
         /* PRIME PROPERTIES */
         public static List<BuffController> allControllers = new List<BuffController>();
@@ -305,7 +311,35 @@ namespace FFW_TT_BuffBlock
 
             this.hoverListGeneric.Remove(hover);
         }
-        
+
+        public void AddItemStore(ModuleItemStore item)
+        {
+            this.itemStoreListGeneric.Add(item);
+
+            this.allSegments["ItemStoreCap"].ManipulateObj(new List<object> { item }, "SAVE");
+        }
+
+        public void RemoveItemStore(ModuleItemStore item)
+        {
+            this.allSegments["ItemStoreCap"].ManipulateObj(new List<object> { item }, "CLEAN");
+
+            this.itemStoreListGeneric.Remove(item);
+        }
+
+        public void AddItemHolder(ModuleItemHolder item)
+        {
+            this.itemHoldListGeneric.Add(item);
+
+            this.allSegments["ItemHoldCap"].ManipulateObj(new List<object> { item }, "SAVE");
+        }
+
+        public void RemoveItemHolder(ModuleItemHolder item)
+        {
+            this.allSegments["ItemHoldCap"].ManipulateObj(new List<object> { item }, "CLEAN");
+
+            this.itemHoldListGeneric.Remove(item);
+        }
+
         public void RefreshWheels(List<ModuleWheels> wheelsList)
         {
             FieldInfo field_TorqueParams = typeof(ModuleWheels) // Maybe I should find a way to compress these?
