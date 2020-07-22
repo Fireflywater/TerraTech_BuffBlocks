@@ -1,4 +1,4 @@
-## TerraTech Buff Blocks (v1.1.0)
+## TerraTech Buff Blocks (v1.1.1)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
@@ -37,10 +37,17 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 
 * Where <BuffType> can be...
 
-* "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity", "DrillDps"...
-* "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip", "WheelsSuspension", "WheelsTurnAngle"...
-* "HoverForce", "HoverRange", "HoverDamping", "BoosterBurnRate"...
-* "ItemPickupRange", "ItemProSpeed"...
+Valid floats: "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity", "DrillDps"...
+
+Valid floats: "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip", "WheelsSuspension", "WheelsTurnAngle"...
+
+Valid floats: "HoverForce", "HoverRange", "HoverDamping", "BoosterBurnRate"...
+
+Valid floats: "ChargerRange", "ChargerSpeed"...
+
+Valid floats: "ItemPickupRange", "ItemProSpeed"...
+
+Valid ints: "ItemStoreCap", "ItemHoldCap"...
 
 * Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. 1.0 for no change. Default 1.0.
 
@@ -63,6 +70,20 @@ Adding your own, and want to suggest additional variables or functionality? Cont
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
+7/21/2020, v1.1.1:
+
+* Added support for Ints. When doing math, Ints are *rounded up*. 
+
+* Added `ItemStoreCap`, allowing Silos to hold more, but their beams won't. Which leads to...
+
+* Added `ItemHoldCap`, allowing Silos, Conveyors, and Collectors to hold more per beam.
+
+* Added `ChargerRange`, which can increase the range of energy chargers.
+
+* Added `ChargerSpeed`, which relates to the interval of charger zaps. In this case, lower numbers are better.
+
+* Added a wrapper for Chargers, because they do not have an OnAttach function. This wrappper will eventually assist in removal of arbitrary BuffTypes.
+
 7/19/2020, v1.1.0:
 
 * Absolutely massive refactor, greatly increases speed of new variable implementation.

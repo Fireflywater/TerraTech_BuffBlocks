@@ -1,7 +1,7 @@
 {
-  "Name": "WEAPON VELOCITY TEST TEST",
+  "Name": "CHARGER RANGE + SPEED TEST TEST",
   "Description": "aaaaaa",
-  "ID": 6630012, 
+  "ID": 6630028, 
 
   "Faction": 0, 
   "Category": 5, 
@@ -41,10 +41,10 @@
   "KeepColliders": false,
   "JSONBLOCK": {
     "FFW_TT_BuffBlock.ModuleBuff": {
-		"m_BuffType": ["WeaponVelocity"],
-		"m_Strength": [2.5],
-		"m_AddAfter": [0.0],
-		"m_NeedsToBeAnchored": [true]
+		"m_BuffType": ["ChargerRange", "ChargerSpeed"],
+		"m_Strength": [3.0, 3.0],
+		"m_AddAfter": [0.0, 0.0],
+		"m_NeedsToBeAnchored": [false]
 	}
   }
 }
