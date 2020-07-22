@@ -282,6 +282,18 @@ namespace FFW_TT_BuffBlock
                 return true;
             }
         }
+
+        [HarmonyPatch(typeof(ModuleRemoteCharger), "OnPool")]
+        class ModuleRemoteCharger_Pool_Patch
+        {
+            static bool Prefix(ref ModuleRemoteCharger __instance)
+            {
+                ModuleRemoteChargerWrapper comp = __instance.gameObject.AddComponent<ModuleRemoteChargerWrapper>();
+                comp.pointer = __instance;
+                comp.OnPool();
+                return true;
+            }
+        }
     }
 }
 

@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="BuffController.cs" />
     <Compile Include="BuffSegment.cs" />
+    <Compile Include="ModuleRemoteChargerWrapper.cs" />
     <Compile Include="QPatch.cs" />
     <Compile Include="Legacy\ModuleKillSwitch_Advanced.cs" />
     <Compile Include="Legacy\RoFDict.cs" />

@@ -32,7 +32,10 @@ namespace FFW_TT_BuffBlock
             { "HoverDamping" , new string[] { "jets.m_DampingScale" } },
 
             { "BoosterBurnRate" , new string[] { "jets.m_BurnRate" } },
-            
+
+            { "ChargerRange" , new string[] { "m_ChargingRadius" } },
+            { "ChargerSpeed" , new string[] { "m_ArcFiringInterval" } },
+
             { "ItemPickupRange" , new string[] { "m_PickupRange" } },
             { "ItemProSpeed" , new string[] { "m_SecPerItemProduced", "m_MinDispenseInterval" } },
             { "ItemStoreCap" , new string[] { "m_Capacity" } },
@@ -60,6 +63,9 @@ namespace FFW_TT_BuffBlock
             { "HoverDamping" , "hoverListGeneric" },
 
             { "BoosterBurnRate" , "boosterListGeneric" },
+            
+            { "ChargerRange" , "chargerListGeneric" },
+            { "ChargerSpeed" , "chargerListGeneric" },
 
             { "ItemPickupRange" , "itemPickupListGeneric" },
             { "ItemProSpeed" , "itemProListGeneric" },
@@ -76,6 +82,8 @@ namespace FFW_TT_BuffBlock
         public List<ModuleWheels> wheelsList = new List<ModuleWheels>();
         public List<object> hoverListGeneric = new List<object>();
         public List<object> boosterListGeneric = new List<object>();
+        
+        public List<object> chargerListGeneric = new List<object>();
 
         public List<object> itemPickupListGeneric = new List<object>();
         public List<object> itemProListGeneric = new List<object>();
@@ -338,6 +346,22 @@ namespace FFW_TT_BuffBlock
             this.allSegments["ItemHoldCap"].ManipulateObj(new List<object> { item }, "CLEAN");
 
             this.itemHoldListGeneric.Remove(item);
+        }
+
+        public void AddCharger(ModuleRemoteCharger charger)
+        {
+            this.chargerListGeneric.Add(charger);
+
+            this.allSegments["ChargerRange"].ManipulateObj(new List<object> { charger }, "SAVE");
+            this.allSegments["ChargerSpeed"].ManipulateObj(new List<object> { charger }, "SAVE");
+        }
+
+        public void RemoveCharger(ModuleRemoteCharger charger)
+        {
+            this.allSegments["ChargerRange"].ManipulateObj(new List<object> { charger }, "CLEAN");
+            this.allSegments["ChargerSpeed"].ManipulateObj(new List<object> { charger }, "CLEAN");
+
+            this.chargerListGeneric.Remove(charger);
         }
 
         public void RefreshWheels(List<ModuleWheels> wheelsList)
