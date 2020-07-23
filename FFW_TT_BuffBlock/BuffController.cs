@@ -97,7 +97,8 @@ namespace FFW_TT_BuffBlock
         public List<object> heartListGeneric = new List<object>();
 
         /* PRIME PROPERTIES */
-        public static List<BuffController> allControllers = new List<BuffController>();
+        //public static List<BuffController> allControllers = new List<BuffController>();
+        public static Dictionary<Tank, BuffController> allControllers = new Dictionary<Tank, BuffController>();
         public Tank tank;
 
         public static BuffController MakeNewIfNone(Tank objTank)
@@ -106,12 +107,16 @@ namespace FFW_TT_BuffBlock
             Console.WriteLine("FFW! 0.5 " + BuffController.Clamp(0.5f, 0.0f, 1.0f));
             Console.WriteLine("FFW! -2 " + BuffController.Clamp(-2.0f, 0.0f, 1.0f));
             Console.WriteLine("FFW! 0 " + BuffController.Clamp(0.0f, 0.0f, 1.0f));*/
-            foreach (BuffController element in BuffController.allControllers)
+            /*foreach (BuffController element in BuffController.allControllers)
             {
                 if (element.tank == objTank)
                 {
                     return element;
                 }
+            }*/
+            if (BuffController.allControllers.ContainsKey(objTank))
+            {
+                return BuffController.allControllers[objTank];
             }
             BuffController newObject = new BuffController
             {
@@ -129,7 +134,7 @@ namespace FFW_TT_BuffBlock
                 newObject.allSegments.Add(entry.Key, newSegment);
                 //Console.WriteLine("FFW: Entry Key Type: " + entry.Key.GetType().Name + " / Entry Value Length: " + entry.Value.Length);
             }
-            BuffController.AddObject(newObject);
+            BuffController.AddObject(newObject, objTank);
             Console.WriteLine("FFW: Active BuffControls: " + BuffController.allControllers.Count);
             return newObject;
         }
@@ -141,14 +146,14 @@ namespace FFW_TT_BuffBlock
             else return val;
         }
 
-        public static void AddObject(BuffController obj)
+        public static void AddObject(BuffController obj, Tank tank)
         {
-            BuffController.allControllers.Add(obj);
+            BuffController.allControllers.Add(tank, obj);
         }
 
-        public static void RemoveObject(BuffController obj) // Todo: Make "cleaning" function
+        public static void RemoveObject(BuffController obj, Tank tank) // Todo: Make "cleaning" function
         {
-            BuffController.allControllers.Remove(obj);
+            BuffController.allControllers.Remove(tank);
         }
 
         public void Update(string[] effects)

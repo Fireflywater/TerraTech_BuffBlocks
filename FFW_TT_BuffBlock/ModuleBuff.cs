@@ -52,7 +52,14 @@ namespace FFW_TT_BuffBlock
         {
             BuffController buff = BuffController.MakeNewIfNone(this.block.tank);
             List<string> list = new List<string>();
-            list.AddRange(m_BuffType);
+            for (int i = 0; i < m_BuffType.Length; i++)
+            {
+                if (m_NeedsToBeAnchored[i] == true)
+                {
+                    list.Add(m_BuffType[i]);
+                }
+            }
+            //list.AddRange(m_BuffType);
             list.Add("Anchor");
             buff.Update(list.ToArray());
         }
