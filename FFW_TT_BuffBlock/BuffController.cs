@@ -39,7 +39,9 @@ namespace FFW_TT_BuffBlock
             { "ItemPickupRange" , new string[] { "m_PickupRange" } },
             { "ItemProSpeed" , new string[] { "m_SecPerItemProduced", "m_MinDispenseInterval" } },
             { "ItemStoreCap" , new string[] { "m_Capacity" } },
-            { "ItemHoldCap" , new string[] { "m_CapacityPerStack" } }
+            { "ItemHoldCap" , new string[] { "m_CapacityPerStack" } },
+            { "ItemConAnchor" , new string[] { "m_NeedsToBeAnchored" } },
+            { "HeartAnchor" , new string[] { "m_HasAnchor" } }
         };
 
         public static readonly Dictionary<string, string> segmentListAssociation = new Dictionary<string, string>
@@ -70,7 +72,9 @@ namespace FFW_TT_BuffBlock
             { "ItemPickupRange" , "itemPickupListGeneric" },
             { "ItemProSpeed" , "itemProListGeneric" },
             { "ItemStoreCap" , "itemStoreListGeneric" },
-            { "ItemHoldCap" , "itemHoldListGeneric" }
+            { "ItemHoldCap" , "itemHoldListGeneric" },
+            { "ItemConAnchor" , "itemConListGeneric" },
+            { "HeartAnchor" , "heartListGeneric" }
         };
         public Dictionary<string, BuffSegment> allSegments = new Dictionary<string, BuffSegment>();
 
@@ -89,15 +93,19 @@ namespace FFW_TT_BuffBlock
         public List<object> itemProListGeneric = new List<object>();
         public List<object> itemStoreListGeneric = new List<object>();
         public List<object> itemHoldListGeneric = new List<object>();
+        public List<object> itemConListGeneric = new List<object>();
+        public List<object> heartListGeneric = new List<object>();
 
         /* PRIME PROPERTIES */
         public static List<BuffController> allControllers = new List<BuffController>();
         public Tank tank;
-        public List<ModuleItemConsume> itemConList = new List<ModuleItemConsume>();
-        public List<ModuleHeart> heartList = new List<ModuleHeart>();
 
         public static BuffController MakeNewIfNone(Tank objTank)
         {
+            /*Console.WriteLine("FFW! 4 " + BuffController.Clamp(4.0f, 0.0f, 1.0f));
+            Console.WriteLine("FFW! 0.5 " + BuffController.Clamp(0.5f, 0.0f, 1.0f));
+            Console.WriteLine("FFW! -2 " + BuffController.Clamp(-2.0f, 0.0f, 1.0f));
+            Console.WriteLine("FFW! 0 " + BuffController.Clamp(0.0f, 0.0f, 1.0f));*/
             foreach (BuffController element in BuffController.allControllers)
             {
                 if (element.tank == objTank)
@@ -124,6 +132,13 @@ namespace FFW_TT_BuffBlock
             BuffController.AddObject(newObject);
             Console.WriteLine("FFW: Active BuffControls: " + BuffController.allControllers.Count);
             return newObject;
+        }
+
+        public static T Clamp<T>(T val, T min, T max) where T : IComparable<T>
+        {
+            if (val.CompareTo(min) < 0) return min;
+            else if (val.CompareTo(max) > 0) return max;
+            else return val;
         }
 
         public static void AddObject(BuffController obj)
@@ -362,6 +377,34 @@ namespace FFW_TT_BuffBlock
             this.allSegments["ChargerSpeed"].ManipulateObj(new List<object> { charger }, "CLEAN");
 
             this.chargerListGeneric.Remove(charger);
+        }
+
+        public void AddItemCon(ModuleItemConsume item)
+        {
+            this.itemConListGeneric.Add(item);
+
+            this.allSegments["ItemConAnchor"].ManipulateObj(new List<object> { item }, "SAVE");
+        }
+
+        public void RemoveItemCon(ModuleItemConsume item)
+        {
+            this.allSegments["ItemConAnchor"].ManipulateObj(new List<object> { item }, "CLEAN");
+
+            this.itemConListGeneric.Remove(item);
+        }
+        
+        public void AddHeart(ModuleHeart heart)
+        {
+            this.heartListGeneric.Add(heart);
+
+            this.allSegments["HeartAnchor"].ManipulateObj(new List<object> { heart }, "SAVE");
+        }
+
+        public void RemoveHeart(ModuleHeart heart)
+        {
+            this.allSegments["HeartAnchor"].ManipulateObj(new List<object> { heart }, "CLEAN");
+
+            this.heartListGeneric.Remove(heart);
         }
 
         public void RefreshWheels(List<ModuleWheels> wheelsList)

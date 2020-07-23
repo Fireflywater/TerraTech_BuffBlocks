@@ -103,6 +103,10 @@ namespace FFW_TT_BuffBlock
                                 {
                                     this.effectMemory[tgt].Add(Convert.ToSingle((int)value_thisIter));
                                 }
+                                else if (value_thisIter.GetType() == typeof(bool))
+                                {
+                                    this.effectMemory[tgt].Add(Convert.ToSingle((bool)value_thisIter));
+                                }
                                 /*Console.WriteLine("FFW! " + field_thisIter.GetValue(ara).GetType() + " / " + typeof(float) + " / " +
                                     (field_thisIter.GetValue(ara).GetType() == typeof(float)));*/
                             }
@@ -116,6 +120,10 @@ namespace FFW_TT_BuffBlock
                                 {
                                     field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[tgt][i] * this.GetBuffAverage() + this.GetBuffAddAverage())));
                                 }
+                                else if (value_thisIter.GetType() == typeof(bool))
+                                {
+                                    field_thisIter.SetValue(ara, Convert.ToBoolean(Math.Round(BuffController.Clamp(this.effectMemory[tgt][i] * this.GetBuffAverage() + this.GetBuffAddAverage(), 0.0f, 1.0f))));
+                                }
                             }
                             else if (request == "CLEAN")
                             {
@@ -127,6 +135,10 @@ namespace FFW_TT_BuffBlock
                                 else if (value_thisIter.GetType() == typeof(int))
                                 {
                                     field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[tgt][i])));
+                                }
+                                else if (value_thisIter.GetType() == typeof(bool))
+                                {
+                                    field_thisIter.SetValue(ara, Convert.ToBoolean(Math.Round(BuffController.Clamp(this.effectMemory[tgt][i], 0.0f, 1.0f))));
                                 }
                             }
                         }

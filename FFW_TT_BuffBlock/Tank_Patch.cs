@@ -129,7 +129,7 @@ namespace FFW_TT_BuffBlock
             }
         }
 
-        /*[HarmonyPatch(typeof(ModuleItemConsume), "OnAttach")]
+        [HarmonyPatch(typeof(ModuleItemConsume), "OnAttach")]
         class ModuleItemConsume_Attach_Patch
         {
             static bool Prefix(ref ModuleItemConsume __instance)
@@ -171,7 +171,7 @@ namespace FFW_TT_BuffBlock
                 buff.RemoveHeart(__instance);
                 return true;
             }
-        }*/
+        }
 
         [HarmonyPatch(typeof(ModuleItemPickup), "OnAttach")]
         class ModuleItemPickup_Attach_Patch
