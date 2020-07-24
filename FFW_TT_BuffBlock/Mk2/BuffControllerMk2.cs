@@ -86,9 +86,11 @@ namespace FFW_TT_BuffBlock
                         };
                         this.pathToSegment.Add(path, segment);
                         Console.WriteLine("FFW! Added pathToSegment => " + path);
+                        pathToSegment[path].ManipulateObj(this.typeToBlock[component], "SAVE");
                     }
                     pathToSegment[path].AddBuff(buff, i);
                     Console.WriteLine("FFW! Added buff to Segment => " + path);
+                    pathToSegment[path].ManipulateObj(this.typeToBlock[component], "UPDATE");
                 }
                 else
                 {
@@ -108,6 +110,7 @@ namespace FFW_TT_BuffBlock
                 {
                     pathToSegment[path].RemoveBuff(buff);
                     Console.WriteLine("FFW! Removed buff from Segment => " + path);
+                    pathToSegment[path].ManipulateObj(this.typeToBlock[component], "UPDATE");
                 }
                 else
                 {
