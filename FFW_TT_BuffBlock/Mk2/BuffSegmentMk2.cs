@@ -14,7 +14,7 @@ namespace FFW_TT_BuffBlock
         public BuffControllerMk2 controller;
 
         public Type effectComponent;
-        public string effectPath;
+        public List<string> effectPath;
 
         public Dictionary<ModuleBuffMk2, int> effectBuffBlocks = new Dictionary<ModuleBuffMk2, int>();
         public Dictionary<object, float> effectMemory = new Dictionary<object, float>();

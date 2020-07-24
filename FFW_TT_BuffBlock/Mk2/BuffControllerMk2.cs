@@ -46,7 +46,7 @@ namespace FFW_TT_BuffBlock
             BuffControllerMk2.allControllers.Add(tank, obj);
         }
 
-        public static void RemoveController(Tank tank) // Todo: Make "cleaning" function
+        public static void RemoveController(Tank tank)
         {
             BuffControllerMk2.allControllers.Remove(tank);
         }
@@ -57,6 +57,7 @@ namespace FFW_TT_BuffBlock
             {
                 string path = buff.m_BuffPath[i];
                 List<string> splitPath = path.Split('.').ToList();
+                List<string> restOfPath = splitPath.Skip(1).ToList();
                 Type component = typeof(TankBlock).Assembly.GetType(splitPath[0]);
                 if (component != null)
                 {
@@ -64,6 +65,15 @@ namespace FFW_TT_BuffBlock
                     {
                         typeToBlock.Add(component, new List<TankBlock>());
                         Console.WriteLine("FFW! Added typeToBlock => " + component.Name);
+                        foreach (TankBlock block in this.allBlocks)
+                        {
+                            object blockComponent = block.GetComponent(component);
+                            if (blockComponent != null)
+                            {
+                                this.typeToBlock[component].Add(block);
+                                Console.WriteLine("FFW! +Reg => " + block.name + " => " + path);
+                            }
+                        }
                     }
                     if (!pathToSegment.ContainsKey(path))
                     {
@@ -72,7 +82,7 @@ namespace FFW_TT_BuffBlock
                             tank = this.tank,
                             controller = this,
                             effectComponent = component,
-                            effectPath = path
+                            effectPath = restOfPath
                         };
                         this.pathToSegment.Add(path, segment);
                         Console.WriteLine("FFW! Added pathToSegment => " + path);
@@ -109,11 +119,30 @@ namespace FFW_TT_BuffBlock
         public void AddBlock(TankBlock block)
         {
             this.allBlocks.Add(block);
+            foreach (KeyValuePair<string, BuffSegmentMk2> segPair in this.pathToSegment)
+            {
+                Type component = segPair.Value.effectComponent;
+                object blockComponent = block.GetComponent(component);
+                if (blockComponent != null)
+                {
+                    this.typeToBlock[component].Add(block);
+                    Console.WriteLine("FFW! +Reg => " + block.name + " => " + segPair.Key);
+                }
+            }
         }
 
         public void RemoveBlock(TankBlock block)
         {
-            
+            foreach (KeyValuePair<string, BuffSegmentMk2> segPair in this.pathToSegment)
+            {
+                Type component = segPair.Value.effectComponent;
+                object blockComponent = block.GetComponent(component);
+                if (blockComponent != null)
+                {
+                    this.typeToBlock[component].Remove(block);
+                    Console.WriteLine("FFW! -Reg => " + block.name + " => " + segPair.Key);
+                }
+            }
             this.allBlocks.Remove(block);
         }
         
