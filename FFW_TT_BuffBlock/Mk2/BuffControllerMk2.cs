@@ -17,7 +17,8 @@ namespace FFW_TT_BuffBlock
         public List<TankBlock> allBlocks = new List<TankBlock>(); // Memory of all blocks on tech
         public Dictionary<Type, List<TankBlock>> typeToBlock = new Dictionary<Type, List<TankBlock>>(); // Shorthand for all blocks with specific Type
         public Dictionary<string, BuffSegmentMk2> pathToSegment = new Dictionary<string, BuffSegmentMk2>(); // Reference to all Segments, via path
-
+        
+        public Dictionary<CannonBarrel, float> weaponSpeedMemory = new Dictionary<CannonBarrel, float>();
 
         public static T Clamp<T>(T val, T min, T max) where T : IComparable<T>
         {
@@ -53,6 +54,7 @@ namespace FFW_TT_BuffBlock
 
         public void AddBuff(ModuleBuffMk2 buff)
         {
+            List<string> affectedModules = new List<string>();
             for (int i = 0; i < buff.m_BuffPath.Length; i++)
             {
                 string path = buff.m_BuffPath[i];
@@ -63,6 +65,7 @@ namespace FFW_TT_BuffBlock
                 {
                     if (!typeToBlock.ContainsKey(component))
                     {
+                        affectedModules.Add(splitPath[0]);
                         typeToBlock.Add(component, new List<TankBlock>());
                         Console.WriteLine("FFW! Added typeToBlock => " + component.Name);
                         foreach (TankBlock block in this.allBlocks)
@@ -87,6 +90,10 @@ namespace FFW_TT_BuffBlock
                         this.pathToSegment.Add(path, segment);
                         Console.WriteLine("FFW! Added pathToSegment => " + path);
                         pathToSegment[path].ManipulateObj(this.typeToBlock[component], "SAVE");
+                        if (path == "ModuleWeaponGun.m_ShotCooldown")
+                        {
+                            BuffSpecificFix.ManipulateBarrels(this.typeToBlock[component], "SAVE", this.weaponSpeedMemory, 1.0f);
+                        }
                     }
                     pathToSegment[path].AddBuff(buff, i);
                     Console.WriteLine("FFW! Added buff to Segment => " + path);
@@ -96,6 +103,11 @@ namespace FFW_TT_BuffBlock
                 {
                     Console.WriteLine("FFW! AddBuff! Type " + splitPath[0] + " doesn't exist.");
                 }
+            }
+            if (affectedModules.Contains("ModuleWeaponGun") && pathToSegment.ContainsKey("ModuleWeaponGun.m_ShotCooldown"))
+            {
+                float avg = pathToSegment["ModuleWeaponGun.m_ShotCooldown"].GetAverages();
+                BuffSpecificFix.ManipulateBarrels(this.typeToBlock[typeof(ModuleWeaponGun)], "UPDATE", this.weaponSpeedMemory, avg);
             }
         }
 
@@ -131,6 +143,12 @@ namespace FFW_TT_BuffBlock
                     this.typeToBlock[component].Add(block);
                     Console.WriteLine("FFW! +Reg => " + block.name + " => " + segPair.Key);
                     segPair.Value.ManipulateObj(new List<TankBlock> { block }, "SAVE");
+                    if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
+                    {
+                        float avg = segPair.Value.GetAverages();
+                        BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "SAVE", this.weaponSpeedMemory, 1.0f);
+                        BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "UPDATE", this.weaponSpeedMemory, avg);
+                    }
                 }
             }
         }
@@ -146,6 +164,11 @@ namespace FFW_TT_BuffBlock
                     this.typeToBlock[component].Remove(block);
                     Console.WriteLine("FFW! -Reg => " + block.name + " => " + segPair.Key);
                     segPair.Value.ManipulateObj(new List<TankBlock> { block }, "CLEAN");
+                    if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
+                    {
+                        float avg = segPair.Value.GetAverages();
+                        BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "CLEAN", this.weaponSpeedMemory, 1.0f);
+                    }
                 }
             }
             this.allBlocks.Remove(block);
