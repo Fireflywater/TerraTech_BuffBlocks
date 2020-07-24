@@ -127,6 +127,7 @@ namespace FFW_TT_BuffBlock
                 {
                     this.typeToBlock[component].Add(block);
                     Console.WriteLine("FFW! +Reg => " + block.name + " => " + segPair.Key);
+                    segPair.Value.ManipulateObj(new List<TankBlock> { block }, "SAVE");
                 }
             }
         }
@@ -141,6 +142,7 @@ namespace FFW_TT_BuffBlock
                 {
                     this.typeToBlock[component].Remove(block);
                     Console.WriteLine("FFW! -Reg => " + block.name + " => " + segPair.Key);
+                    segPair.Value.ManipulateObj(new List<TankBlock> { block }, "CLEAN");
                 }
             }
             this.allBlocks.Remove(block);

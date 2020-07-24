@@ -21,7 +21,131 @@ namespace FFW_TT_BuffBlock
 
         public void ManipulateObj(List<TankBlock> blockPool, string request)
         {
+            foreach (TankBlock block in blockPool)
+            {
+                object tgt = block.GetComponent(effectComponent);
+                if (tgt == null)
+                {
+                    break;
+                }
 
+                List<object> lastIterObjs = null;
+                List<object> thisIterObjs = new List<object> { tgt };
+
+                FieldInfo field_lastIter = null;
+                FieldInfo field_thisIter = null;
+
+                object structWarningObj = null;
+                object structWarningParent = null;
+                FieldInfo structWarningField = null;
+
+                foreach (string e in this.effectPath)
+                {
+                    field_lastIter = field_thisIter;
+                    lastIterObjs = new List<object>(thisIterObjs);
+                    thisIterObjs = new List<object>();
+                    foreach (object obj in lastIterObjs)
+                    {
+                        field_thisIter = obj.GetType().GetField(e, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        if (field_thisIter != null)
+                        {
+                            object value_thisIter = field_thisIter.GetValue(obj);
+                            var arrayTest = value_thisIter as Array;
+                            var listTest = value_thisIter as System.Collections.IList;
+                            Boolean isStruct = value_thisIter.GetType().IsValueType && !value_thisIter.GetType().IsPrimitive;
+                            if (isStruct)
+                            {
+                                structWarningObj = value_thisIter;
+                                structWarningParent = obj;
+                                structWarningField = field_thisIter;
+                                thisIterObjs.Add(structWarningObj);
+                            }
+                            else if (arrayTest != null)
+                            {
+                                Array value_thisIterCasted = (Array)value_thisIter;
+                                foreach (object element in value_thisIterCasted)
+                                {
+                                    thisIterObjs.Add(element);
+                                }
+                            }
+                            else if (listTest != null)
+                            {
+                                System.Collections.IList value_thisIterCasted = (System.Collections.IList)value_thisIter;
+                                foreach (object element in value_thisIterCasted)
+                                {
+                                    thisIterObjs.Add(element);
+                                }
+                            }
+                            else
+                            {
+                                thisIterObjs.Add(value_thisIter);
+                            }
+                        }
+                    }
+                }
+
+                foreach (object ara in lastIterObjs)
+                {
+                    if (field_thisIter != null)
+                    {
+                        object value_thisIter = field_thisIter.GetValue(ara);
+                        if (request == "SAVE")
+                        {
+                            if (value_thisIter.GetType() == typeof(float))
+                            {
+                                this.effectMemory.Add(ara, (float)value_thisIter);
+                            }
+                            else if (value_thisIter.GetType() == typeof(int))
+                            {
+                                this.effectMemory.Add(ara, Convert.ToSingle((int)value_thisIter));
+                            }
+                            else if (value_thisIter.GetType() == typeof(bool))
+                            {
+                                this.effectMemory.Add(ara, Convert.ToSingle((bool)value_thisIter));
+                            }
+                        }
+                        else if (request == "UPDATE")
+                        {
+                            if (value_thisIter.GetType() == typeof(float))
+                            {
+                                field_thisIter.SetValue(ara, this.effectMemory[ara] * this.GetBuffAverage() + this.GetBuffAddAverage());
+                            }
+                            else if (value_thisIter.GetType() == typeof(int))
+                            {
+                                field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[ara] * this.GetBuffAverage() + this.GetBuffAddAverage())));
+                            }
+                            else if (value_thisIter.GetType() == typeof(bool))
+                            {
+                                field_thisIter.SetValue(ara, Convert.ToBoolean(Math.Round(BuffControllerMk2.Clamp(this.effectMemory[ara] * this.GetBuffAverage() + this.GetBuffAddAverage(), 0.0f, 1.0f))));
+                            }
+                        }
+                        else if (request == "CLEAN")
+                        {
+                            if (value_thisIter.GetType() == typeof(float))
+                            {
+                                field_thisIter.SetValue(ara, this.effectMemory[ara]);
+                            }
+                            else if (value_thisIter.GetType() == typeof(int))
+                            {
+                                field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[ara])));
+                            }
+                            else if (value_thisIter.GetType() == typeof(bool))
+                            {
+                                field_thisIter.SetValue(ara, Convert.ToBoolean(Math.Round(BuffControllerMk2.Clamp(this.effectMemory[ara], 0.0f, 1.0f))));
+                            }
+                            this.effectMemory.Remove(ara);
+                        }
+                    }
+                }
+                if (structWarningObj != null)
+                {
+                    structWarningField.SetValue(structWarningParent, structWarningObj);
+                }
+            }
+            if (request == "SAVE")
+            {
+                this.ManipulateObj(blockPool, "UPDATE");
+            }
         }
 
         public float GetBuffAverage()
