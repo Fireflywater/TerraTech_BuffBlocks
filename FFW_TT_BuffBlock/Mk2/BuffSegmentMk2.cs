@@ -93,47 +93,49 @@ namespace FFW_TT_BuffBlock
                         {
                             if (value_thisIter.GetType() == typeof(float))
                             {
-                                this.effectMemory.Add(ara, (float)value_thisIter);
+                                this.effectMemory.Add(block, (float)value_thisIter);
                             }
                             else if (value_thisIter.GetType() == typeof(int))
                             {
-                                this.effectMemory.Add(ara, Convert.ToSingle((int)value_thisIter));
+                                this.effectMemory.Add(block, Convert.ToSingle((int)value_thisIter));
                             }
                             else if (value_thisIter.GetType() == typeof(bool))
                             {
-                                this.effectMemory.Add(ara, Convert.ToSingle((bool)value_thisIter));
+                                this.effectMemory.Add(block, Convert.ToSingle((bool)value_thisIter));
                             }
                         }
                         else if (request == "UPDATE")
                         {
                             if (value_thisIter.GetType() == typeof(float))
                             {
-                                field_thisIter.SetValue(ara, this.effectMemory[ara] * this.GetBuffAverage() + this.GetBuffAddAverage());
+                                field_thisIter.SetValue(ara, this.effectMemory[block] * this.GetBuffAverage() + this.GetBuffAddAverage());
                             }
                             else if (value_thisIter.GetType() == typeof(int))
                             {
-                                field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[ara] * this.GetBuffAverage() + this.GetBuffAddAverage())));
+                                field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[block] * this.GetBuffAverage() + this.GetBuffAddAverage())));
                             }
                             else if (value_thisIter.GetType() == typeof(bool))
                             {
-                                field_thisIter.SetValue(ara, Convert.ToBoolean(Math.Round(BuffControllerMk2.Clamp(this.effectMemory[ara] * this.GetBuffAverage() + this.GetBuffAddAverage(), 0.0f, 1.0f))));
+                                field_thisIter.SetValue(ara, Convert.ToBoolean(Math.Round(BuffControllerMk2.Clamp(this.effectMemory[block] * this.GetBuffAverage() + this.GetBuffAddAverage(), 0.0f, 1.0f))));
                             }
                         }
                         else if (request == "CLEAN")
                         {
                             if (value_thisIter.GetType() == typeof(float))
                             {
-                                field_thisIter.SetValue(ara, this.effectMemory[ara]);
+                                field_thisIter.SetValue(ara, this.effectMemory[block]);
+                                this.effectMemory.Remove(block);
                             }
                             else if (value_thisIter.GetType() == typeof(int))
                             {
-                                field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[ara])));
+                                field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[block])));
+                                this.effectMemory.Remove(block);
                             }
                             else if (value_thisIter.GetType() == typeof(bool))
                             {
-                                field_thisIter.SetValue(ara, Convert.ToBoolean(Math.Round(BuffControllerMk2.Clamp(this.effectMemory[ara], 0.0f, 1.0f))));
+                                field_thisIter.SetValue(ara, Convert.ToBoolean(Math.Round(BuffControllerMk2.Clamp(this.effectMemory[block], 0.0f, 1.0f))));
+                                this.effectMemory.Remove(block);
                             }
-                            this.effectMemory.Remove(ara);
                         }
                     }
                 }

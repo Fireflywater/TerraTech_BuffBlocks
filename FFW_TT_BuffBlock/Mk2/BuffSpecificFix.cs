@@ -10,7 +10,7 @@ namespace FFW_TT_BuffBlock
 {
     class BuffSpecificFix
     {
-        public static void RefreshWheels(List<ModuleWheels> wheelsList)
+        public static void RefreshWheels(List<TankBlock> blockList)
         {
             FieldInfo field_TorqueParams = typeof(ModuleWheels) // Maybe I should find a way to compress these?
                 .GetField("m_TorqueParams", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -22,8 +22,10 @@ namespace FFW_TT_BuffBlock
                 .GetField("attachedID", BindingFlags.NonPublic | BindingFlags.Instance);
             FieldInfo field_WheelState = typeof(ManWheels)
                 .GetField("m_WheelState", BindingFlags.NonPublic | BindingFlags.Instance);
-            foreach (ModuleWheels wheels in wheelsList)
+            Console.WriteLine("FFW! Update Wheels. Count: " + blockList.Count);
+            foreach (TankBlock block in blockList)
             {
+                ModuleWheels wheels = block.GetComponent<ModuleWheels>();
                 ManWheels.TorqueParams torque = (ManWheels.TorqueParams)field_TorqueParams.GetValue(wheels); // Read active Torque... 
                 ManWheels.WheelParams wheelparams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels); // Read active WheelParams... 
 

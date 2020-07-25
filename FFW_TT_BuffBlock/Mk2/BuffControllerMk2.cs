@@ -63,9 +63,9 @@ namespace FFW_TT_BuffBlock
                 Type component = typeof(TankBlock).Assembly.GetType(splitPath[0]);
                 if (component != null)
                 {
+                    affectedModules.Add(splitPath[0]);
                     if (!typeToBlock.ContainsKey(component))
                     {
-                        affectedModules.Add(splitPath[0]);
                         typeToBlock.Add(component, new List<TankBlock>());
                         Console.WriteLine("FFW! Added typeToBlock => " + component.Name);
                         foreach (TankBlock block in this.allBlocks)
@@ -74,7 +74,7 @@ namespace FFW_TT_BuffBlock
                             if (blockComponent != null)
                             {
                                 this.typeToBlock[component].Add(block);
-                                Console.WriteLine("FFW! +Reg => " + block.name + " => " + path);
+                                Console.WriteLine("FFW! +Reg => " + block.name + " => " + component.Name);
                             }
                         }
                     }
@@ -109,10 +109,15 @@ namespace FFW_TT_BuffBlock
                 float avg = pathToSegment["ModuleWeaponGun.m_ShotCooldown"].GetAverages();
                 BuffSpecificFix.ManipulateBarrels(this.typeToBlock[typeof(ModuleWeaponGun)], "UPDATE", this.weaponSpeedMemory, avg);
             }
+            if (affectedModules.Contains("ModuleWheels"))
+            {
+                BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
+            }
         }
 
         public void RemoveBuff(ModuleBuffMk2 buff)
         {
+            List<string> affectedModules = new List<string>();
             for (int i = 0; i < buff.m_BuffPath.Length; i++)
             {
                 string path = buff.m_BuffPath[i];
@@ -120,6 +125,7 @@ namespace FFW_TT_BuffBlock
                 Type component = typeof(TankBlock).Assembly.GetType(splitPath[0]);
                 if (component != null)
                 {
+                    affectedModules.Add(splitPath[0]);
                     pathToSegment[path].RemoveBuff(buff);
                     Console.WriteLine("FFW! Removed buff from Segment => " + path);
                     pathToSegment[path].ManipulateObj(this.typeToBlock[component], "UPDATE");
@@ -128,6 +134,15 @@ namespace FFW_TT_BuffBlock
                 {
                     Console.WriteLine("FFW! RemoveBuff! Type " + splitPath[0] + " doesn't exist.");
                 }
+            }
+            if (affectedModules.Contains("ModuleWeaponGun") && pathToSegment.ContainsKey("ModuleWeaponGun.m_ShotCooldown"))
+            {
+                float avg = pathToSegment["ModuleWeaponGun.m_ShotCooldown"].GetAverages();
+                BuffSpecificFix.ManipulateBarrels(this.typeToBlock[typeof(ModuleWeaponGun)], "UPDATE", this.weaponSpeedMemory, avg);
+            }
+            if (affectedModules.Contains("ModuleWheels"))
+            {
+                BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
             }
         }
 
@@ -149,6 +164,10 @@ namespace FFW_TT_BuffBlock
                         BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "SAVE", this.weaponSpeedMemory, 1.0f);
                         BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "UPDATE", this.weaponSpeedMemory, avg);
                     }
+                    if (component == typeof(ModuleWheels))
+                    {
+                        BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
+                    }
                 }
             }
         }
@@ -168,6 +187,10 @@ namespace FFW_TT_BuffBlock
                     {
                         float avg = segPair.Value.GetAverages();
                         BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "CLEAN", this.weaponSpeedMemory, 1.0f);
+                    }
+                    if (component == typeof(ModuleWheels))
+                    {
+                        BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
                     }
                 }
             }
