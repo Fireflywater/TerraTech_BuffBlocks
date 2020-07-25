@@ -29,6 +29,11 @@ namespace FFW_TT_BuffBlock
                     break;
                 }
 
+                if (request == "SAVE")
+                {
+                    this.effectMemory.Add(block, 1.0f);
+                }
+
                 List<object> lastIterObjs = null;
                 List<object> thisIterObjs = new List<object> { tgt };
 
@@ -93,15 +98,18 @@ namespace FFW_TT_BuffBlock
                         {
                             if (value_thisIter.GetType() == typeof(float))
                             {
-                                this.effectMemory.Add(block, (float)value_thisIter);
+                                //this.effectMemory.Add(block, (float)value_thisIter);
+                                this.effectMemory[block] = (float)value_thisIter;
                             }
                             else if (value_thisIter.GetType() == typeof(int))
                             {
-                                this.effectMemory.Add(block, Convert.ToSingle((int)value_thisIter));
+                                //this.effectMemory.Add(block, Convert.ToSingle((int)value_thisIter));
+                                this.effectMemory[block] = Convert.ToSingle((int)value_thisIter);
                             }
                             else if (value_thisIter.GetType() == typeof(bool))
                             {
-                                this.effectMemory.Add(block, Convert.ToSingle((bool)value_thisIter));
+                                //this.effectMemory.Add(block, Convert.ToSingle((bool)value_thisIter));
+                                this.effectMemory[block] = Convert.ToSingle((bool)value_thisIter);
                             }
                         }
                         else if (request == "UPDATE")
@@ -124,17 +132,14 @@ namespace FFW_TT_BuffBlock
                             if (value_thisIter.GetType() == typeof(float))
                             {
                                 field_thisIter.SetValue(ara, this.effectMemory[block]);
-                                this.effectMemory.Remove(block);
                             }
                             else if (value_thisIter.GetType() == typeof(int))
                             {
                                 field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[block])));
-                                this.effectMemory.Remove(block);
                             }
                             else if (value_thisIter.GetType() == typeof(bool))
                             {
                                 field_thisIter.SetValue(ara, Convert.ToBoolean(Math.Round(BuffControllerMk2.Clamp(this.effectMemory[block], 0.0f, 1.0f))));
-                                this.effectMemory.Remove(block);
                             }
                         }
                     }
@@ -142,6 +147,10 @@ namespace FFW_TT_BuffBlock
                 if (structWarningObj != null)
                 {
                     structWarningField.SetValue(structWarningParent, structWarningObj);
+                }
+                if (request == "CLEAN")
+                {
+                    this.effectMemory.Remove(block);
                 }
             }
             if (request == "SAVE")

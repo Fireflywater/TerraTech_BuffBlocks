@@ -13,12 +13,28 @@ namespace FFW_TT_BuffBlock
 {
     public static class WrappedDataHolder
     {
-        /*[HarmonyPatch(typeof(ManWheels.Wheel), "UpdateAttachData")] // Thanks Aceba!
+        [HarmonyPatch(typeof(ManWheels.Wheel), "UpdateAttachData")] // Thanks Aceba!
         private static class FixUpdateAttachData
         {
             public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
             {
                 var codes = new List<CodeInstruction>(instructions);
+                /*for (int i = 0; i < codes.Count; i++)
+                {
+                    if (codes[i].opcode == OpCodes.Ldstr)
+                    {
+                        codes.RemoveAt(i);
+                        break;
+                    }
+                }
+                for (int i = 0; i < codes.Count; i++)
+                {
+                    if (codes[i].opcode == OpCodes.Call)
+                    {
+                        codes.RemoveAt(i);
+                        break;
+                    }
+                }*/
 
                 codes = codes.Skip(2).ToList();
                 Console.WriteLine("FFW: Transpiled ManWheels.Wheel.UpdateAttachData()");
@@ -113,7 +129,7 @@ namespace FFW_TT_BuffBlock
             }
         }
 
-        [HarmonyPatch(typeof(ModuleItemConsume), "OnAttach")]
+        /*[HarmonyPatch(typeof(ModuleItemConsume), "OnAttach")]
         class ModuleItemConsume_Attach_Patch
         {
             static bool Prefix(ref ModuleItemConsume __instance)
@@ -155,7 +171,7 @@ namespace FFW_TT_BuffBlock
                 buff.RemoveHeart(__instance);
                 return true;
             }
-        }
+        }*/
 
         [HarmonyPatch(typeof(ModuleItemPickup), "OnAttach")]
         class ModuleItemPickup_Attach_Patch
@@ -223,8 +239,52 @@ namespace FFW_TT_BuffBlock
             }
         }
 
+        [HarmonyPatch(typeof(ModuleItemHolder), "OnAttach")]
+        class ModuleItemHolder_Attach_Patch
+        {
+            static bool Prefix(ref ModuleItemHolder __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddItemHolder(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleItemHolder), "OnDetach")]
+        class ModuleItemHolder_Detach_Patch
+        {
+            static bool Prefix(ref ModuleItemHolder __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveItemHolder(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleItemStore), "OnAttach")]
+        class ModuleItemStore_Attach_Patch
+        {
+            static bool Prefix(ref ModuleItemStore __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.AddItemStore(__instance);
+                return true;
+            }
+        }
+
+        [HarmonyPatch(typeof(ModuleItemStore), "OnDetach")]
+        class ModuleItemStore_Detach_Patch
+        {
+            static bool Prefix(ref ModuleItemStore __instance)
+            {
+                BuffController buff = BuffController.MakeNewIfNone(__instance.block.tank);
+                buff.RemoveItemStore(__instance);
+                return true;
+            }
+        }
+
         [HarmonyPatch(typeof(ModuleRemoteCharger), "OnPool")]
-        class TankBlock_Pool_Patch
+        class ModuleRemoteCharger_Pool_Patch
         {
             static bool Prefix(ref ModuleRemoteCharger __instance)
             {
@@ -233,7 +293,7 @@ namespace FFW_TT_BuffBlock
                 comp.OnPool();
                 return true;
             }
-        }*/
+        }
     }
 }
 

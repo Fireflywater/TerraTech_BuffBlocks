@@ -92,17 +92,42 @@ namespace FFW_TT_BuffBlock
                     {
                         if (field_thisIter != null)
                         {
+                            object value_thisIter = field_thisIter.GetValue(ara);
                             if (request == "SAVE")
                             {
-                                this.effectMemory[tgt].Add((float)field_thisIter.GetValue(ara));
+                                if (value_thisIter.GetType() == typeof(float))
+                                {
+                                    this.effectMemory[tgt].Add((float)value_thisIter);
+                                }
+                                else if (value_thisIter.GetType() == typeof(int))
+                                {
+                                    this.effectMemory[tgt].Add(Convert.ToSingle((int)value_thisIter));
+                                }
+                                /*Console.WriteLine("FFW! " + field_thisIter.GetValue(ara).GetType() + " / " + typeof(float) + " / " +
+                                    (field_thisIter.GetValue(ara).GetType() == typeof(float)));*/
                             }
                             else if (request == "UPDATE")
                             {
-                                field_thisIter.SetValue(ara, this.effectMemory[tgt][i] * this.GetBuffAverage() + this.GetBuffAddAverage());
+                                if (value_thisIter.GetType() == typeof(float))
+                                {
+                                    field_thisIter.SetValue(ara, this.effectMemory[tgt][i] * this.GetBuffAverage() + this.GetBuffAddAverage());
+                                }
+                                else if (value_thisIter.GetType() == typeof(int))
+                                {
+                                    field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[tgt][i] * this.GetBuffAverage() + this.GetBuffAddAverage())));
+                                }
                             }
                             else if (request == "CLEAN")
                             {
-                                field_thisIter.SetValue(ara, this.effectMemory[tgt][i]);
+                                //field_thisIter.SetValue(ara, this.effectMemory[tgt][i]);
+                                if (value_thisIter.GetType() == typeof(float))
+                                {
+                                    field_thisIter.SetValue(ara, this.effectMemory[tgt][i]);
+                                }
+                                else if (value_thisIter.GetType() == typeof(int))
+                                {
+                                    field_thisIter.SetValue(ara, Convert.ToInt32(Math.Ceiling(this.effectMemory[tgt][i])));
+                                }
                             }
                         }
                     }
@@ -115,6 +140,10 @@ namespace FFW_TT_BuffBlock
                 {
                     this.effectMemory.Remove(tgt);
                 }
+            }
+            if (request == "SAVE")
+            {
+                this.ManipulateObj(tgtPool, "UPDATE");
             }
         }
 
@@ -138,6 +167,11 @@ namespace FFW_TT_BuffBlock
                 a = allAdds.Average();
             }
             return a;
+        }
+
+        public float GetAverages()
+        {
+            return GetBuffAverage() + GetBuffAddAverage();
         }
 
         public void AddBuff(ModuleBuff buff)

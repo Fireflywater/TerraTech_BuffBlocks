@@ -1,10 +1,10 @@
-## TerraTech Buff Blocks (v1.2.0)
+## TerraTech Buff Blocks (v1.1.1)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
 Want to add your own? Consule `MODULE IMPLEMENTATION TO JSON BLOCKS` below.
 
-Adding your own, and jave problems with your variables? Contact me on Discord at `Fireflywater#0457`.
+Adding your own, and want to suggest additional variables or functionality? Contact me on Discord at `Fireflywater#0457`.
 
 ### RELEASE INSTALLATION:
 
@@ -28,16 +28,26 @@ Adding your own, and jave problems with your variables? Contact me on Discord at
 
 ```
 "FFW_TT_BuffBlock.ModuleBuff": {
-	"m_BuffPath": [<BuffPath>],
+	"m_BuffType": [<BuffType>],
 	"m_Strength": [<Strength>],
 	"m_AddAfter": [<AddAfter>],
 	"m_NeedsToBeAnchored": [<Anchor>]
 }
 ```
 
-* Where <BuffPath> must be a string related to the target Module, a path to target value, and the target value itself. Only Floats, Ints, and Bools are supported. 
+* Where <BuffType> can be...
 
-* If you have trouble ascertaining a path, use DnSpy to view the game's architecture. Example path for Weapon Rotation Speed. `"ModuleWeaponGun.m_WeaponModule.m_RotateSpeed"`
+Valid floats: "WeaponCooldown", "WeaponRotation", "WeaponSpread", "WeaponVelocity", "DrillDps"...
+
+Valid floats: "WheelsRpm", "WheelsBrake", "WheelsTorque", "WheelsGrip", "WheelsSuspension", "WheelsTurnAngle"...
+
+Valid floats: "HoverForce", "HoverRange", "HoverDamping", "BoosterBurnRate"...
+
+Valid floats: "ChargerRange", "ChargerSpeed"...
+
+Valid floats: "ItemPickupRange", "ItemProSpeed"...
+
+Valid ints: "ItemStoreCap", "ItemHoldCap"...
 
 * Where <Strength> can be a float. Strength is based on a multiplier, please be careful with `0.0`, and do not enter the negatives. Unforeseen consequences may ensue. 1.0 for no change. Default 1.0.
 
@@ -60,14 +70,6 @@ Adding your own, and jave problems with your variables? Contact me on Discord at
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
-7/24/2020, v1.2.0:
-
-* Another massive refactor to remove arbitrary BuffTypes in favor of directly specified Paths.
-
-* Anchoring will only send requests if associated m_Anchor variable is true.
-
-* Console Logging is still enabled in the likely cash crashes are reached. Please report these to me on Discord via `Fireflywater#0457`.
-
 7/21/2020, v1.1.1:
 
 * Added support for Ints. When doing math, Ints are *rounded up*. 
