@@ -23,6 +23,17 @@ namespace FFW_TT_BuffBlock
         {
             foreach (TankBlock block in blockPool)
             {
+                Console.WriteLine("FFW! Manipulate Obj... 1 ");
+                if (request == "SAVE" && this.effectMemory.ContainsKey(block))
+                {
+                    Console.WriteLine("Aborting " + request + "! effectMemory already contains " + block.name);
+                    return;
+                }
+                if ((request == "UPDATE" || request == "CLEAN") && !this.effectMemory.ContainsKey(block))
+                {
+                    Console.WriteLine("Aborting " + request+  "! effectMemory doesn't contain " + block.name);
+                    return;
+                }
                 object tgt = block.GetComponent(effectComponent);
                 if (tgt == null)
                 {
@@ -31,6 +42,7 @@ namespace FFW_TT_BuffBlock
 
                 if (request == "SAVE")
                 {
+                    Console.Write("2 ");
                     this.effectMemory.Add(block, 1.0f);
                 }
 
@@ -46,20 +58,24 @@ namespace FFW_TT_BuffBlock
 
                 foreach (string e in this.effectPath)
                 {
+                    Console.Write("3 ");
                     field_lastIter = field_thisIter;
                     lastIterObjs = new List<object>(thisIterObjs);
                     thisIterObjs = new List<object>();
                     foreach (object obj in lastIterObjs)
                     {
+                        Console.Write("4 ");
                         field_thisIter = obj.GetType().GetField(e, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                         if (field_thisIter != null)
                         {
+                            Console.Write("5 ");
                             object value_thisIter = field_thisIter.GetValue(obj);
                             var arrayTest = value_thisIter as Array;
                             var listTest = value_thisIter as System.Collections.IList;
                             Boolean isStruct = value_thisIter.GetType().IsValueType && !value_thisIter.GetType().IsPrimitive;
                             if (isStruct)
                             {
+                                Console.Write("6 ");
                                 structWarningObj = value_thisIter;
                                 structWarningParent = obj;
                                 structWarningField = field_thisIter;
@@ -67,6 +83,7 @@ namespace FFW_TT_BuffBlock
                             }
                             else if (arrayTest != null)
                             {
+                                Console.Write("7 ");
                                 Array value_thisIterCasted = (Array)value_thisIter;
                                 foreach (object element in value_thisIterCasted)
                                 {
@@ -75,6 +92,7 @@ namespace FFW_TT_BuffBlock
                             }
                             else if (listTest != null)
                             {
+                                Console.Write("8 ");
                                 System.Collections.IList value_thisIterCasted = (System.Collections.IList)value_thisIter;
                                 foreach (object element in value_thisIterCasted)
                                 {
@@ -83,19 +101,24 @@ namespace FFW_TT_BuffBlock
                             }
                             else
                             {
+                                Console.Write("9 ");
                                 thisIterObjs.Add(value_thisIter);
                             }
                         }
                     }
                 }
 
+                Console.Write("10 ");
                 foreach (object ara in lastIterObjs)
                 {
+                    Console.Write("11 ");
                     if (field_thisIter != null)
                     {
+                        Console.Write("12 ");
                         object value_thisIter = field_thisIter.GetValue(ara);
                         if (request == "SAVE")
                         {
+                            Console.Write("13 ");
                             if (value_thisIter.GetType() == typeof(float))
                             {
                                 //this.effectMemory.Add(block, (float)value_thisIter);
@@ -114,6 +137,7 @@ namespace FFW_TT_BuffBlock
                         }
                         else if (request == "UPDATE")
                         {
+                            Console.Write("14 ");
                             if (value_thisIter.GetType() == typeof(float))
                             {
                                 field_thisIter.SetValue(ara, this.effectMemory[block] * this.GetBuffAverage() + this.GetBuffAddAverage());
@@ -129,6 +153,7 @@ namespace FFW_TT_BuffBlock
                         }
                         else if (request == "CLEAN")
                         {
+                            Console.Write("15 ");
                             if (value_thisIter.GetType() == typeof(float))
                             {
                                 field_thisIter.SetValue(ara, this.effectMemory[block]);
@@ -144,17 +169,22 @@ namespace FFW_TT_BuffBlock
                         }
                     }
                 }
+                Console.Write("16 ");
                 if (structWarningObj != null)
                 {
+                    Console.Write("17 ");
                     structWarningField.SetValue(structWarningParent, structWarningObj);
                 }
+                Console.Write("18 ");
                 if (request == "CLEAN")
                 {
+                    Console.Write("19 ");
                     this.effectMemory.Remove(block);
                 }
             }
             if (request == "SAVE")
             {
+                Console.Write("20 ");
                 this.ManipulateObj(blockPool, "UPDATE");
             }
         }

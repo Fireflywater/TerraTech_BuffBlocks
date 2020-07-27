@@ -73,8 +73,11 @@ namespace FFW_TT_BuffBlock
                             object blockComponent = block.GetComponent(component);
                             if (blockComponent != null)
                             {
-                                this.typeToBlock[component].Add(block);
-                                Console.WriteLine("FFW! +Reg => " + block.name + " => " + component.Name);
+                                if (!this.typeToBlock[component].Contains(block))
+                                {
+                                    this.typeToBlock[component].Add(block);
+                                    Console.WriteLine("FFW! +Reg => " + block.name + " => " + component.Name);
+                                }
                             }
                         }
                     }
@@ -155,18 +158,21 @@ namespace FFW_TT_BuffBlock
                 object blockComponent = block.GetComponent(component);
                 if (blockComponent != null)
                 {
-                    this.typeToBlock[component].Add(block);
-                    Console.WriteLine("FFW! +Reg => " + block.name + " => " + segPair.Key);
-                    segPair.Value.ManipulateObj(new List<TankBlock> { block }, "SAVE");
-                    if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
+                    if (!this.typeToBlock[component].Contains(block))
                     {
-                        float avg = segPair.Value.GetAverages();
-                        BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "SAVE", this.weaponSpeedMemory, 1.0f);
-                        BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "UPDATE", this.weaponSpeedMemory, avg);
-                    }
-                    if (component == typeof(ModuleWheels))
-                    {
-                        BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
+                        this.typeToBlock[component].Add(block);
+                        Console.WriteLine("FFW! +Reg => " + block.name + " => " + segPair.Key);
+                        segPair.Value.ManipulateObj(new List<TankBlock> { block }, "SAVE");
+                        if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
+                        {
+                            float avg = segPair.Value.GetAverages();
+                            BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "SAVE", this.weaponSpeedMemory, 1.0f);
+                            BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "UPDATE", this.weaponSpeedMemory, avg);
+                        }
+                        if (component == typeof(ModuleWheels))
+                        {
+                            BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
+                        }
                     }
                 }
             }
@@ -180,17 +186,20 @@ namespace FFW_TT_BuffBlock
                 object blockComponent = block.GetComponent(component);
                 if (blockComponent != null)
                 {
-                    this.typeToBlock[component].Remove(block);
-                    Console.WriteLine("FFW! -Reg => " + block.name + " => " + segPair.Key);
-                    segPair.Value.ManipulateObj(new List<TankBlock> { block }, "CLEAN");
-                    if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
+                    if (this.typeToBlock[component].Contains(block))
                     {
-                        float avg = segPair.Value.GetAverages();
-                        BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "CLEAN", this.weaponSpeedMemory, 1.0f);
-                    }
-                    if (component == typeof(ModuleWheels))
-                    {
-                        BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
+                        this.typeToBlock[component].Remove(block);
+                        Console.WriteLine("FFW! -Reg => " + block.name + " => " + segPair.Key);
+                        segPair.Value.ManipulateObj(new List<TankBlock> { block }, "CLEAN");
+                        if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
+                        {
+                            float avg = segPair.Value.GetAverages();
+                            BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "CLEAN", this.weaponSpeedMemory, 1.0f);
+                        }
+                        if (component == typeof(ModuleWheels))
+                        {
+                            BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
+                        }
                     }
                 }
             }
