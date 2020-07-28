@@ -12,7 +12,46 @@ namespace FFW_TT_BuffBlock
     {
         public static Dictionary<Tank, BuffControllerMk2> allControllers = new Dictionary<Tank, BuffControllerMk2>();
         public Tank tank;
-        
+
+        /* TODO: Refactor 3
+        Instatiate all available buffs on load into static field
+        Copy said information into local field on controller instantiation
+
+            When BUFF gets pooled:
+                go through BUFF.BUFFPATHS as PATH
+                    add new SEGMENT to static SEGMENTS
+
+            When CONTROLLER gets created:
+                go through static SEGMENTS as SEGMENT
+                    add a copy of SEGMENT to local SEGMENTS
+                    // use shallow copy?
+
+            When BLOCK gets added:
+                Add to ALL
+                go through SEGMENTS
+                    if SEGMENT.COMPONENT exists on BLOCK
+                        add BLOCK into SEGMENT.BLOCKS
+                        save this BLOCK
+
+            When BLOCK gets removed:
+                go through SEGMENTS
+                    if SEGMENT.BLOCKS contains BLOCK
+                        clean this BLOCK
+                        remove BLOCK from SEGMENT.BLOCKS
+                Remove from ALL
+
+            When BUFF gets added:
+                go through BUFF.BUFFPATHS as PATH
+                    reference SEGMENT via PATH
+                        add BUFF to SEGMENT.BUFFS
+                        update all in SEGMENT.BLOCKS
+
+            When BUFF gets removed
+                go through BUFF.BUFFPATHS as PATH
+                    reference SEGMENT via PATH
+                        remove BUFF from SEGMENT.BUFFS
+                        update all in SEGMENT.BLOCKS
+        */
 
         public List<TankBlock> allBlocks = new List<TankBlock>(); // Memory of all blocks on tech
         public Dictionary<Type, List<TankBlock>> typeToBlock = new Dictionary<Type, List<TankBlock>>(); // Shorthand for all blocks with specific Type
@@ -161,18 +200,18 @@ namespace FFW_TT_BuffBlock
                     if (!this.typeToBlock[component].Contains(block))
                     {
                         this.typeToBlock[component].Add(block);
-                        Console.WriteLine("FFW! +Reg => " + block.name + " => " + segPair.Key);
-                        segPair.Value.ManipulateObj(new List<TankBlock> { block }, "SAVE");
-                        if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
-                        {
-                            float avg = segPair.Value.GetAverages();
-                            BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "SAVE", this.weaponSpeedMemory, 1.0f);
-                            BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "UPDATE", this.weaponSpeedMemory, avg);
-                        }
-                        if (component == typeof(ModuleWheels))
-                        {
-                            BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
-                        }
+                        Console.WriteLine("FFW! +Reg => " + block.name + " => " + component.Name);
+                    }
+                    segPair.Value.ManipulateObj(new List<TankBlock> { block }, "SAVE");
+                    if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
+                    {
+                        float avg = segPair.Value.GetAverages();
+                        BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "SAVE", this.weaponSpeedMemory, 1.0f);
+                        BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "UPDATE", this.weaponSpeedMemory, avg);
+                    }
+                    if (component == typeof(ModuleWheels))
+                    {
+                        BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
                     }
                 }
             }
