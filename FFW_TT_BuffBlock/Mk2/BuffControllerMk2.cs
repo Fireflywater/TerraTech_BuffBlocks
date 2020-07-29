@@ -225,8 +225,11 @@ namespace FFW_TT_BuffBlock
                 object blockComponent = block.GetComponent(component);
                 if (blockComponent != null)
                 {
-                    this.typeToBlock[component].Remove(block);
-                    Console.WriteLine("FFW! -Reg => " + block.name + " => " + segPair.Key);
+                    if (this.typeToBlock[component].Contains(block))
+                    {
+                        this.typeToBlock[component].Remove(block);
+                        Console.WriteLine("FFW! -Reg => " + block.name + " => " + segPair.Key);
+                    }
                     segPair.Value.ManipulateObj(new List<TankBlock> { block }, "CLEAN");
                     if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
                     {
