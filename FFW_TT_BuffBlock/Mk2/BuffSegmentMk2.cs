@@ -23,17 +23,17 @@ namespace FFW_TT_BuffBlock
         {
             foreach (TankBlock block in blockPool)
             {
-                Console.WriteLine("FFW! Manipulate Obj... 1 ");
-                if (request == "SAVE" && this.effectMemory.ContainsKey(block))
+                Console.WriteLine("FFW! Manipulate Obj " + request + "... 1 ");
+                /*if (request == "SAVE" && this.effectMemory.ContainsKey(block))
                 {
                     Console.WriteLine("Aborting " + request + "! effectMemory already contains " + block.name);
                     return;
                 }
                 if ((request == "UPDATE" || request == "CLEAN") && !this.effectMemory.ContainsKey(block))
                 {
-                    Console.WriteLine("Aborting " + request+  "! effectMemory doesn't contain " + block.name);
+                    Console.WriteLine("Aborting " + request + "! effectMemory doesn't contain " + block.name);
                     return;
-                }
+                }*/
                 object tgt = block.GetComponent(effectComponent);
                 if (tgt == null)
                 {

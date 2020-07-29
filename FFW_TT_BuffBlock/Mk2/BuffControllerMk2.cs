@@ -225,20 +225,17 @@ namespace FFW_TT_BuffBlock
                 object blockComponent = block.GetComponent(component);
                 if (blockComponent != null)
                 {
-                    if (this.typeToBlock[component].Contains(block))
+                    this.typeToBlock[component].Remove(block);
+                    Console.WriteLine("FFW! -Reg => " + block.name + " => " + segPair.Key);
+                    segPair.Value.ManipulateObj(new List<TankBlock> { block }, "CLEAN");
+                    if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
                     {
-                        this.typeToBlock[component].Remove(block);
-                        Console.WriteLine("FFW! -Reg => " + block.name + " => " + segPair.Key);
-                        segPair.Value.ManipulateObj(new List<TankBlock> { block }, "CLEAN");
-                        if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
-                        {
-                            float avg = segPair.Value.GetAverages();
-                            BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "CLEAN", this.weaponSpeedMemory, 1.0f);
-                        }
-                        if (component == typeof(ModuleWheels))
-                        {
-                            BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
-                        }
+                        float avg = segPair.Value.GetAverages();
+                        BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "CLEAN", this.weaponSpeedMemory, 1.0f);
+                    }
+                    if (component == typeof(ModuleWheels))
+                    {
+                        BuffSpecificFix.RefreshWheels(this.typeToBlock[typeof(ModuleWheels)]);
                     }
                 }
             }
