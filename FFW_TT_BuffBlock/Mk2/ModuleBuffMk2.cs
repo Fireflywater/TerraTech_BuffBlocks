@@ -69,6 +69,15 @@ namespace FFW_TT_BuffBlock
             {
                 this.m_NeedsToBeAnchored = this.m_BuffPath.Select(x => false).ToArray();
             }
+            if ((this.m_AffectedBlockList == null) || (this.m_AffectedBlockList.Length != this.m_BuffPath.Length))
+            {
+                this.m_AffectedBlockList = this.m_BuffPath.Select(x => "").ToArray();
+                //this.m_AffectedBlockList = this.m_BuffPath.Select(x => new string[] { } ).ToArray();
+            }
+            if ((this.m_AffectedBlockListType == null) || (this.m_AffectedBlockListType.Length != this.m_BuffPath.Length))
+            {
+                this.m_AffectedBlockListType = this.m_BuffPath.Select(x => "black").ToArray();
+            }
             base.block.AttachEvent.Subscribe(new Action(this.OnAttach));
             base.block.DetachEvent.Subscribe(new Action(this.OnDetach));
         }
@@ -84,5 +93,12 @@ namespace FFW_TT_BuffBlock
 
         [SerializeField]
         public bool[] m_NeedsToBeAnchored;
+
+        [SerializeField]
+        public string[] m_AffectedBlockList;
+        //public string[][] m_AffectedBlockList;
+
+        [SerializeField]
+        public string[] m_AffectedBlockListType;
     }
 }

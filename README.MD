@@ -1,4 +1,4 @@
-## TerraTech Buff Blocks (v1.2.0)
+## TerraTech Buff Blocks (v1.2.1)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
@@ -31,7 +31,9 @@ Adding your own, and jave problems with your variables? Contact me on Discord at
 	"m_BuffPath": [<BuffPath>],
 	"m_Strength": [<Strength>],
 	"m_AddAfter": [<AddAfter>],
-	"m_NeedsToBeAnchored": [<Anchor>]
+	"m_NeedsToBeAnchored": [<Anchor>],
+	"m_AffectedBlockList": [<Name>],
+	"m_AffectedBlockListType": [<"black"/"white">]
 }
 ```
 
@@ -44,6 +46,10 @@ Adding your own, and jave problems with your variables? Contact me on Discord at
 * Where <AddAfter> can be a float. AddAfter is added after Strength, go figure. Use this to force 0s to become positives. Be careful with extreme numbers. 0.0 for no change. Default 0.0.
 
 * Where <Anchor> can be a boolean, true or false. Dictating if the tech must be anchored to benefit from the buff. There is no "If Not Anchored" flag, unless requested. Default false.
+
+* Where <Name> is the internal name of a block to be excluded or only included for that buff. Be advised this is only for ONE block, no lists! Default "".
+
+* Where <"black"/"white"> is either "black" or "white". "black" means the block stated in "m_AffectedBlockList" will be ignored, and white means everything except that is ignored. Default "black".
 
 * As arrays, you can put multiple variables in each. Matching indexes are read together. For example, the 1st m_BuffType will have the 1st m_Strength, ditto 2nd.
 
@@ -60,6 +66,12 @@ Adding your own, and jave problems with your variables? Contact me on Discord at
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
+9/4/2020, v.1.2.1: 
+
+* Suppressed most console logging.
+
+* "m_AffectedBlockList" and "m_AffectedBlockListType" functionality added, allowing buffs to ignore or only affect certain blocks. Functionality requested by Saelem Black.
+
 7/24/2020, v1.2.0:
 
 * Another massive refactor to remove arbitrary BuffTypes in favor of directly specified Paths.
