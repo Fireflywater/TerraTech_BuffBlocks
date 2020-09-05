@@ -148,7 +148,7 @@ namespace FFW_TT_BuffBlock
             }
             if (affectedModules.Contains("ModuleWeaponGun") && pathToSegment.ContainsKey("ModuleWeaponGun.m_ShotCooldown"))
             {
-                float avg = pathToSegment["ModuleWeaponGun.m_ShotCooldown"].GetAverages("");
+                float avg = pathToSegment["ModuleWeaponGun.m_ShotCooldown"].GetAverages("~");
                 BuffSpecificFix.ManipulateBarrels(this.typeToBlock[typeof(ModuleWeaponGun)], "UPDATE", this.weaponSpeedMemory, avg);
             }
             if (affectedModules.Contains("ModuleWheels"))
@@ -179,7 +179,7 @@ namespace FFW_TT_BuffBlock
             }
             if (affectedModules.Contains("ModuleWeaponGun") && pathToSegment.ContainsKey("ModuleWeaponGun.m_ShotCooldown"))
             {
-                float avg = pathToSegment["ModuleWeaponGun.m_ShotCooldown"].GetAverages("");
+                float avg = pathToSegment["ModuleWeaponGun.m_ShotCooldown"].GetAverages("~");
                 BuffSpecificFix.ManipulateBarrels(this.typeToBlock[typeof(ModuleWeaponGun)], "UPDATE", this.weaponSpeedMemory, avg);
             }
             if (affectedModules.Contains("ModuleWheels"))
@@ -205,7 +205,7 @@ namespace FFW_TT_BuffBlock
                     segPair.Value.ManipulateObj(new List<TankBlock> { block }, "SAVE");
                     if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
                     {
-                        float avg = segPair.Value.GetAverages("");
+                        float avg = segPair.Value.GetAverages("~");
                         BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "SAVE", this.weaponSpeedMemory, 1.0f);
                         BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "UPDATE", this.weaponSpeedMemory, avg);
                     }
@@ -233,7 +233,7 @@ namespace FFW_TT_BuffBlock
                     segPair.Value.ManipulateObj(new List<TankBlock> { block }, "CLEAN");
                     if (segPair.Key == "ModuleWeaponGun.m_ShotCooldown")
                     {
-                        float avg = segPair.Value.GetAverages("");
+                        float avg = segPair.Value.GetAverages("~");
                         BuffSpecificFix.ManipulateBarrels(new List<TankBlock> { block }, "CLEAN", this.weaponSpeedMemory, 1.0f);
                     }
                     if (component == typeof(ModuleWheels))
