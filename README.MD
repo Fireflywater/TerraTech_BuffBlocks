@@ -1,4 +1,4 @@
-## TerraTech Buff Blocks (v1.2.2)
+## TerraTech Buff Blocks (v1.2.0)
 
 Adds a Module that allows for tech-wide buffs or debuffs, while it's attached to the tech. Shoot faster, drive faster, and drill harder! 
 
@@ -66,6 +66,10 @@ Adding your own, and jave problems with your variables? Contact me on Discord at
 * Rafs / Modeling and JSON Block Implementation (TBD)
 
 ### CHANGELOG:
+9/12/2020, v1.2.0: 
+
+* Rollback to 7/24/2020 version
+
 9/5/2020, v1.2.2: 
 
 * Fixed a bug where weapon firerate fix (recoil animation) wasn't being applied, due to new white/black list code 
