@@ -13,15 +13,15 @@ namespace FFW_TT_BuffBlock
         public static void RefreshWheels(List<TankBlock> blockList)
         {
             FieldInfo field_TorqueParams = typeof(ModuleWheels) // Maybe I should find a way to compress these?
-                .GetField("m_TorqueParams", BindingFlags.NonPublic | BindingFlags.Instance);
+                .GetField("m_TorqueParams", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             FieldInfo field_Wheels = typeof(ModuleWheels)
-                .GetField("m_Wheels", BindingFlags.NonPublic | BindingFlags.Instance);
+                .GetField("m_Wheels", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             FieldInfo field_WheelParams = typeof(ModuleWheels)
-                .GetField("m_WheelParams", BindingFlags.NonPublic | BindingFlags.Instance);
+                .GetField("m_WheelParams", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             FieldInfo field_AttachedId = typeof(ManWheels.Wheel)
-                .GetField("attachedID", BindingFlags.NonPublic | BindingFlags.Instance);
+                .GetField("attachedID", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             FieldInfo field_WheelState = typeof(ManWheels)
-                .GetField("m_WheelState", BindingFlags.NonPublic | BindingFlags.Instance);
+                .GetField("m_WheelState", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             Console.WriteLine("FFW! Update Wheels. Count: " + blockList.Count);
             foreach (TankBlock block in blockList)
             {
@@ -39,15 +39,15 @@ namespace FFW_TT_BuffBlock
                     {
                         object value_AttachedWheelState = value_WheelState.GetValue(value_WheelAttachedId); // AttachedWheelState is a PRIVATE STRUCT, `object` neccessary
                         FieldInfo field_p_TorqueParams = value_AttachedWheelState.GetType() // Get types of private struct...
-                            .GetField("torqueParams", BindingFlags.NonPublic | BindingFlags.Instance);
+                            .GetField("torqueParams", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                         FieldInfo field_p_WheelParams = value_AttachedWheelState.GetType()
-                            .GetField("wheelParams", BindingFlags.NonPublic | BindingFlags.Instance);
+                            .GetField("wheelParams", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                         field_p_TorqueParams.SetValue(value_AttachedWheelState, torque); // Apply new Torque to ManWheels.Wheel
                         field_p_WheelParams.SetValue(value_AttachedWheelState, wheelparams); // Apply new WheelParams...
 
                         FieldInfo field_p_Inertia = value_AttachedWheelState.GetType()
-                            .GetField("inertia", BindingFlags.NonPublic | BindingFlags.Instance);
+                            .GetField("inertia", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                         ManWheels.WheelParams value_WheelParams = (ManWheels.WheelParams)field_WheelParams.GetValue(wheels); // Note: Keep these incase inertia read causes issues
                                                                                                                              //float i = wheels.block.CurrentMass * 0.9f / (float)value_Wheels.Count * value_WheelParams.radius * value_WheelParams.radius;
