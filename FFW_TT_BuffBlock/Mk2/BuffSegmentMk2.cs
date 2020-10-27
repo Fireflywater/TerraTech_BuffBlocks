@@ -76,7 +76,7 @@ namespace FFW_TT_BuffBlock
                                 Boolean isStruct = value_thisIter.GetType().IsValueType && !value_thisIter.GetType().IsPrimitive;
                                 if (isStruct)
                                 {
-                                    Console.Write("6 ");
+                                    //Console.Write("6 ");
                                     structWarningObj = value_thisIter;
                                     structWarningParent = obj;
                                     structWarningField = field_thisIter;
@@ -198,8 +198,8 @@ namespace FFW_TT_BuffBlock
         public float GetBuffAverage(string name)
         {
             float m = 1.0f;
-            //List<float> allMults = (List<float>)this.effectBuffBlocks.Select(x => x.Key.Strength(x.Value)).ToList();
-            List<float> allMults = new List<float>();
+            List<float> allMults = (List<float>)this.effectBuffBlocks.Select(x => x.Key.Strength(x.Value)).ToList();
+            /*List<float> allMults = new List<float>();
             foreach (KeyValuePair<ModuleBuffMk2, int> buffKvp in this.effectBuffBlocks)
             {
                 if (
@@ -210,7 +210,7 @@ namespace FFW_TT_BuffBlock
                 {
                     allMults.Add(buffKvp.Key.Strength(buffKvp.Value));
                 }
-            }
+            }*/
             if (allMults.Count > 0)
             {
                 m = allMults.Average();
@@ -221,8 +221,8 @@ namespace FFW_TT_BuffBlock
         public float GetBuffAddAverage(string name)
         {
             float a = 0.0f;
-            //List<float> allAdds = (List<float>)this.effectBuffBlocks.Select(x => x.Key.AddAfter(x.Value)).ToList();
-            List<float> allAdds = new List<float>();
+            List<float> allAdds = (List<float>)this.effectBuffBlocks.Select(x => x.Key.AddAfter(x.Value)).ToList();
+            /*List<float> allAdds = new List<float>();
             foreach (KeyValuePair<ModuleBuffMk2, int> buffKvp in this.effectBuffBlocks)
             {
                 //Console.WriteLine("FFW! Find me! ");
@@ -231,7 +231,7 @@ namespace FFW_TT_BuffBlock
                     /*foreach (string y in x)
                     {
                         Console.Write(y);
-                    }*/
+                    }//
                     Console.Write(x);
 
                 }
@@ -243,7 +243,7 @@ namespace FFW_TT_BuffBlock
                 {
                     allAdds.Add(buffKvp.Key.Strength(buffKvp.Value));
                 }
-            }
+            }*/
             if (allAdds.Count > 0)
             {
                 a = allAdds.Average();

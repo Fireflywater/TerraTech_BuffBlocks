@@ -64,6 +64,8 @@ Adding your own, and jave problems with your variables? Contact me on Discord at
 
 * Updated BindingFlags for RefreshWheels, should now work with current unstable.
 
+* Cleaned old code that may have screwed with AddAfter.
+
 9/12/2020, v1.2.0: 
 
 * Rollback to 7/24/2020 version.
