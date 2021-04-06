@@ -1,6 +1,6 @@
 {
-  "Name": "MK2 #3 TEST TEST",
-  "Description": "aaaaaa",
+  "Name": "MK2 #3 TEST; Remove Anchor Requirements",
+  "Description": "Removes the anchor requirement from SCUs and Item Consumers, like Generators, Delivery Cannons, and Refineries.",
   "ID": 6630032, 
 
   "Faction": 0, 

@@ -1,6 +1,6 @@
 {
-  "Name": "MK2 TEST TEST",
-  "Description": "aaaaaa",
+  "Name": "MK2 #1 TEST; Pickup Range and Weapon Firerate",
+  "Description": "Increases the pickup range of Collectors and SCUs, also greatly increases weapon firerate",
   "ID": 6630030, 
 
   "Faction": 0, 
