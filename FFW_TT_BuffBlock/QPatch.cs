@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using Nuterra.BlockInjector;
 using UnityEngine;
 
@@ -10,7 +10,7 @@ namespace FFW_TT_BuffBlock
     {
         public static void Main()
         {
-            HarmonyInstance harmonyInstance = HarmonyInstance.Create("ffw.ttmm.buffblock.mod");
+            Harmony harmonyInstance = new Harmony("ffw.ttmm.buffblock.mod");
             harmonyInstance.PatchAll(Assembly.GetExecutingAssembly());
         }
     }
